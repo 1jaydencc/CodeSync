@@ -1,1 +1,3 @@
 .env
+routers/chat_router.py
+schemas/chat_schema.py
