@@ -11,6 +11,26 @@ const App = () => {
     const [currentFileName, setCurrentFileName] = useState('');
     const [isPopupOpen, setIsPopupOpen] = useState(false);
 
+    const handleOpenFile = () => {
+        // Placeholder for open file logic
+    };
+
+    const handleRun = () => {
+        // Placeholder for run without debugging logic
+    };
+
+    const handleDebug = () => {
+        // Placeholder for run with debugging logic
+    };
+
+    const handleTerminal = () => {
+        // Placeholder for terminal logic
+    };
+
+    const handleHelp = () => {
+        // Placeholder for help/documentation logic
+    };
+
     const getLanguageFromFileName = (fileName) => {
         const extension = fileName.split('.').pop();
         switch (extension) {
@@ -63,6 +83,11 @@ const App = () => {
             <Taskbar
                 onNewFile={handleNewFile}
                 onSaveFile={handleSaveFile}
+                onOpenFile={handleOpenFile}
+                onRun={handleRun}
+                onDebug={handleDebug}
+                onTerminal={handleTerminal}
+                onHelp={handleHelp}
                 // Other Taskbar props and handlers
             />
             <NewFilePopup
