@@ -3,10 +3,11 @@ from pymongo import MongoClient
 from dotenv import load_dotenv
 import os
 
-load_dotenv()  # Load environment variables
+load_dotenv()
 
 MONGO_DETAILS = os.getenv("MONGODB_URL")
 
 client = MongoClient(MONGO_DETAILS)
-db = client[os.getenv("DATABASE_NAME")]
-users_collection = db[os.getenv("USERS_COLLECTION_NAME")]
+db = client["codesync"]
+users_collection = db["users"]
+chat_messages_collection = db["chat_messages"]
