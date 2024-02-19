@@ -16,18 +16,17 @@ export default function Home() {
             <button type='submit'>Login</button>
 
             <div className='forgot-password'>
-                <a href="Forgot Password?">Forgot Password?</a>
+                <a href="/Password-Reset">Forgot Password?</a>
             </div>
             <div className='divider'>
                 <p>___________________________</p>
             </div>
-            
             <div className='register-link'>
                 <p><a href="/Register">Create Account</a></p>
             </div>
 
         </form>
-    </div>
+      </div>
     </div>
   );
 }
