@@ -20,7 +20,6 @@ export default function Home() {
     router.push('/'); // Use navigate function to go to the home page
   };
 
-
   return (
     <div>
       <div className='wrapper'>
