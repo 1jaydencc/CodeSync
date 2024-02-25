@@ -14,112 +14,79 @@ def client():
 
 @pytest.mark.asyncio
 async def test_correct_signup(client):
-    """
-    Test the sign-up endpoint.
-    """
-    # Define test user data
-    user_data = {
-        "email": "test@example.com",
-        "first_name": "testuser",
-        "password": "Test@1234"  
-    }
-    
-    # Make a request to the sign-up endpoint
+    user_data = {"email": "test@example.com", "first_name": "testuser", "password": "Test@1234"}
     response = await client.post("/auth/sign-up/", json=user_data)
-
-    # Check if the request was successful (status code 200)
     assert response.status_code == 200
-
-    # Check if the response contains the user data
-    assert "email" in response.json()
-    assert response.json()["email"] == user_data["email"]
-    assert "username" in response.json()
-    assert response.json()["username"] == user_data["username"]
+    assert "email" in response.json() and response.json()["email"] == user_data["email"]
+    assert "username" in response.json() and response.json()["username"] == user_data["username"]
 
 @pytest.mark.asyncio
-async def test_signup_no_special_character(client):
-    """
-    Test the sign-up endpoint when the password doesn't contain a special character.
-    """
-    # Define test user data with a password missing a special character
-    user_data = {
-        "email": "test@example.com",
-        "first_name": "testuser",
-        "password": "Test1234"  # Missing special character
-    }
-    
-    # Make a request to the sign-up endpoint
+async def test_invalid_signup_missing_special_character(client):
+    user_data = {"email": "test@example.com", "first_name": "testuser", "password": "Test1234"}
     response = await client.post("/auth/sign-up/", json=user_data)
-
-    # Check if the request fails with a status code 400 (Bad Request)
     assert response.status_code == 400
-
-    # Check if the response contains an error message indicating the missing special character
-    assert "special character" in response.text.lower()  # Assuming the error message contains this phrase
+    assert "special character" in response.text.lower()
 
 @pytest.mark.asyncio
-async def test_signup_no_capital_character(client):
-    """
-    Test the sign-up endpoint when the password doesn't start with a capital.
-    """
-    # Define test user data with a password not starting with a capital
-    user_data = {
-        "email": "test@example.com",
-        "first_name": "testuser",
-        "password": "test@1234"  # lowercase start
-    }
-    
-    # Make a request to the sign-up endpoint
+async def test_invalid_signup_missing_capital_character(client):
+    user_data = {"email": "test@example.com", "first_name": "testuser", "password": "test@1234"}
     response = await client.post("/auth/sign-up/", json=user_data)
-
-    # Check if the request fails with a status code 400 (Bad Request)
     assert response.status_code == 400
-
-    # Check if the response contains an error message indicating the missing special character
-    assert "capital letter" in response.text.lower()  # Assuming the error message contains this phrase
+    assert "capital letter" in response.text.lower()
 
 @pytest.mark.asyncio
-async def test_signup_length(client):
-    """
-    Test the sign-up endpoint when the password isn't 7 or more characters.
-    """
-    # Define test user data with a password that isn't long enough
-    user_data = {
-        "email": "test@example.com",
-        "first_name": "testuser",
-        "password": "A@n"  # Missing special character
-    }
-    
-    # Make a request to the sign-up endpoint
+async def test_invalid_signup_short_password(client):
+    user_data = {"email": "test@example.com", "first_name": "testuser", "password": "A@n"}
     response = await client.post("/auth/sign-up/", json=user_data)
-
-    # Check if the request fails with a status code 400 (Bad Request)
     assert response.status_code == 400
-
-    # Check if the response contains an error message indicating the missing special character
-    assert "long" in response.text.lower()  # Assuming the error message contains this phrase
+    assert "long" in response.text.lower()
 
 @pytest.mark.asyncio
 async def test_password_hashing(client):
-    """
-    Test password hashing when a user signs up.
-    """
-    # Define test user data
-    user_data = {
-        "email": "test@example.com",
-        "first_name": "testuser",
-        "password": "Test@1234"  # Password to be hashed
-    }
-    
-    # Make a request to the sign-up endpoint
+    user_data = {"email": "test@example.com", "first_name": "testuser", "password": "Test@1234"}
     response = await client.post("/auth/sign-up/", json=user_data)
     assert response.status_code == 200
-    
-    # Check if the password stored in the database is hashed
     user = await users_collection.find_one({"email": user_data["email"]})
-    assert user is not None
-    assert "password" in user
-    
-    # Verify that the stored password is hashed
+    assert user is not None and "password" in user
     pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-    assert pwd_context.verify(user_data["password"], user["password"])  # Verify password hashing
+    assert pwd_context.verify(user_data["password"], user["password"])
+
+@pytest.mark.asyncio
+async def test_correct_login(client):
+    user_data = {"email": "test@example.com", "password": "Test@1234"}
+    response = await client.post("/auth/login/", json=user_data)
+    assert response.status_code == 200
+    assert response.json()["message"] == "Login successful"
+
+@pytest.mark.asyncio
+async def test_invalid_login_wrong_email(client):
+    user_data = {"email": "wrong@example.com", "password": "Test@1234"}
+    response = await client.post("/auth/login/", json=user_data)
+    assert response.status_code == 401
+    assert "incorrect email or password" in response.text.lower()
+
+@pytest.mark.asyncio
+async def test_invalid_login_wrong_password(client):
+    user_data = {"email": "test@example.com", "password": "WrongPassword"}
+    response = await client.post("/auth/login/", json=user_data)
+    assert response.status_code == 401
+    assert "incorrect email or password" in response.text.lower()
+
+async def test_invalid_signup_blank_fields(client):
+    # Test with blank email
+    user_data = {"email": "", "first_name": "testuser", "password": "Test@1234"}
+    response = await client.post("/auth/sign-up/", json=user_data)
+    assert response.status_code == 400
+    assert "value_error.missing" in response.text.lower()
+
+    # Test with blank first name
+    user_data = {"email": "test@example.com", "first_name": "", "password": "Test@1234"}
+    response = await client.post("/auth/sign-up/", json=user_data)
+    assert response.status_code == 400
+    assert "value_error.missing" in response.text.lower()
+
+    # Test with blank password
+    user_data = {"email": "test@example.com", "first_name": "testuser", "password": ""}
+    response = await client.post("/auth/sign-up/", json=user_data)
+    assert response.status_code == 400
+    assert "value_error.missing" in response.text.lower()
