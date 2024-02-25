@@ -4,12 +4,18 @@ from schemas.user_schema import UserSchema, UserDisplay
 from config.database import users_collection
 from passlib.context import CryptContext
 from fastapi.encoders import jsonable_encoder
+from pydantic import ValidationError
+
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 @router.post("/sign-up/", response_model=UserDisplay)
 async def sign_up(user: UserSchema = Body(...)):
+    try:
+        validated_user = UserSchema(**user.dict())
+    except ValidationError as e:
+        raise HTTPException(status_code=400, detail="Invalid email address: " + str(e))
     user_dict = user.dict()
     user_dict['password'] = pwd_context.hash(user_dict['password'])
     existing_user = await users_collection.find_one({"email": user_dict['email']})
