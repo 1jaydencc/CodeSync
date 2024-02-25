@@ -11,3 +11,4 @@ client = MongoClient(MONGO_DETAILS)
 db = client["codesync"]
 users_collection = db["users"]
 chat_messages_collection = db["chat_messages"]
+comments_collection = db["comments"]
