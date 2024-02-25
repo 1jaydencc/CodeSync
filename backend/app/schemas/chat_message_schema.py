@@ -7,7 +7,7 @@ from datetime import datetime
 class ChatMessageSchema(BaseModel):
     sender_email: str = Field(...)
     message_content: str = Field(...)
-    room_id: Optional[str] = Field(None)  # Optional, if you plan to implement chat rooms
+    #room_id: Optional[str] = Field(None)
     timestamp: datetime = Field(default_factory=datetime.utcnow)
 
 class ChatMessageDisplay(BaseModel):

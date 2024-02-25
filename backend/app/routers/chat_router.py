@@ -15,7 +15,7 @@ async def send_message(message: ChatMessageSchema = Body(...)):
     created_message = await chat_messages_collection.find_one({"_id": new_message.inserted_id})
     return created_message
 
-@router.get("/messages/{room_id}", response_model=List[ChatMessageDisplay])
-async def fetch_messages(room_id: str):
-    messages = await chat_messages_collection.find({"room_id": room_id}).to_list(100)  # Adjust the limit as needed
+@router.get("/messages/", response_model=List[ChatMessageDisplay])
+async def fetch_messages():
+    messages = await chat_messages_collection.find().sort("timestamp", -1).to_list(100)  # Fetches the latest 100 messages
     return messages
