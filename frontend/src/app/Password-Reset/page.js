@@ -17,9 +17,8 @@ export default function Home() {
   const router = useRouter();
 
   const handleGoToHomePage = () => {
-    router.push('/'); // Use navigate function to go to the home page
+    router.push('/continue-reset'); // Use navigate function to go to the home page
   };
-
 
   return (
     <div>
