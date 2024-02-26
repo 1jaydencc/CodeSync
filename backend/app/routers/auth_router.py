@@ -11,6 +11,9 @@ from pydantic import ValidationError
 import re
 import secrets
 from typing import Tuple
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
@@ -32,7 +35,7 @@ def check_password_policy(password: str) -> Tuple[bool, str]:
     if requires_special_char and not re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
         return False, "Password must contain a special character"
 
-    return True
+    return True, "PaswordWorks"
 
 @router.post("/sign-up/", response_model=UserDisplay)
 async def sign_up(user: UserSchema = Body(...)):
@@ -40,6 +43,7 @@ async def sign_up(user: UserSchema = Body(...)):
         validated_user = UserSchema(**user.dict())
     except ValidationError as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
     is_valid, error_message = check_password_policy(user.password)
     if not is_valid:
         raise HTTPException(status_code=400, detail=error_message)

@@ -2,7 +2,7 @@
 from pydantic import BaseModel, Field, EmailStr
 
 class UserSchema(BaseModel):
-    email: EmailStr = Field(...)
+    email: str = Field(...)
     first_name: str = Field(...)
     password: str = Field(...)
 
