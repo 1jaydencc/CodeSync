@@ -10,6 +10,7 @@ const App = () => {
     const [files, setFiles] = useState([]);
     const [currentFileName, setCurrentFileName] = useState('');
     const [isPopupOpen, setIsPopupOpen] = useState(false);
+    const [isSaving, setIsSaving] = useState(false);
 
     const handleOpenFile = () => {
         // Placeholder for open file logic
@@ -71,6 +72,36 @@ const App = () => {
             return file;
         });
         setFiles(newFiles);
+
+        const apiEndpoint = 'https://your-backend-api.com/files/save';
+
+        const fileData = {
+            language: language,
+            code: editorCode,
+            fileName: currentFileName,
+        };
+
+        setIsSaving(true);
+
+        try {
+            const response = await fetch(apiEndpoint, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(fileData)
+            });
+
+            if (!response.ok) {
+                throw new Error('Network response was not ok.');
+            }
+            const responseData = await response.json();
+            console.log('File saved:', responseData);
+        } catch (error) {
+            console.error('Failed to save the file:', error);
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const handleLanguageChange = (language) => {
