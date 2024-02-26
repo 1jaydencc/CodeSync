@@ -80,21 +80,21 @@ const App = () => {
 
     return (
         <div className="app">
-            <Taskbar
-                onNewFile={handleNewFile}
-                onSaveFile={handleSaveFile}
-                onOpenFile={handleOpenFile}
-                onRun={handleRun}
-                onDebug={handleDebug}
-                onTerminal={handleTerminal}
-                onHelp={handleHelp}
-                // Other Taskbar props and handlers
-            />
-            <NewFilePopup
+        <Taskbar
+            onNewFile={handleNewFile}
+            onSaveFile={handleSaveFile}
+            onOpenFile={handleOpenFile}
+            onRun={handleRun}
+            onDebug={handleDebug}
+            onTerminal={handleTerminal}
+            onHelp={handleHelp}
+        />
+        <NewFilePopup
                 isOpen={isPopupOpen}
                 onClose={() => setIsPopupOpen(false)}
                 onCreate={handleFileCreate}
-            />
+        />
+        <div className="content">
             <div className="file-explorer">
                 {files.map(file => (
                     <div key={file.name} onClick={() => handleFileSelect(file.name)}>
@@ -102,12 +102,15 @@ const App = () => {
                     </div>
                 ))}
             </div>
-            <Editor
-                language={language}
-                code={editorCode}
-                onCodeChange={setEditorCode}
-            />
+            <div className="editor-container">
+                <Editor
+                    language={language}
+                    code={editorCode}
+                    onCodeChange={setEditorCode}
+                />
+            </div>
         </div>
+    </div>
     );
 };
 

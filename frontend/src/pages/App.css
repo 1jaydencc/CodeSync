@@ -1,0 +1,41 @@
+/* App.css */
+html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scrollbars */
+}
+
+.app {
+    display: flex;
+    flex-direction: column;
+    margin: 0; /* Remove any default margins */
+    background-color: #1e1e1e; /* VSCode dark theme background color */
+    width: 100%;
+    height: 100%;
+  }
+  
+  .taskbar {
+    background-color: #333333;
+    color: white;
+    padding: 0.5rem 1rem; /* Adjust padding as needed */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
+    width: 100vh;
+  }
+  
+  .taskbar button {
+    background-color: transparent;
+    border: none;
+    color: white;
+    cursor: pointer;
+  }
+  
+  .taskbar button:hover {
+    background-color: #4f4f4f;
+  }
+  
+  

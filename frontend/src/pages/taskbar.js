@@ -1,4 +1,5 @@
 import React from 'react';
+import './Taskbar.css';
 
 const Taskbar = ({ onNewFile, onSaveFile, onOpenFile, onRun, onDebug, onTerminal, onHelp, }) => {
     return (
