@@ -1,8 +1,11 @@
-import React, { useState } from 'react';
-import Editor from './Editor';
-import Taskbar from './Taskbar';
+import React, { useState, useEffect } from 'react';
+import Editor from './Editor.js';
+import Taskbar from './Taskbar.js';
+import NewFilePopup from './NewFilePopup.js';
+import './App.css';
+import languages from './languages.json';
+import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
-import NewFilePopup from './NewFilePopup';
 
 const App = () => {
     const [language, setLanguage] = useState('javascript');
@@ -11,6 +14,8 @@ const App = () => {
     const [currentFileName, setCurrentFileName] = useState('');
     const [isPopupOpen, setIsPopupOpen] = useState(false);
     const [isSaving, setIsSaving] = useState(false);
+    const [openTabs, setOpenTabs] = useState([]);
+    const [activeTab, setActiveTab] = useState('');
 
     const handleOpenFile = () => {
         // Placeholder for open file logic
@@ -32,16 +37,41 @@ const App = () => {
         // Placeholder for help/documentation logic
     };
 
+    useEffect(() => {
+        const handleAutoSave = () => {
+            if (!currentFileName) return;
+            const updatedFiles = files.map(file => {
+                if (file.name === currentFileName) {
+                    return { ...file, content: editorCode };
+                }
+                return file;
+            });
+    
+            setFiles(updatedFiles);
+        };
+        const debounceSave = setTimeout(handleAutoSave, 1000);
+        return () => clearTimeout(debounceSave);
+    
+    }, [editorCode, currentFileName, files]);
+    
+    
+
+    const handleDownloadAllFiles = () => {
+        const zip = new JSZip();
+        files.forEach(file => {
+            zip.file(file.name, file.content);
+        });
+        zip.generateAsync({ type: 'blob' }).then(content => {
+            saveAs(content, 'project.zip');
+        });
+    };
+
     const getLanguageFromFileName = (fileName) => {
         const extension = fileName.split('.').pop();
-        switch (extension) {
-            case 'py': return 'python';
-            case 'cpp': return 'cpp';
-            case 'js': return 'javascript';
-            // Add other cases as necessary
-            default: return 'plaintext';
-        }
+        const languageObj = languages.find(lang => lang.extension === `.${extension}`);
+        return languageObj ? languageObj.language : 'plaintext';
     };
+    
 
     const handleFileSelect = (fileName) => {
         const file = files.find(f => f.name === fileName);
@@ -49,6 +79,21 @@ const App = () => {
             setEditorCode(file.content);
             setCurrentFileName(fileName);
             setLanguage(getLanguageFromFileName(fileName));
+            if (!openTabs.includes(fileName)) {
+                setOpenTabs([...openTabs, fileName]);
+            }
+            setActiveTab(fileName);
+        }
+    };
+
+    const handleCloseTab = (fileName) => {
+        const newOpenTabs = openTabs.filter(name => name !== fileName);
+        setOpenTabs(newOpenTabs);
+        if (activeTab === fileName && newOpenTabs.length > 0) {
+            setActiveTab(newOpenTabs[0]);
+        } else if (newOpenTabs.length === 0) {
+            setEditorCode('');
+            setCurrentFileName('');
         }
     };
 
@@ -58,9 +103,14 @@ const App = () => {
     };
 
     const handleFileCreate = (fileName) => {
-        const newFile = { name: fileName, content: '' };
+        const extension = fileName.split('.').pop();
+        const languageObj = languages.find(lang => lang.extension === `.${extension}`);
+        const language = languageObj ? languageObj.language : 'plaintext';
+    
+        const newFile = { name: fileName, content: '', language };
         setFiles([...files, newFile]);
         setCurrentFileName(fileName);
+        setLanguage(language);
         setIsPopupOpen(false);
     };
 
@@ -82,26 +132,6 @@ const App = () => {
         };
 
         setIsSaving(true);
-
-        try {
-            const response = await fetch(apiEndpoint, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(fileData)
-            });
-
-            if (!response.ok) {
-                throw new Error('Network response was not ok.');
-            }
-            const responseData = await response.json();
-            console.log('File saved:', responseData);
-        } catch (error) {
-            console.error('Failed to save the file:', error);
-        } finally {
-            setIsSaving(false);
-        }
     };
 
     const handleLanguageChange = (language) => {
@@ -111,37 +141,61 @@ const App = () => {
 
     return (
         <div className="app">
-        <Taskbar
-            onNewFile={handleNewFile}
-            onSaveFile={handleSaveFile}
-            onOpenFile={handleOpenFile}
-            onRun={handleRun}
-            onDebug={handleDebug}
-            onTerminal={handleTerminal}
-            onHelp={handleHelp}
-        />
-        <NewFilePopup
-                isOpen={isPopupOpen}
-                onClose={() => setIsPopupOpen(false)}
-                onCreate={handleFileCreate}
-        />
-        <div className="content">
-            <div className="file-explorer">
-                {files.map(file => (
-                    <div key={file.name} onClick={() => handleFileSelect(file.name)}>
-                        {file.name}
+            <div className="container0">
+                <div className="container1">
+                    <div className="logo">
+                        CodeSync
                     </div>
-                ))}
-            </div>
-            <div className="editor-container">
-                <Editor
-                    language={language}
-                    code={editorCode}
-                    onCodeChange={setEditorCode}
+                    <div className="taskBar">
+                        <Taskbar
+                            onNewFile={handleNewFile}
+                            onSaveFile={handleSaveFile}
+                            onOpenFile={handleOpenFile}
+                            onRun={handleRun}
+                            onDebug={handleDebug}
+                            onTerminal={handleTerminal}
+                            onHelp={handleHelp}
+                        />
+                    </div>
+                </div>
+                <NewFilePopup
+                        isOpen={isPopupOpen}
+                        onClose={() => setIsPopupOpen(false)}
+                        onCreate={handleFileCreate}
                 />
+                <div className="container2">
+                    <div className="container3">
+                        <div className="container7">
+                            Project Information
+                        </div>
+                        <div className="container8">
+                            {files.map(file => (
+                                <div key={file.name} className="file-item" onClick={() => handleFileSelect(file.name)}>
+                                    📄{file.name} {}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                    <div className="container4">
+                        <div className="container5">
+                            {openTabs.map(tabName => (
+                                <div key={tabName} className={`tab-item ${tabName === activeTab ? 'active' : ''}`} onClick={() => handleFileSelect(tabName)}>
+                                    {tabName}
+                                    <span onClick={() => handleCloseTab(tabName)}> ✖ </span> {}
+                                </div>
+                            ))}
+                        </div>
+                        <div className="container6">
+                            <Editor
+                                language={language}
+                                code={editorCode}
+                                onCodeChange={setEditorCode}
+                            />
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
     );
 };
 

@@ -9,8 +9,12 @@ const EditorPage = ({ language, code, onCodeChange }) => {
 
     return (
         <Editor
-            height="1000px"
-            width="1000px"
+            height="100vh"
+            width="100%"
+            options={{
+                automaticLayout: true,
+                fontSize: 13,
+            }}
             language={language}
             theme="vs-dark"
             value={code} // Managed by parent component
