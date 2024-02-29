@@ -1,8 +1,10 @@
 "use client";
 import React, { useState } from 'react';
+import { auth } from '@/firebase-config'; // Adjust the import path according to your project structure
+import { signInWithEmailAndPassword } from "firebase/auth";
 
-import './LoginForm.css'
-import './globals.css'
+import './LoginForm.css';
+import './globals.css';
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -18,56 +20,43 @@ export default function Home() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('HELLO!');
-    fetch('http://127.0.0.1:8000/auth/login/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    })
-      .then(async (response) => {
-        if (response.ok) {
-          alert('login successful');
-          // Redirect user to another page or perform any necessary action
-        } else {
-          const data = await response.json();
-          throw new Error(data.detail || 'Failed to login');
-        }
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
+    const { email, password } = formData;
+
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      alert('Login successful');
+      console.log(userCredential.user);
+      // Redirect user to another page or perform any necessary action
+    } catch (error) {
+      alert(error.message);
+    }
   };
 
-
-
   return (
-    <div>
-      <div className='wrapper'>
-        <form action=''>
+    <div className='wrapper'>
+        <form onSubmit={handleSubmit}>
             <h1>Login</h1>
             <div className='input-box'>
-            <input
-              type='email'
-              name='email'
-              placeholder='Email'
-              value={formData.email}
-              onChange={handleChange}
-              required
-            />
+              <input
+                type='email'
+                name='email'
+                placeholder='Email'
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
             </div>
             <div className='input-box'>
-            <input
-              type='password'
-              name='password'
-              placeholder='Password'
-              value={formData.password}
-              onChange={handleChange}
-              required
-            />
+              <input
+                type='password'
+                name='password'
+                placeholder='Password'
+                value={formData.password}
+                onChange={handleChange}
+                required
+              />
             </div>
             <button type='submit'>Login</button>
 
@@ -80,9 +69,7 @@ export default function Home() {
             <div className='register-link'>
                 <p><a href="/Register">Create Account</a></p>
             </div>
-
         </form>
-      </div>
     </div>
   );
 }
