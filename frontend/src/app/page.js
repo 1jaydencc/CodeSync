@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/router';
 import { auth } from '@/firebase-config.js';
 import { signInWithEmailAndPassword } from "firebase/auth";
 
@@ -12,6 +13,7 @@ export default function Home() {
     email: '',
     password: '',
   });
+  const router = useRouter();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -27,9 +29,8 @@ export default function Home() {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      alert('Login successful');
       console.log(userCredential.user);
-      // Redirect user to another page or perform any necessary action
+      router.push('/editor');
     } catch (error) {
       alert(error.message);
     }
