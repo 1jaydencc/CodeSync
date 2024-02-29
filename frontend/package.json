@@ -9,12 +9,11 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@monaco-editor/react": "^4.6.0",
     "axios": "^1.6.7",
     "date-fns": "^3.3.1",
-    "firebase": "^10.8.1",
-    "next": "14.1.0",
-    "@monaco-editor/react": "^4.6.0",
     "file-saver": "^2.0.5",
+    "firebase": "^10.8.1",
     "jszip": "^3.10.1",
     "monaco-editor": "^0.44.0",
     "monaco-themes": "^0.4.4",

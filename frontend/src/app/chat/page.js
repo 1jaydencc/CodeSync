@@ -1,23 +1,9 @@
-// chat/page.js
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-"use client";
->>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
-import React, { useState, useEffect } from 'react';
-import useWebSocket from '../hooks/useWebSocket';
-import axios from 'axios';
-<<<<<<< HEAD
-=======
-import './chat.css';
->>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
-=======
 "use client";
 import React, { useState, useEffect } from 'react';
-import useWebSocket from '../hooks/useWebSocket';
+import useWebSocket from '../hooks/useWebSocket'; 
 import axios from 'axios';
-import './chat.css';
->>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
+import './chat.css'; 
+
 import { format } from 'date-fns';
 
 const ChatPage = () => {
@@ -38,8 +24,7 @@ const ChatPage = () => {
         fetchMessages();
     }, []);
 
-    // This event handler should be attached using React's event system, not directly to the DOM
-    const handleSubmit = (event) => {
+    const handleSendMessage = (event) => {
         event.preventDefault();
         const message = {
             sender_email: "user@example.com",
@@ -50,68 +35,32 @@ const ChatPage = () => {
     };
 
     return (
-<<<<<<< HEAD
-<<<<<<< HEAD
-        <div>
-            <h2>Chat Messages</h2>
+        // Wrap everything in a single div or React.Fragment (<> ... </>)
+        <div> 
             <div>
-                {messages.map((msg, index) => (
-                    <div key={index}>
-                        <strong>{msg.sender_email}</strong>: {msg.message_content}
-                        <br />
-                        <small>{format(new Date(msg.timestamp), 'PPpp')}</small>
-                    </div>
-                ))}
-            </div>
-            <input
-                value={newMessage}
-                onChange={(e) => setNewMessage(e.target.value)}
-                type="text"
-                placeholder="Type a message..."
-            />
-            <button onClick={handleSendMessage}>Send</button>
-        </div>
-=======
-=======
->>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
-        <section className="msger">
-            <header className="msger-header">
-                <div className="msger-header-title">
-                    <i className="fas fa-comment-alt"></i> SimpleChat
-                </div>
-                <div className="msger-header-options">
-                    <span><i className="fas fa-cog"></i></span>
-                </div>
-            </header>
-
-            <main className="msger-chat">
-                {messages.map((msg, index) => (
-                    <div key={index} className={`msg ${msg.side}-msg`}>
-                        <div className="msg-bubble">
-                            <div className="msg-info">
-                                <div className="msg-info-name">{msg.sender_name}</div>
-                                <div className="msg-info-time">{format(new Date(msg.timestamp), 'PPpp')}</div>
-                            </div>
-                            <div className="msg-text">{msg.message_content}</div>
+                <h2>Chat Messages</h2>
+                <div>
+                    {messages.map((msg, index) => (
+                        <div key={index}>
+                            <strong>{msg.sender_email}</strong>: {msg.message_content}
+                            <br />
+                            <small>{format(new Date(msg.timestamp), 'PPpp')}</small>
                         </div>
-                    </div>
-                ))}
-            </main>
-            <form className="msger-inputarea" onSubmit={handleSubmit}>
+                    ))}
+                </div>
                 <input
-                    type="text"
-                    className="msger-input"
-                    placeholder="Enter your message..."
                     value={newMessage}
                     onChange={(e) => setNewMessage(e.target.value)}
+                    type="text"
+                    placeholder="Type a message..."
                 />
-                <button type="submit" className="msger-send-btn">Send</button>
-            </form>
-        </section>
-<<<<<<< HEAD
->>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
-=======
->>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
+                <button onClick={handleSendMessage}>Send</button>
+            </div>
+            {/* Ensure that the following section is correctly nested within the root div */}
+            <section className="msger">
+                {/* Section content */}
+            </section>
+        </div>
     );
 };
 

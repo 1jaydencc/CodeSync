@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { auth } from '@/firebase-config'; // Adjust the import path according to your project structure
+import { auth } from '@/firebase-config.js';
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 import './LoginForm.css';
