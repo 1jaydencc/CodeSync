@@ -21,7 +21,6 @@ export default function Home() {
   };
 
   const handleSubmit = (e) => {
-    alert(JSON.stringify(formData));
     e.preventDefault();
     console.log('HELLO!');
     fetch('http://127.0.0.1:8000/auth/sign-up/', {

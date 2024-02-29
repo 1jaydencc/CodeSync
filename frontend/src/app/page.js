@@ -1,4 +1,5 @@
-"use client";
+'use client';
+
 import React, { useState } from 'react';
 import { auth } from '@/firebase-config'; // Adjust the import path according to your project structure
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -69,6 +70,7 @@ export default function Home() {
             <div className='register-link'>
                 <p><a href="/Register">Create Account</a></p>
             </div>
+
         </form>
     </div>
   );

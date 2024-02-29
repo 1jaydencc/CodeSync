@@ -1,9 +1,23 @@
 // chat/page.js
+<<<<<<< HEAD
+<<<<<<< HEAD
+=======
+"use client";
+>>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
+import React, { useState, useEffect } from 'react';
+import useWebSocket from '../hooks/useWebSocket';
+import axios from 'axios';
+<<<<<<< HEAD
+=======
+import './chat.css';
+>>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
+=======
 "use client";
 import React, { useState, useEffect } from 'react';
 import useWebSocket from '../hooks/useWebSocket';
 import axios from 'axios';
 import './chat.css';
+>>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
 import { format } from 'date-fns';
 
 const ChatPage = () => {
@@ -36,6 +50,30 @@ const ChatPage = () => {
     };
 
     return (
+<<<<<<< HEAD
+<<<<<<< HEAD
+        <div>
+            <h2>Chat Messages</h2>
+            <div>
+                {messages.map((msg, index) => (
+                    <div key={index}>
+                        <strong>{msg.sender_email}</strong>: {msg.message_content}
+                        <br />
+                        <small>{format(new Date(msg.timestamp), 'PPpp')}</small>
+                    </div>
+                ))}
+            </div>
+            <input
+                value={newMessage}
+                onChange={(e) => setNewMessage(e.target.value)}
+                type="text"
+                placeholder="Type a message..."
+            />
+            <button onClick={handleSendMessage}>Send</button>
+        </div>
+=======
+=======
+>>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
         <section className="msger">
             <header className="msger-header">
                 <div className="msger-header-title">
@@ -70,6 +108,10 @@ const ChatPage = () => {
                 <button type="submit" className="msger-send-btn">Send</button>
             </form>
         </section>
+<<<<<<< HEAD
+>>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
+=======
+>>>>>>> 41e84922956091fe7a5e507f0970824e58b262b6
     );
 };
 
