@@ -156,6 +156,7 @@ const App = () => {
                             onDebug={handleDebug}
                             onTerminal={handleTerminal}
                             onHelp={handleHelp}
+                            onDownloadAllFiles={handleDownloadAllFiles}
                         />
                     </div>
                 </div>
