@@ -9,11 +9,14 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "axios": "^1.6.7",
-    "date-fns": "^3.3.1",
-    "next": "14.1.0",
+    "@monaco-editor/react": "^4.6.0",
+    "file-saver": "^2.0.5",
+    "jszip": "^3.10.1",
+    "monaco-editor": "^0.44.0",
+    "next": "^14.1.0",
     "react": "^18",
-    "react-dom": "^18"
+    "react-dom": "^18",
+    "xterm": "^5.3.0"
   },
   "devDependencies": {
     "autoprefixer": "^10.0.1",
