@@ -80,6 +80,9 @@ export default function Home() {
             <div className='register-link'>
                 <p><a href="/Register">Create Account</a></p>
             </div>
+            <div className='editor'>
+              <p><a href='/editor'>Temp Editor Access</a></p>
+            </div>
         </form>
       </div>
     </div>
