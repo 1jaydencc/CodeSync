@@ -187,11 +187,16 @@ const App = () => {
                             ))}
                         </div>
                         <div className="container6">
-                            <Editor
-                                language={language}
-                                code={editorCode}
-                                onCodeChange={setEditorCode}
-                            />
+                            <div className='editor-container'>
+                                <Editor
+                                    language={language}
+                                    code={editorCode}
+                                    onCodeChange={setEditorCode}
+                                />
+                            </div>
+                            <div className='editor-footer'>
+                                <p>current line</p>
+                            </div>
                         </div>
                     </div>
                 </div>
