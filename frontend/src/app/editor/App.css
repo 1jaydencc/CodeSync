@@ -74,9 +74,26 @@ html, body, #root {
 
 .container6 {
   display: flex;
+  flex: 1;
+  flex-direction: column;
   flex-grow: 1;
   height: 100%;
   width: 100%;
+}
+
+.editor-container {
+  display: flex;
+  flex-direction: row;
+  height: 80%;
+  width: 100%;
+}
+
+.editor-footer {
+  display: flex;
+  flex-direction: row;
+  height: 20%;
+  width: 100%;
+  background-color: #333333;
 }
 
 .container7 {
