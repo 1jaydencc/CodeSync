@@ -81,7 +81,7 @@ export default function Home() {
             <button type='submit'>CREATE</button>
 
             <div className='terms'>
-                <p>By continuing, you agree to CodeSync's Terms of Service and Privacy Policy</p>
+                <p>By continuing, you agree to CodeSync&apos;s Terms of Service and Privacy Policy</p>
             </div>
         </form>
       </div>
