@@ -1,3 +1,4 @@
+'use client';
 import React, { useState, useEffect } from 'react';
 import Editor from './Editor.js';
 import Taskbar from './Taskbar.js';

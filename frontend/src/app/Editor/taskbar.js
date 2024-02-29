@@ -1,3 +1,4 @@
+'use client';
 import React from 'react';
 
 const Taskbar = ({ onNewFile, onSaveFile, onOpenFile, onRun, onDebug, onTerminal, onHelp, }) => {
