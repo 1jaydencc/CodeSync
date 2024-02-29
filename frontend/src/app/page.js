@@ -1,3 +1,6 @@
+'use client';
+
+import React, { useState } from 'react';
 import './LoginForm.css'
 import './globals.css'
 
@@ -77,7 +80,6 @@ export default function Home() {
             <div className='register-link'>
                 <p><a href="/Register">Create Account</a></p>
             </div>
-
         </form>
       </div>
     </div>
