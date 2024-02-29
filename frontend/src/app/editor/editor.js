@@ -9,16 +9,9 @@ const EditorPage = ({ language, code, onCodeChange }) => {
     const [line, setLine] = useState(0);
     const [col, setCol] = useState(0);
 
-    const updateLineAndCol = (newLine, newCol) => {
-        // Update state variables
-        setLine(newLine);
-        setCol(newCol);
-    };
-
     const editorRef = useRef(null); // Create a reference to the editor instance
 
     if (editorRef.current) {
-        console.log("here");
         editorRef.current.onDidChangeCursorSelection((e) => {
             console.log(JSON.stringify(e));
             const obj = JSON.parse(JSON.stringify(e));
@@ -29,8 +22,7 @@ const EditorPage = ({ language, code, onCodeChange }) => {
     }
     
     const handleEditorChange = (value, event) => {
-        console.log("updated:", value);
-        console.log(editorRef.current.getPosition());
+        /* whenever text in the editor is updated */
     }
 
     const handleEditorDidMount = (editor, monaco) => {
