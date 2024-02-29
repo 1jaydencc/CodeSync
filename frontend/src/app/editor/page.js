@@ -188,17 +188,11 @@ const App = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="container6">
+                        <div>
                             <Editor
                                 language={language}
                                 code={editorCode}
                                 onCodeChange={setEditorCode}
-                            />
-                        </div>
-                        <div className='footer'>
-                            <Footer
-                                curLine={1}
-                                curCol={1}
                             />
                         </div>
                     </div>

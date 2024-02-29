@@ -77,9 +77,6 @@ html, body, #root {
 
 .container6 {
   display: flex;
-  overflow: hidden;
-  /* flex: 1;
-  flex-grow: 1; */
   height: 95%;
   width: 100%;
 }
