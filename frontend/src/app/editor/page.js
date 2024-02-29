@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Editor from './editor.js';
 import Taskbar from './taskbar.js';
+import Footer from './footer.js'
 import NewFilePopup from './NewFilePopup.js';
 import './App.css';
 import languages from './languages.json';
@@ -179,6 +180,7 @@ const App = () => {
                     </div>
                     <div className="container4">
                         <div className="container5">
+                            tabs
                             {openTabs.map(tabName => (
                                 <div key={tabName} className={`tab-item ${tabName === activeTab ? 'active' : ''}`} onClick={() => handleFileSelect(tabName)}>
                                     {tabName}
@@ -187,16 +189,17 @@ const App = () => {
                             ))}
                         </div>
                         <div className="container6">
-                            <div className='editor-container'>
-                                <Editor
-                                    language={language}
-                                    code={editorCode}
-                                    onCodeChange={setEditorCode}
-                                />
-                            </div>
-                            <div className='editor-footer'>
-                                <p>current line</p>
-                            </div>
+                            <Editor
+                                language={language}
+                                code={editorCode}
+                                onCodeChange={setEditorCode}
+                            />
+                        </div>
+                        <div className='footer'>
+                            <Footer
+                                curLine={1}
+                                curCol={1}
+                            />
                         </div>
                     </div>
                 </div>
