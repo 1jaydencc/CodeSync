@@ -93,7 +93,7 @@ export default function Home() {
               <p>Verification email sent!</p>
               <button onClick={() => {
                 setShowNotification(false);
-                router.push('/')
+                router.push('/');
             }}>Go to Login.</button>
               </div>
             </div>
