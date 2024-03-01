@@ -75,6 +75,19 @@ html, body, #root {
   background-color: #920000;
 }
 
+.editor-comments {
+  display:flex;
+  flex-direction: row;
+}
+
+.editor-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  height: 100%;
+  width: 100%;
+}
+
 .container6 {
   display: flex;
   height: 95%;
@@ -87,6 +100,35 @@ html, body, #root {
   height: 3%;
   width: 100%;
   background-color: #00ff91;
+}
+
+.comment-container {
+  display: flex;
+  flex-direction: column;
+  width: 20%;
+}
+
+.comment-container button {
+  background-color: transparent;
+  border: 1px solid #000000;
+  color: #ffffff;
+  padding: 10px 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 10px;
+  border-radius: 5px;
+  color: #000000;
+  font-family: 'Poppins', sans-serif;  
+}
+
+.comment-container button:hover {
+  background-color: #4b4b4b;
+}
+
+.comment {
+  display: flex;
+  background-color: #ff0000;
+
 }
 
 .container7 {
@@ -112,8 +154,6 @@ html, body, #root {
   height: auto;
   width: 100%;
 }
-
-
 
 .taskbar {
   display: flex;
