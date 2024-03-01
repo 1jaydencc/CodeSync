@@ -1,7 +1,7 @@
 'use client';
 import React from 'react';
 
-const Taskbar = ({ onNewFile, onSaveFile, onOpenFile, onRun, onDebug, onTerminal, onTheme, onHelp, onDownloadAllFiles, onChat, }) => {
+const Taskbar = ({ onNewFile, onSaveFile, onOpenFile, onRun, onDebug, onTerminal, onTheme, onHelp, onDownloadAllFiles, onChat, onAutoSave, }) => {
     return (
         <div className="taskbar">
             <button onClick={onNewFile}>New File</button>
@@ -13,7 +13,8 @@ const Taskbar = ({ onNewFile, onSaveFile, onOpenFile, onRun, onDebug, onTerminal
             <button onClick={onTheme}>Theme</button>
             <button onClick={onHelp}>Help</button>
             <button onClick={onDownloadAllFiles}>Download</button>
-            <button onClick={onHelp}>NewWindow</button>
+            <button onClick={onChat}>Chat</button>
+            <button onClick={onHelp}>New Window</button>
             <button onClick={onHelp}>Open File</button>
             <button onClick={onHelp}>Open Folder</button>
             <button onClick={onHelp}>Save as</button>
@@ -25,7 +26,8 @@ const Taskbar = ({ onNewFile, onSaveFile, onOpenFile, onRun, onDebug, onTerminal
             <button onClick={onHelp}>Toggle Breakpoints</button>
             <button onClick={onHelp}>New Terminal</button>
             <button onClick={onHelp}>Split Terminal</button>
-            <button onClick={onChat}>Chat</button>        </div>
+            <button onClick={onAutoSave}>Auto Save</button>        
+        </div>
     );
 };
 
