@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback} from 'react';
 import Editor from './Editor.js';
 import Taskbar from './Taskbar.js';
 import NewFilePopup from './NewFilePopup.js';
@@ -7,6 +7,7 @@ import './App.css';
 import languages from './languages.json';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import _ from 'lodash';
 
 const App = () => {
     const [language, setLanguage] = useState('javascript');
@@ -39,6 +40,7 @@ const App = () => {
     };
 
     useEffect(() => {
+        /*
         const handleAutoSave = () => {
             if (!currentFileName) return;
             const updatedFiles = files.map(file => {
@@ -52,20 +54,33 @@ const App = () => {
         };
         const debounceSave = setTimeout(handleAutoSave, 1000);
         return () => clearTimeout(debounceSave);
-    
+        */
     }, [editorCode, currentFileName, files]);
     
     
 
     const handleDownloadAllFiles = () => {
-        const zip = new JSZip();
-        files.forEach(file => {
-            zip.file(file.name, file.content);
-        });
-        zip.generateAsync({ type: 'blob' }).then(content => {
-            saveAs(content, 'project.zip');
-        });
+        const projectName = "TestProject";
+        fetch(`http://localhost:3001/api/download?projectName=${encodeURIComponent(projectName)}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP status ${response.status}`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${projectName}.zip`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a); 
+                window.URL.revokeObjectURL(url);
+            })
+            .catch(error => console.error('Error downloading project files:', error));
     };
+    
 
     const getLanguageFromFileName = (fileName) => {
         const extension = fileName.split('.').pop();
@@ -74,18 +89,49 @@ const App = () => {
     };
     
 
-    const handleFileSelect = (fileName) => {
-        const file = files.find(f => f.name === fileName);
-        if (file) {
-            setEditorCode(file.content);
-            setCurrentFileName(fileName);
-            setLanguage(getLanguageFromFileName(fileName));
-            if (!openTabs.includes(fileName)) {
-                setOpenTabs([...openTabs, fileName]);
-            }
-            setActiveTab(fileName);
+    const handleFileSelect = useCallback((fileName) => {
+        const projectName = "TestProject"; // Static projectName for now
+        fetch(`http://localhost:3001/api/files?projectName=${encodeURIComponent(projectName)}&fileName=${encodeURIComponent(fileName)}`)
+            .then(response => {
+                if (!response.ok) {
+                    // Handle non-2xx HTTP status
+                    throw new Error(`${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                setEditorCode(data.content);
+                setCurrentFileName(fileName);
+                setLanguage(getLanguageFromFileName(fileName));
+                if (!openTabs.includes(fileName)) {
+                    setOpenTabs([...openTabs, fileName]);
+                }
+                setActiveTab(fileName);
+            })
+            .catch(error => console.error('Error fetching file:', error));
+    }, [openTabs]);
+    
+
+    const debouncedSave = useCallback(_.debounce((code, fileName) => {
+        const projectName = "TestProject";
+        
+        fetch('http://localhost:3001/api/save', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ projectName: projectName, files: [{ name: fileName, content: code }] }),
+        })
+        .then(response => response.json())
+        .then(data => console.log(data))
+        .catch(error => console.error('Error saving file:', error));
+    }, 1000), []);
+
+    useEffect(() => {
+        if (currentFileName) {
+            debouncedSave(editorCode, currentFileName);
         }
-    };
+    }, [editorCode, currentFileName, debouncedSave]);
 
     const handleCloseTab = (fileName) => {
         const newOpenTabs = openTabs.filter(name => name !== fileName);
