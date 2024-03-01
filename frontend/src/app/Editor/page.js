@@ -56,6 +56,26 @@ const App = () => {
         return () => clearTimeout(debounceSave);
         */
     }, [editorCode, currentFileName, files]);
+
+    let serverOnline = true;
+
+    const checkServerAvailability = () => {
+        fetch('http://localhost:3001/api/heartbeat')
+            .then(response => {
+                if (response.ok) {
+                    serverOnline = true;
+                } else {
+                    throw new Error('Server not responding properly');
+                }
+            })
+            .catch(error => {
+                console.error('Server is offline:', error);
+                serverOnline = false;
+            });
+    };
+
+    setInterval(checkServerAvailability, 30000);
+    
     
     
 
@@ -114,7 +134,9 @@ const App = () => {
 
     const debouncedSave = useCallback(_.debounce((code, fileName) => {
         const projectName = "TestProject";
+        const savePayload = { projectName: projectName, files: [{ name: fileName, content: code }] };
         
+        if (serverOnline) {
         fetch('http://localhost:3001/api/save', {
             method: 'POST',
             headers: {
@@ -124,8 +146,16 @@ const App = () => {
         })
         .then(response => response.json())
         .then(data => console.log(data))
-        .catch(error => console.error('Error saving file:', error));
-    }, 1000), []);
+        .catch(error => {
+            console.error('Error saving file:', error);
+            // Save to localStorage
+            localStorage.setItem(`pendingSave_${projectName}_${fileName}`, JSON.stringify(savePayload));
+        });
+    } else {
+        console.log('Server offline, saving locally');
+        localStorage.setItem(`pendingSave_${projectName}_${fileName}`, JSON.stringify(savePayload));
+    }
+    }, 1000), [serverOnline]);
 
     useEffect(() => {
         if (currentFileName) {
