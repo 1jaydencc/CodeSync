@@ -236,6 +236,7 @@ const App = () => {
                             onDebug={handleDebug}
                             onTerminal={handleTerminal}
                             onHelp={handleHelp}
+                            onDownloadAllFiles={handleDownloadAllFiles}
                             onChat={handleChat}
                         />
                     </div>
