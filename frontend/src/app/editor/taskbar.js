@@ -10,6 +10,7 @@ const Taskbar = ({ onNewFile, onSaveFile, onOpenFile, onRun, onDebug, onTerminal
             <button onClick={onRun}>Run</button>
             <button onClick={onDebug}>Debug</button>
             <button onClick={onTerminal}>Terminal</button>
+            <button onClick={onTheme}>Theme</button>
             <button onClick={onHelp}>Help</button>
             <button onClick={onChat}>Chat</button>
             <button onClick={onDownloadAllFiles}>Download</button>
