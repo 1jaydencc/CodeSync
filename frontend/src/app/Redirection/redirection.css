@@ -13,14 +13,14 @@
 
 
 .notification-overlay button {
-    background: white;
+    background: #0F0920;
     border: none;
     outline: none;
     border-radius: 5px;
     box-shadow: 0 0 10px rgba(0, 0, 0, alpha.1);
     cursor: pointer;
     font-size: 16px;
-    color: black;
+    color: white;
     font-weight: 700;
     margin-right: 30px;
     margin-bottom: 5px;

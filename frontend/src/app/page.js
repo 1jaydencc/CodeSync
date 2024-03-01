@@ -14,6 +14,10 @@ export default function Home() {
     email: '',
     password: '',
   });
+
+  const [error, setError] = useState('');
+  const [showNotification, setShowNotification] = useState(false);
+
   const router = useRouter();
   
 
@@ -31,11 +35,29 @@ export default function Home() {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (!userCredential.user.emailVerified) {
+        setFormData({ email: '', password: '' });
+        setError('Please verify your email.');
+        setShowNotification(true);
+      }
+      else {
+        router.push('/editor');
+      }
       console.log(userCredential.user);
-      router.push('/editor');
     } catch (error) {
-      alert(error.message);
+      setFormData({ email: '', password: '' });
+      setError(getErrorMessage(error.code));
+      setShowNotification(true);
     }
+  };
+
+  const getErrorMessage = (errorCode) => {
+    const errorMessages = {
+      'auth/invalid-credential': 'No account found.',
+      'auth/too-many-requests': 'Too many requests, try again in a bit.' 
+    };
+
+    return errorMessages[errorCode] || errorCode;
   };
 
   return (
@@ -73,8 +95,17 @@ export default function Home() {
             <div className='register-link'>
                 <p><a href="/Register">Create Account</a></p>
             </div>
-
         </form>
+        <div>
+          {showNotification && (
+            <div className='notification-overlay'>
+              <div className='notification'>
+              <p>{error}</p>
+              <button onClick={() => setShowNotification(false)}>Try Again</button>
+              </div>
+            </div>
+          )}
+        </div>
     </div>
   );
 }
