@@ -19,6 +19,8 @@ html, body, #root {
   flex-direction: column;
   margin: 0;
   padding: 0;
+  margin: 0;
+  padding: 0;
   height: 100%;
   width: 100%;
 }
@@ -33,12 +35,14 @@ html, body, #root {
   align-items: center;
   justify-content: center;
   padding-left: 10px;
+  padding-left: 10px;
   align-self: center;
 }
 
 .container1 {
   display: flex;
   flex-direction: row;
+  height: 5%;
   height: 5%;
   width: 100%;
   background-color: #333333;
@@ -49,11 +53,13 @@ html, body, #root {
   flex: 1;
   flex-direction: row;
   height: 95%;
+  height: 95%;
   width: 100%;
   background-color: #383838;
 }
 
 .container3 {
+  width: 8%;
   width: 8%;
   height: 100%;
   background-color: #252526;
@@ -62,8 +68,10 @@ html, body, #root {
 .container4 {
   display: flex;
   flex: 1;
+  flex: 1;
   flex-direction: column;
   height: 100%;
+  width: 100%;
   width: 100%;
 }
 

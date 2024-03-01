@@ -1,5 +1,6 @@
 'use client';
 import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import Editor from "@monaco-editor/react";
 import Footer from './footer.js'
 import { editor } from 'monaco-editor';
