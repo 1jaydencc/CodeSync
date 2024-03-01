@@ -3,38 +3,74 @@ import { useState } from 'react';
 import '../globals.css'
 import './Password-Reset.css'
 import { useRouter } from 'next/navigation';
+import { auth } from '../../firebase-config'
+import { sendPasswordResetEmail } from 'firebase/auth'
+
 
 export default function Home() {
 
+  const [error, setError] = useState('');
   const [showNotification, setShowNotification] = useState(false);
+  const [showError, setShowError] = useState(false);
+  
+  const [formData, setFormData] = useState({
+    email: '',
+  });
 
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    setShowNotification(true);
-    console.log('Form Submitted.');
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const { email } = formData;
+    try {
+      await sendPasswordResetEmail(auth, email);
+      setFormData({email: ''});
+      setShowNotification(true);
+    } catch (error) {
+      setFormData({ email: '' });
+      setError(getErrorMessage(error.code));
+      setShowError(true);
+    }
   };
 
   const router = useRouter();
 
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({
+      ...prevData,
+      [name]: value,
+    }));
+  };
+
   const handleGoToHomePage = () => {
-    router.push('/Continue-reset'); // Use navigate function to go to the home page
+    router.push('/'); // Use navigate function to go to the home page
+  };
+
+  const getErrorMessage = (errorCode) => {
+    const errorMessages = {
+      'auth/invalid-email': 'Please input a valid email.'
+    };
+
+    return errorMessages[errorCode] || errorCode;
   };
 
   return (
     <div>
       <div className='wrapper'>
-        <form action='' onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
             <h1>Forgot Your Password?</h1>
-            <div className='reset-information'>
-                <p>Enter your email and we will send you instructions on how to reset your password.</p>
-            </div>
             <div className='input-box'>
-                <input type='text' placeholder='Email' required/>
+            <input
+              type='email'
+              name='email'
+              placeholder='Email'
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
             </div>
             <button type='submit'>Send Reset Link</button>
         </form>
-      </div>
-      <div>
+        <div>
           {showNotification && (
             <div className='notification-overlay'>
               <div className='notification'>
@@ -46,6 +82,18 @@ export default function Home() {
             </div>
           )}
         </div>
+        <div>
+          {showError && (
+            <div className='notification-overlay'>
+              <div className='notification'>
+              <p>{error}</p>
+              <button onClick={() => setShowError(false)}>Try Again.</button>
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      
     </div>
   );
 }

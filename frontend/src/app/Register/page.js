@@ -2,15 +2,20 @@
 import '../globals.css'
 import './Register.css'
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { auth } from '../../firebase-config'
 
 
 export default function Home() {
-  
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
-    first_name: 'Hello',
     password: '',
   });
+
+  const [error, setError] = useState('');
+  const [showNotification, setShowNotification] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,29 +25,32 @@ export default function Home() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('HELLO!');
-    fetch('http://127.0.0.1:8000/auth/sign-up/', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    })
-      .then(async (response) => {
-        console.log('Request sent to the backend:', response);
-        if (response.ok) {
-          alert('Sign-up successful');
-          // Redirect user to another page or perform any necessary action
-        } else {
-          const data = await response.json();
-          throw new Error(data.detail || 'Failed to sign up');
+    const { email, password } = formData;
+        try {
+            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+            const user = userCredential.user;
+            console.log("User signed up:", user);
+            router.push('./editor');
+            // Redirect or perform other actions after successful sign-up
+        } catch (error) {
+            console.error("Error signing up:", error.message);
+            // Set error state and clear form fields
+            setFormData({ email: '', password: '' });
+            setError(getErrorMessage(error.code));
+            setShowNotification(true);
         }
-      })
-      .catch((error) => {
-        alert(error.message);
-      });
+  };
+
+  const getErrorMessage = (errorCode) => {
+    const errorMessages = {
+      'auth/email-already-in-use': 'Email address is already in use.',
+      'auth/weak-password': 'Password must be longer than 6 characters.',
+      'auth/invalid-email': 'Please input a valid email.'
+    };
+
+    return errorMessages[errorCode] || errorCode;
   };
 
 
@@ -62,9 +70,6 @@ export default function Home() {
             />
             </div>
             <div className='input-box'>
-                <input type='text' placeholder='Username' required/>
-            </div>
-            <div className='input-box'>
             <input
               type='password'
               name='password'
@@ -74,9 +79,6 @@ export default function Home() {
               required
             />
             </div>
-            <div className='input-box'>
-                <input type='text' placeholder='Confirm Password' required/>
-            </div>
 
             <button type='submit'>CREATE</button>
 
@@ -84,6 +86,16 @@ export default function Home() {
                 <p>By continuing, you agree to CodeSync&apos;s Terms of Service and Privacy Policy</p>
             </div>
         </form>
+        <div>
+          {showNotification && (
+            <div className='notification-overlay'>
+              <div className='notification'>
+              <p>{error}</p>
+              <button onClick={() => setShowNotification(false)}>Close</button>
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );
