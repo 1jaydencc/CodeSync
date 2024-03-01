@@ -5,7 +5,7 @@ import Footer from './footer.js'
 import { editor } from 'monaco-editor';
 
 
-const EditorPage = ({ language, code, onCodeChange }) => {
+const EditorPage = ({ language, code, selection, onCodeChange}) => {
     const [line, setLine] = useState(0);
     const [col, setCol] = useState(0);
 
@@ -13,11 +13,11 @@ const EditorPage = ({ language, code, onCodeChange }) => {
 
     if (editorRef.current) {
         editorRef.current.onDidChangeCursorSelection((e) => {
-            console.log(JSON.stringify(e));
+            // console.log(JSON.stringify(e));
             const obj = JSON.parse(JSON.stringify(e));
-            const selection = obj.selection;
-            setLine(selection.startLineNumber);
-            setCol(selection.startColumn);
+            const json = obj.selection;
+            setLine(json.startLineNumber);
+            setCol(json.startColumn);
         });
     }
     

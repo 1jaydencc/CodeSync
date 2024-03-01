@@ -112,7 +112,9 @@ html, body, #root {
   height: auto;
   width: 100%;
 }
-  
+
+
+
 .taskbar {
   display: flex;
   flex: 1;

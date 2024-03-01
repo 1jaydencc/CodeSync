@@ -2,7 +2,6 @@
 import React, { useState, useEffect } from 'react';
 import Editor from './editor.js';
 import Taskbar from './taskbar.js';
-import Footer from './footer.js'
 import NewFilePopup from './NewFilePopup.js';
 import './App.css';
 import languages from './languages.json';
@@ -18,6 +17,7 @@ const App = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [openTabs, setOpenTabs] = useState([]);
     const [activeTab, setActiveTab] = useState('');
+    const [selection, setSelection] = useState({ startLineNumber: 1, endLineNumber: 1, startColumn: 1, endColumn: 1 });
 
     const handleOpenFile = () => {
         // Placeholder for open file logic
@@ -192,6 +192,7 @@ const App = () => {
                             <Editor
                                 language={language}
                                 code={editorCode}
+                                selection={selection}
                                 onCodeChange={setEditorCode}
                             />
                         </div>
