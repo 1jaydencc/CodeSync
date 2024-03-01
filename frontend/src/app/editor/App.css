@@ -106,9 +106,18 @@ html, body, #root {
   justify-content: flex-end;
   height: 3%;
   width: 100%;
-  background-color: #00ff91;
+  background-color: #5c605e;
 }
 
+.dropdown {
+  color: #000000;
+  font-family: 'Poppins', sans-serif;  
+}
+
+.options {
+  color: #000000;
+  font-family: 'Poppins', sans-serif;  
+}
 .comment-container {
   display: flex;
   flex-direction: column;
@@ -135,10 +144,8 @@ html, body, #root {
 .comment {
   display: flex;
   background-color: #331d1d;
-}
-
-.comment:hover {
-  border: #333;
+  border: #ff0000;
+  border-radius: 5px;
 }
 
 .container7 {

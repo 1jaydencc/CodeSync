@@ -3,10 +3,14 @@ import React, { useState, useEffect } from 'react';
 import Editor from './editor.js';
 import Taskbar from './taskbar.js';
 import NewFilePopup from './NewFilePopup.js';
+import Dropdown from './themeDropDown.js';
+import themelist from "monaco-themes/themes/themelist.json";
 import './App.css';
 import languages from './languages.json';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import { auth, firestore } from "@/firebase-config";
+import { doc, onSnapshot } from "firebase/firestore";
 
 const App = () => {
     const [language, setLanguage] = useState('javascript');
@@ -17,6 +21,8 @@ const App = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [openTabs, setOpenTabs] = useState([]);
     const [activeTab, setActiveTab] = useState('');
+    const [dropdownVisible, setDropdownVisible] = useState(true);
+    const [theme, setTheme] = useState('vs-dark');
 
     const handleOpenFile = () => {
         // Placeholder for open file logic
@@ -34,6 +40,14 @@ const App = () => {
         // Placeholder for terminal logic
     };
 
+    const toggleVisibility = () => {
+        setDropdownVisible(!dropdownVisible);
+        console.log(dropdownVisible)
+    };
+
+    const handleTheme = () => {
+        toggleVisibility();
+    }
     const handleHelp = () => {
         // Placeholder for help/documentation logic
     };
@@ -55,8 +69,6 @@ const App = () => {
     
     }, [editorCode, currentFileName, files]);
     
-    
-
     const handleDownloadAllFiles = () => {
         const zip = new JSZip();
         files.forEach(file => {
@@ -73,7 +85,6 @@ const App = () => {
         return languageObj ? languageObj.language : 'plaintext';
     };
     
-
     const handleFileSelect = (fileName) => {
         const file = files.find(f => f.name === fileName);
         if (file) {
@@ -140,6 +151,36 @@ const App = () => {
         // Logic to change the language in the editor
     };
 
+    setTimeout(
+        function() {
+            const unsub = onSnapshot(doc(firestore, "user_settings", auth.currentUser.uid), (doc) => {
+                // console.log("Current data: ", doc.data().theme);
+                if (doc.data().theme === 'vs-light') {
+                    setTheme('vs-light');
+                } else if (doc.data().theme === 'vs-dark') {
+                    setTheme('vs-dark');
+                } else if (doc.data().theme === 'hc-black') {
+                    setTheme('hc-black');
+                } else if (doc.data().theme === 'hc-light') {
+                    setTheme('hc-light');
+                }
+            });
+    }, 2000);
+
+
+    const handleThemeChange = (e) => {
+        const selectedOption = e.target.value;
+        if (selectedOption === 'vs-light') {
+            setTheme('vs-light');
+        } else if (selectedOption === 'vs-dark') {
+            setTheme('vs-dark');
+        } else if (selectedOption === 'hc-black') {
+            setTheme('hc-black');
+        } else if (selectedOption === 'hc-light') {
+            setTheme('hc-light');
+        }
+    };
+
     return (
         <div className="app">
             <div className="container0">
@@ -155,8 +196,17 @@ const App = () => {
                             onRun={handleRun}
                             onDebug={handleDebug}
                             onTerminal={handleTerminal}
+                            onTheme={handleTheme}
                             onHelp={handleHelp}
                         />
+                        <div hidden={dropdownVisible} onChange={handleThemeChange} >
+                            <select className='options'>
+                                <option value="vs-light">vs-light</option>
+                                <option value="vs-dark">vs-dark</option>
+                                <option value="hc-black">hc-black</option>
+                                <option value="hc-light">hc-light</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <NewFilePopup
@@ -190,6 +240,8 @@ const App = () => {
                             <Editor
                                 language={language}
                                 code={editorCode}
+                                theme={theme}
+                                currentFile={activeTab}
                                 onCodeChange={setEditorCode}
                             />
                         </div>
