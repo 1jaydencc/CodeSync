@@ -11,20 +11,8 @@ const Taskbar = ({ onNewFile, onSaveFile, onOpenFile, onRun, onDebug, onTerminal
             <button onClick={onDebug}>Debug</button>
             <button onClick={onTerminal}>Terminal</button>
             <button onClick={onHelp}>Help</button>
-            <button onClick={onChat}>Chat</button>
             <button onClick={onDownloadAllFiles}>Download</button>
-            <button onClick={onHelp}>NewWindow</button>
-            <button onClick={onHelp}>Open File</button>
-            <button onClick={onHelp}>Open Folder</button>
-            <button onClick={onHelp}>Save as</button>
-            <button onClick={onHelp}>Share</button>
-            <button onClick={onHelp}>Preferences</button>
-            <button onClick={onHelp}>Run with Debugging</button>
-            <button onClick={onHelp}>Run without Debugging</button>
-            <button onClick={onHelp}>Add/Remove Breakpoints</button>
-            <button onClick={onHelp}>Toggle Breakpoints</button>
-            <button onClick={onHelp}>New Terminal</button>
-            <button onClick={onHelp}>Split Terminal</button>
+            <button onClick={onChat}>Chat</button>
         </div>
     );
 };
