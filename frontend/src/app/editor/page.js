@@ -10,7 +10,6 @@ import languages from '@/app/editor/languages.json';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { signOut } from 'firebase/auth';
-import { auth } from '@/firebase-config';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
@@ -232,7 +231,7 @@ const App = () => {
 
     setTimeout(
         function() {
-            const unsub = onSnapshot(doc(firestore, "user_settings", auth.currentUser.uid), (doc) => {
+            const unsub = onSnapshot(doc(db, "user_settings", auth.currentUser.uid), (doc) => {
                 // console.log("Current data: ", doc.data().theme);
                 if (doc.data().theme === 'vs-light') {
                     setTheme('vs-light');
@@ -277,6 +276,8 @@ const App = () => {
                             onTerminal={handleTerminal}
                             onTheme={handleTheme}
                             onHelp={handleHelp}
+                            onDownloadAllFiles={handleDownloadAllFiles}
+                            onChat={handleChat}
                         />
                         <div hidden={dropdownVisible} onChange={handleThemeChange} >
                             <select className='options'>

@@ -2,7 +2,7 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Editor from "@monaco-editor/react";
 import Footer from './footer.js'
-import { auth, firestore } from "@/firebase-config";
+import { auth, db } from "@/firebase-config";
 import { collection, doc, addDoc, setDoc, deleteDoc } from "firebase/firestore";
 import { editor } from 'monaco-editor';
 import { milliseconds } from 'date-fns';
@@ -57,7 +57,7 @@ const EditorPage = ( { language, code, theme, currentFile, onCodeChange } ) => {
     };
 
     const onAddCommentClick = (file, startLineNumber, startColumn, endLineNumber, endColumn, collaborators) => {
-        const docRef = addDoc(collection(firestore, "comments"), {
+        const docRef = addDoc(collection(db, "comments"), {
             author: auth.currentUser.uid,   // must be signed in
             file: file,
             startLineNumber: startLineNumber,
@@ -90,7 +90,7 @@ const EditorPage = ( { language, code, theme, currentFile, onCodeChange } ) => {
     useEffect(() => {   // update's theme on every render
         if (auth.currentUser) {
             console.log(auth.currentUser.uid, theme)
-            const docRef = doc(firestore, "user_settings", auth.currentUser.uid);
+            const docRef = doc(db, "user_settings", auth.currentUser.uid);
             setDoc(docRef, {
                 theme: theme
             })
