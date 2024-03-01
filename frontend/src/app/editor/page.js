@@ -17,7 +17,6 @@ const App = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [openTabs, setOpenTabs] = useState([]);
     const [activeTab, setActiveTab] = useState('');
-    const [selection, setSelection] = useState({ startLineNumber: 1, endLineNumber: 1, startColumn: 1, endColumn: 1 });
 
     const handleOpenFile = () => {
         // Placeholder for open file logic
@@ -180,7 +179,6 @@ const App = () => {
                     </div>
                     <div className="container4">
                         <div className="container5">
-                            tabs
                             {openTabs.map(tabName => (
                                 <div key={tabName} className={`tab-item ${tabName === activeTab ? 'active' : ''}`} onClick={() => handleFileSelect(tabName)}>
                                     {tabName}
@@ -192,7 +190,6 @@ const App = () => {
                             <Editor
                                 language={language}
                                 code={editorCode}
-                                selection={selection}
                                 onCodeChange={setEditorCode}
                             />
                         </div>

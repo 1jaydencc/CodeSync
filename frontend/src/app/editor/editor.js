@@ -2,16 +2,17 @@
 import React, { useRef, useState, useEffect } from 'react';
 import Editor from "@monaco-editor/react";
 import Footer from './footer.js'
+import { getDatabase, ref, set } from "firebase/database";
 
-const Comment = (file, startLineNumber, startColumn, text) => {
-    // TODO: backend logic to save comment
-
-    return <div className="comment"> <h2>{file}</h2> </div>;
+function writeUserData(userId, name, email, imageUrl) {
+  const db = getDatabase();
+  set(ref(db, 'users/' + userId), {
+    username: name,
+    email: email,
+    profile_picture : imageUrl
+  });
 }
 
-const Input = () => {
-    return <input placeholder="Your input here" />;
-  };
 
 const EditorPage = ({ language, code, selection, onCodeChange}) => {
     const [startLineNumber, setStartLineNumber] = useState(0);
@@ -22,6 +23,18 @@ const EditorPage = ({ language, code, selection, onCodeChange}) => {
 
     const editorRef = useRef(null); // Create a reference to the editor instance
 
+    const Comment = (file, startLineNumber, startColumn, text, commentID) => {
+        // TODO: backend logic to save comment
+        return  (
+            <div className="comment">
+                <p>{file} @ Ln: {startLineNumber} Col: {startColumn} <br></br>
+                <input type="comment"/>
+                </p>
+                <span onClick={() => handleCloseComment(commentID)}> ✖ </span> {}
+            </div>
+        );
+    }
+    
     setTimeout(
         function() {
             if (editorRef.current) {
@@ -45,10 +58,15 @@ const EditorPage = ({ language, code, selection, onCodeChange}) => {
         console.log("mounted");
     };
 
-    const onAddCommentClick = (file, startLineNumber, startColumn, text) => {
-        // setCommentList(commentList.concat(<Comment></Comment>));
-        console.log("comment added");
+    const onAddCommentClick = (file, startLineNumber, startColumn, text, commentID) => {
+        setCommentList([...commentList, Comment(file, startLineNumber, startColumn, text, commentID)]);
     }
+
+    const handleCloseComment = (commentID) => {
+        const newCommentList = commentList.filter(name => name !== commentID);
+        setCommentList(newCommentList);
+    };
+    
     return (
         <div className='editor-comments'>
             <div className="editor-container">
@@ -78,13 +96,18 @@ const EditorPage = ({ language, code, selection, onCodeChange}) => {
                 <h2>Comments</h2>
                 {((startColumn != endColumn) || (startLineNumber != endLineNumber)) && 
                     <button onClick={() => onAddCommentClick(
-                                            // "temp.js",
-                                            // startLineNumber,
-                                            // startColumn,
-                                            // "test comment"
+                                            "temp.js",
+                                            startLineNumber,
+                                            startColumn,
+                                            "test comment",
+                                            commentList.length
                                         )}>Add Comment</button>
                 }
-                {commentList}
+                {commentList.map(commentID => (
+                                <div key={commentID} className='comment-item'>
+                                    {commentID}
+                                </div>
+                            ))}
             </div>
         </div>
     );
