@@ -1,0 +1,113 @@
+.chat-container {
+    background: #f0f0f0;
+    padding: 1rem;
+    border-radius: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    max-width: 600px;
+    /* Optional: set a max-width for the chat container */
+    margin: 0 auto;
+    /* Center the chat container */
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.messages-container {
+    margin-bottom: 1rem;
+    height: 500px;
+    /* Adjust height as necessary */
+    background: #e5e5ea;
+    /* iMessage background color */
+    overflow-y: auto;
+    border-radius: 20px;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    /* Newer messages appear at the bottom */
+}
+
+.message {
+    max-width: 70%;
+    padding: 0.4rem .8rem;
+    margin: 0rem;
+    font-size: 0.9rem;
+    border-radius: 17px;
+    display: flex;
+    flex-direction: column;
+    word-wrap: break-word;
+    box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    /* Subtle shadow like iMessage */
+}
+
+.message-header {
+    font-size: 0.75rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    margin-bottom: .25rem;
+    color: #a1a1aa;
+    padding-left: .4rem;
+    /* Align with message bubble padding */
+}
+
+.sent {
+    background: #007aff;
+    /* iMessage blue */
+    align-self: flex-end;
+    text-align: right;
+    /* Aligns text to the right */
+    color: white;
+}
+
+/* Styles for messages received from other users */
+.received {
+    background: #6c757d;
+    align-self: flex-start;
+    /* Aligns received messages to the left */
+    text-align: left;
+    /* Aligns text to the left */
+    color: white;
+}
+
+.message-content {
+    display: inline-block;
+}
+
+.message-form {
+    display: flex;
+    background: white;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    border-radius: 20px;
+}
+
+.message-input {
+    flex-grow: 1;
+    border: 1px solid #ccc;
+    border-radius: 20px;
+    padding: 0.5rem;
+    font-size: .9rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    
+}
+
+.send-button {
+    background: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 20px;
+    padding: 0.5rem 1rem;
+    font-size: .9rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+.message-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end; /* Align sent messages to the right */
+    margin-bottom: .25rem;
+}
+
+.received-wrapper {
+    align-items: flex-start; /* Align received messages to the left */
+}
+

@@ -1,0 +1,20 @@
+.chat-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .hidden-header {
+    height: 5px; /* Or any other styling to shrink the header */
+    margin-bottom: 0; /* Remove the margin-bottom when the header is hidden */
+  }
+  
+  .chat-header {
+    font-size: 2rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+  }

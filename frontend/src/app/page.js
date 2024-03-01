@@ -1,8 +1,9 @@
+// @/app/page
 'use client';
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { auth } from '@/firebase-config.js';
+import { auth } from '@/firebase-config';
 import { signInWithEmailAndPassword } from "firebase/auth";
 
 import './LoginForm.css';
@@ -14,6 +15,7 @@ export default function Home() {
     password: '',
   });
   const router = useRouter();
+  
 
   const handleChange = (e) => {
     const { name, value } = e.target;
