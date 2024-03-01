@@ -12,6 +12,8 @@ import { auth } from '@/firebase-config';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
+import { doc, setDoc } from "firebase/firestore"; 
+import { db } from '@/firebase-config';
 
 
 
@@ -152,24 +154,30 @@ const App = () => {
         setIsPopupOpen(false);
     };
 
-    const handleSaveFile = () => {
-        const newFiles = files.map(file => {
-            if (file.name === currentFileName) {
-                return { ...file, content: editorCode };
-            }
-            return file;
-        });
-        setFiles(newFiles);
-
-        const apiEndpoint = 'https://your-backend-api.com/files/save';
-
+    const handleSaveFile = async () => {
+        if (!currentFileName.trim() || !editorCode.trim()) {
+            console.log("No file name or content to save");
+            return;
+        }
+    
+        setIsSaving(true); // Indicate that saving has started
+    
+        const fileRef = doc(db, "files", currentFileName);
         const fileData = {
             language: language,
-            code: editorCode,
-            fileName: currentFileName,
+            content: editorCode,
+            uid: auth.currentUser.uid,
+            //updatedAt: new Date(), // Optionally store the last updated time
         };
-
-        setIsSaving(true);
+    
+        try {
+            await setDoc(fileRef, fileData, { merge: true }); // Save or merge data in Firestore
+            console.log("File saved successfully");
+        } catch (error) {
+            console.error("Error saving file to Firestore:", error);
+        } finally {
+            setIsSaving(false); // Reset the saving indicator
+        }
     };
 
     const handleLanguageChange = (language) => {
