@@ -1,16 +1,16 @@
 // @/app/Chat/ChatRoom
 "use client";
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { db, auth } from '@/firebase-config'; // make sure these imports are correct
 import { collection, query, orderBy, onSnapshot, addDoc } from 'firebase/firestore';
-import './ChatRoom.css';
+import '@/app/chat/chat-room.css';
 import { onAuthStateChanged } from 'firebase/auth';
 
 const ChatRoom = () => {
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
     const [currentUserUid, setCurrentUserUid] = useState(null);
-
+    const messagesEndRef = useRef(null);
 
     useEffect(() => {
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -43,6 +43,7 @@ const ChatRoom = () => {
             uid: currentUserUid,
             displayName: auth.currentUser?.displayName || auth.currentUser?.email || "Anonymous",
         });
+        messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
         setNewMessage('');
     };
 
@@ -68,7 +69,7 @@ const ChatRoom = () => {
 
                 })}
 
-
+                <div ref={messagesEndRef} />
             </div>
             <form onSubmit={sendMessage} className="message-form">
                 <input

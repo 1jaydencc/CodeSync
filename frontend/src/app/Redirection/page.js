@@ -1,9 +1,9 @@
 'use client';
 import { useState, useEffect } from 'react';
-import '../globals.css';
-import './redirection.css';
+import '@/app/globals.css';
+import '@/app/redirection/redirection.css';
 import { useRouter, useLocation} from 'next/navigation';
-import { auth } from '../../firebase-config';
+import { auth } from '@/firebase-config';
 import { sendPasswordResetEmail } from 'firebase/auth';
 
 export default function HandleEmailAction() {

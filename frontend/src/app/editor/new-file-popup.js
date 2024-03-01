@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import './App.css';
+import './editor.css';
 
 const NewFilePopup = ({ isOpen, onClose, onCreate }) => {
     const [fileName, setFileName] = useState('');

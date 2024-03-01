@@ -1,9 +1,9 @@
 'use client';
 import { useState } from 'react';
-import '../globals.css'
-import './Password-Reset.css'
+import '@/app/globals.css'
+import '@/app/password-reset/password-reset.css'
 import { useRouter } from 'next/navigation';
-import { auth } from '../../firebase-config'
+import { auth } from '@/firebase-config'
 import { sendPasswordResetEmail } from 'firebase/auth'
 
 

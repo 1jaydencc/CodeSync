@@ -56,6 +56,7 @@ html, body, #root {
   width: 10%;
   height: 100%;
   background-color: #252526;
+  position: relative;
 }
 
 .container4 {
@@ -94,6 +95,7 @@ html, body, #root {
   justify-content: center;
   height: 20px;
   align-items: right;
+  padding-top: 1rem;
 }
 
 .container8 {
@@ -249,4 +251,49 @@ html, body, #root {
   display: flex;
   color: white;
   font-family: 'Poppins', sans-serif;
+}
+
+.user-profile {
+    position: absolute;
+    bottom: 4rem; /* Aligns it to the bottom of container3 */
+    width: 100%; /* Ensures it spans the width of container3 */
+    display: flex;
+    justify-content: center; /* Center the icon horizontally */
+    color:#bbb;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    height: 5%;
+
+}
+
+.dropdown-menu {
+    position: absolute;
+    bottom: 100%; /* Positions the dropdown above the user icon */
+    left: 50%;
+    transform: translateX(-50%);
+    /* Style your dropdown menu as needed */
+}
+
+.dropdown-item {
+    padding: 10px;
+    cursor: pointer;
+    background-color: transparent; /* Dark grey background */
+    color: white; /* Light text color for contrast */
+    border-radius: 5px; /* Rounded corners */
+    margin: 2px 0; /* Slight space between items */
+    transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.dropdown-item:hover {
+    background-color: #555; /* Slight light grey on hover */
+}
+
+.user-icon {
+    font-size: 24px;
+    cursor: pointer;
+}
+
+.user-icon:hover, .user-icon:focus {
+    color: #ffffff; /* Change color on hover/focus */
 }

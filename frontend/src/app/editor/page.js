@@ -1,12 +1,19 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import Editor from './editor.js';
-import Taskbar from './taskbar.js';
-import NewFilePopup from './NewFilePopup.js';
-import './App.css';
-import languages from './languages.json';
+import Editor from '@/app/editor/editor.js';
+import Taskbar from '@/app/editor/taskbar.js';
+import NewFilePopup from '@/app/editor/new-file-popup.js';
+import '@/app/editor/editor.css';
+import languages from '@/app/editor/languages.json';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
+import { signOut } from 'firebase/auth';
+import { auth } from '@/firebase-config';
+import { useRouter } from 'next/navigation';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-solid-svg-icons';
+
+
 
 const App = () => {
     const [language, setLanguage] = useState('javascript');
@@ -17,6 +24,11 @@ const App = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [openTabs, setOpenTabs] = useState([]);
     const [activeTab, setActiveTab] = useState('');
+    const [showDropdown, setShowDropdown] = useState(false);
+    const router = useRouter();
+
+    const toggleDropdown = () => setShowDropdown(!showDropdown);
+
 
     const handleOpenFile = () => {
         // Placeholder for open file logic
@@ -38,6 +50,10 @@ const App = () => {
         // Placeholder for help/documentation logic
     };
 
+    const handleChat = () => {
+        router.push('/chat');
+    };
+
     useEffect(() => {
         const handleAutoSave = () => {
             if (!currentFileName) return;
@@ -47,15 +63,36 @@ const App = () => {
                 }
                 return file;
             });
-    
+
             setFiles(updatedFiles);
         };
         const debounceSave = setTimeout(handleAutoSave, 1000);
         return () => clearTimeout(debounceSave);
-    
+
     }, [editorCode, currentFileName, files]);
-    
-    
+
+    useEffect(() => {
+        const closeDropdown = (e) => {
+            if (!e.target.closest('.user-profile')) {
+                setShowDropdown(false);
+            }
+        };
+
+        document.addEventListener('click', closeDropdown);
+        return () => document.removeEventListener('click', closeDropdown);
+    }, []);
+
+    const handleSignOut = async () => {
+        try {
+            await signOut(auth);
+
+            router.push('/');
+        } catch (error) {
+            console.error("Error signing out:", error);
+        }
+    };
+
+
 
     const handleDownloadAllFiles = () => {
         const zip = new JSZip();
@@ -72,7 +109,7 @@ const App = () => {
         const languageObj = languages.find(lang => lang.extension === `.${extension}`);
         return languageObj ? languageObj.language : 'plaintext';
     };
-    
+
 
     const handleFileSelect = (fileName) => {
         const file = files.find(f => f.name === fileName);
@@ -107,7 +144,7 @@ const App = () => {
         const extension = fileName.split('.').pop();
         const languageObj = languages.find(lang => lang.extension === `.${extension}`);
         const language = languageObj ? languageObj.language : 'plaintext';
-    
+
         const newFile = { name: fileName, content: '', language };
         setFiles([...files, newFile]);
         setCurrentFileName(fileName);
@@ -156,13 +193,14 @@ const App = () => {
                             onDebug={handleDebug}
                             onTerminal={handleTerminal}
                             onHelp={handleHelp}
+                            onChat={handleChat}
                         />
                     </div>
                 </div>
                 <NewFilePopup
-                        isOpen={isPopupOpen}
-                        onClose={() => setIsPopupOpen(false)}
-                        onCreate={handleFileCreate}
+                    isOpen={isPopupOpen}
+                    onClose={() => setIsPopupOpen(false)}
+                    onCreate={handleFileCreate}
                 />
                 <div className="container2">
                     <div className="container3">
@@ -172,9 +210,17 @@ const App = () => {
                         <div className="container8">
                             {files.map(file => (
                                 <div key={file.name} className="file-item" onClick={() => handleFileSelect(file.name)}>
-                                    📄{file.name} {}
+                                    📄{file.name} { }
                                 </div>
                             ))}
+                        </div>
+                        <div className="user-profile">
+                            <FontAwesomeIcon icon={faUser} onClick={toggleDropdown} className="user-icon" />
+                            {showDropdown && (
+                                <div className="dropdown-menu">
+                                    <div className="dropdown-item" onClick={handleSignOut}>Sign Out</div>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div className="container4">
@@ -182,7 +228,7 @@ const App = () => {
                             {openTabs.map(tabName => (
                                 <div key={tabName} className={`tab-item ${tabName === activeTab ? 'active' : ''}`} onClick={() => handleFileSelect(tabName)}>
                                     {tabName}
-                                    <span onClick={() => handleCloseTab(tabName)}> ✖ </span> {}
+                                    <span onClick={() => handleCloseTab(tabName)}> ✖ </span> { }
                                 </div>
                             ))}
                         </div>
@@ -196,7 +242,7 @@ const App = () => {
                     </div>
                 </div>
             </div>
-        </div>
+        </div >
     );
 };
 

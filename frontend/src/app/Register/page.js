@@ -1,10 +1,10 @@
 'use client';
-import '../globals.css'
-import './Register.css'
+import '@/app/globals.css'
+import '@/app/register/register.css'
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
-import { auth } from '../../firebase-config'
+import { auth } from '@firebase-config'
 
 export default function Home() {
   const router = useRouter();

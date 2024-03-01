@@ -1,0 +1,43 @@
+/*chat-page.css*/
+.chat-page {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    width: 100vw;
+    padding: 1rem;
+    gap: 1rem;
+    background-color: #252525;
+  }
+
+
+  
+  .chat-header {
+    font-size: 2rem;
+    font-weight: 450;
+    margin: auto;
+    color:azure;
+    justify-content: center;
+    align-items: center;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  
+  .back-to-editor-btn {
+    padding: 0.5rem 1rem;
+    background-color: transparent;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    max-width: 10rem;
+    font-size: .75rem;
+    position:absolute;
+    left: 1.5rem;
+    top: 1.5rem;
+    margin:auto
+}
+
+.back-to-editor-btn:hover {
+    background-color: #4b4b4b;
+}

@@ -4,10 +4,11 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase-config';
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { signInWithEmailAndPassword, onAuthStateChanged} from "firebase/auth";
+import { useEffect } from 'react';
 
-import './LoginForm.css';
-import './globals.css';
+import '@/app/login.css';
+import '@/app/globals.css';
 
 export default function Home() {
   const [formData, setFormData] = useState({
@@ -19,6 +20,21 @@ export default function Home() {
   const [showNotification, setShowNotification] = useState(false);
 
   const router = useRouter();
+
+  useEffect(() => {
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in, redirect them to the editor
+        router.push('/editor');
+      } else {
+        // User is signed out, stay on this page or handle accordingly
+        console.log('User is not signed in');
+      }
+    });
+
+    // Clean up the subscription on unmount
+    return () => unsubscribe();
+  }, [router]);
   
 
   const handleChange = (e) => {
@@ -87,13 +103,13 @@ export default function Home() {
             <button type='submit'>Login</button>
 
             <div className='forgot-password'>
-                <a href="/Password-Reset">Forgot Password?</a>
+                <a href="/password-reset">Forgot Password?</a>
             </div>
             <div className='divider'>
                 <p>___________________________</p>
             </div>
             <div className='register-link'>
-                <p><a href="/Register">Create Account</a></p>
+                <p><a href="/register">Create Account</a></p>
             </div>
         </form>
         <div>
