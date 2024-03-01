@@ -12,7 +12,8 @@ import { auth } from '@/firebase-config';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { doc, setDoc } from "firebase/firestore"; 
+import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { onAuthStateChanged } from 'firebase/auth';
 import { db } from '@/firebase-config';
 
 
@@ -55,6 +56,40 @@ const App = () => {
     const handleChat = () => {
         router.push('/chat');
     };
+
+    useEffect(() => {
+        // Listen for auth state changes
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            console.log("Auth state changed. Current user:", user);
+            if (user) {
+                // User is signed in, now fetch files
+                const fetchFiles = async () => {
+                    console.log("Fetching files for user:", user.uid);
+                    const q = query(collection(db, "files"), where("uid", "==", user.uid));
+                    try {
+                        const querySnapshot = await getDocs(q);
+                        console.log(`Fetched ${querySnapshot.docs.length} files`);
+                        const fetchedFiles = querySnapshot.docs.map(doc => ({
+                            name: doc.id,
+                            ...doc.data(),
+                        }));
+                        console.log("Fetched files:", fetchedFiles);
+                        setFiles(fetchedFiles);
+                    } catch (error) {
+                        console.error("Error fetching files:", error);
+                    }
+                };
+                fetchFiles();
+            } else {
+                // User is signed out
+                console.log("User is signed out.");
+                // Handle sign out scenario
+            }
+        });
+    
+        // Cleanup subscription on unmount
+        return () => unsubscribe();
+    }, []);
 
     useEffect(() => {
         const handleAutoSave = () => {
@@ -159,9 +194,9 @@ const App = () => {
             console.log("No file name or content to save");
             return;
         }
-    
+
         setIsSaving(true); // Indicate that saving has started
-    
+
         const fileRef = doc(db, "files", currentFileName);
         const fileData = {
             language: language,
@@ -169,7 +204,7 @@ const App = () => {
             uid: auth.currentUser.uid,
             //updatedAt: new Date(), // Optionally store the last updated time
         };
-    
+
         try {
             await setDoc(fileRef, fileData, { merge: true }); // Save or merge data in Firestore
             console.log("File saved successfully");
@@ -218,7 +253,7 @@ const App = () => {
                         <div className="container8">
                             {files.map(file => (
                                 <div key={file.name} className="file-item" onClick={() => handleFileSelect(file.name)}>
-                                    📄{file.name} { }
+                                    {file.name} { }
                                 </div>
                             ))}
                         </div>
