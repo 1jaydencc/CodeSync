@@ -38,7 +38,7 @@ html, body, #root {
 .container1 {
   display: flex;
   flex-direction: row;
-  height: 40px;
+  height: 70px;
   width: 100%;
   background-color: #333333;
 }
@@ -87,11 +87,12 @@ html, body, #root {
   width: 100%;
   color: #fff;
   font-family: 'Poppins', sans-serif;  
-  font-size: 10px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: light;
   text-align: center;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
+  padding-left: 1.5rem;
   justify-content: center;
   height: 20px;
   align-items: right;
@@ -103,6 +104,9 @@ html, body, #root {
   flex-direction: column;
   height: auto;
   width: 100%;
+  margin-top: 1rem; /* Increase space below Project Information */
+  overflow-y: auto; /* Allows scrolling if many files */
+  padding: 0 1rem; /* Adjust padding for visual consistency */
 }
   
 .taskbar {
@@ -175,7 +179,10 @@ html, body, #root {
   cursor: pointer;
   display: flex;
   align-items: center;
-  color: #bbb;
+  color: white;
+  font-family: 'Poppins', sans-serif;  
+  font-size: 12px;
+  font-weight: 500;
 }
 
 .file-item:hover {
@@ -290,7 +297,7 @@ html, body, #root {
 }
 
 .user-icon {
-    font-size: 24px;
+    font-size: 20px;
     cursor: pointer;
 }
 

@@ -91,22 +91,51 @@ const App = () => {
         return () => unsubscribe();
     }, []);
 
+    // Function to save file data online
+    const saveOnline = async (fileData) => {
+        const fileRef = doc(db, "files", currentFileName);
+        try {
+            await setDoc(fileRef, fileData, { merge: true });
+            console.log("File saved successfully online.");
+            // Optionally, remove from local storage after successful sync
+        } catch (error) {
+            console.error("Error saving file to Firestore:", error);
+        }
+    };
+
+    // Function to save file data offline
+    const saveOffline = (fileData) => {
+        localStorage.setItem(currentFileName, JSON.stringify(fileData));
+        console.log("File saved locally for offline use.");
+    };
+
+    const handleOnline = () => {
+        console.log("Back online, syncing local changes...");
+        // Loop through all locally stored files and sync them
+        Object.keys(localStorage).forEach(async (key) => {
+            const fileData = JSON.parse(localStorage.getItem(key));
+            await saveOnline(fileData);
+            localStorage.removeItem(key); // Remove from local storage after sync
+        });
+    };
+
+    useEffect(() => {
+    
+        window.addEventListener("online", handleOnline);
+    
+        // Cleanup on component unmount
+        return () => window.removeEventListener("online", handleOnline);
+    }, [handleOnline]); // Add dependencies as needed
+
     useEffect(() => {
         const handleAutoSave = () => {
             if (!currentFileName) return;
-            const updatedFiles = files.map(file => {
-                if (file.name === currentFileName) {
-                    return { ...file, content: editorCode };
-                }
-                return file;
-            });
-
-            setFiles(updatedFiles);
+            handleSaveFile();
         };
         const debounceSave = setTimeout(handleAutoSave, 1000);
         return () => clearTimeout(debounceSave);
 
-    }, [editorCode, currentFileName, files]);
+    }, [currentFileName]);
 
     useEffect(() => {
         const closeDropdown = (e) => {
@@ -189,30 +218,30 @@ const App = () => {
         setIsPopupOpen(false);
     };
 
+    // Modify the handleSaveFile function
     const handleSaveFile = async () => {
-        if (!currentFileName.trim() || !editorCode.trim()) {
+        if (!currentFileName) {
             console.log("No file name or content to save");
             return;
         }
 
-        setIsSaving(true); // Indicate that saving has started
-
-        const fileRef = doc(db, "files", currentFileName);
         const fileData = {
             language: language,
             content: editorCode,
-            uid: auth.currentUser.uid,
-            //updatedAt: new Date(), // Optionally store the last updated time
+            uid: auth.currentUser?.uid, // Ensure you have a fallback or check for currentUser being null
         };
 
-        try {
-            await setDoc(fileRef, fileData, { merge: true }); // Save or merge data in Firestore
-            console.log("File saved successfully");
-        } catch (error) {
-            console.error("Error saving file to Firestore:", error);
-        } finally {
-            setIsSaving(false); // Reset the saving indicator
+        setIsSaving(true); // Indicate saving process has started
+
+        if (navigator.onLine) {
+            // Save online if the navigator is online
+            await saveOnline(fileData);
+        } else {
+            // Save offline if the navigator is offline
+            saveOffline(fileData);
         }
+
+        setIsSaving(false); // Reset saving indicator
     };
 
     const handleLanguageChange = (language) => {
@@ -249,12 +278,12 @@ const App = () => {
                 <div className="container2">
                     <div className="container3">
                         <div className="container7">
-                            Project Information
+                            EXPLORER
                         </div>
                         <div className="container8">
                             {files.map(file => (
                                 <div key={file.name} className="file-item" onClick={() => handleFileSelect(file.name)}>
-                                    {file.name} { }
+                                    {file.name}
                                 </div>
                             ))}
                         </div>
@@ -263,6 +292,7 @@ const App = () => {
                             {showDropdown && (
                                 <div className="dropdown-menu">
                                     <div className="dropdown-item" onClick={handleSignOut}>Sign Out</div>
+                                    <div className='dropdown-item'>Settings</div>
                                 </div>
                             )}
                         </div>
