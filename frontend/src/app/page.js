@@ -33,8 +33,15 @@ export default function Home() {
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      if (!userCredential.user.emailVerified) {
+        setFormData({ email: '', password: '' });
+        setError('Please verify your email.');
+        setShowNotification(true);
+      }
+      else {
+        router.push('/editor');
+      }
       console.log(userCredential.user);
-      router.push('/editor');
     } catch (error) {
       setFormData({ email: '', password: '' });
       setError(getErrorMessage(error.code));

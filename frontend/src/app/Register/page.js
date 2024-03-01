@@ -3,9 +3,8 @@ import '../globals.css'
 import './Register.css'
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { createUserWithEmailAndPassword } from 'firebase/auth'
+import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
 import { auth } from '../../firebase-config'
-
 
 export default function Home() {
   const router = useRouter();
@@ -16,6 +15,7 @@ export default function Home() {
 
   const [error, setError] = useState('');
   const [showNotification, setShowNotification] = useState(false);
+  const [showError, setshowError] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -31,15 +31,15 @@ export default function Home() {
         try {
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             const user = userCredential.user;
-            console.log("User signed up:", user);
-            router.push('./editor');
+            setShowNotification(true);
+            sendEmailVerification(user);
             // Redirect or perform other actions after successful sign-up
         } catch (error) {
             console.error("Error signing up:", error.message);
             // Set error state and clear form fields
-            setFormData({ email: '', password: '' });
+            setFormData({ email: error.message, password: '' });
             setError(getErrorMessage(error.code));
-            setShowNotification(true);
+            setshowError(true);
         }
   };
 
@@ -90,8 +90,21 @@ export default function Home() {
           {showNotification && (
             <div className='notification-overlay'>
               <div className='notification'>
+              <p>Verification email sent!</p>
+              <button onClick={() => {
+                setShowNotification(false);
+                router.push('/')
+            }}>Go to Login.</button>
+              </div>
+            </div>
+          )}
+        </div>
+        <div>
+          {showError && (
+            <div className='notification-overlay'>
+              <div className='notification'>
               <p>{error}</p>
-              <button onClick={() => setShowNotification(false)}>Close</button>
+              <button onClick={() => setshowError(false)}>Try Again.</button>
               </div>
             </div>
           )}
