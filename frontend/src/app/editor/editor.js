@@ -48,6 +48,7 @@ const EditorPage = ( { language, code, theme, currentFile, onCodeChange } ) => {
 
     const handleEditorChange = (value, event) => {
         /* whenever text in the editor is updated */
+        onCodeChange(value);
     }
 
     const handleEditorDidMount = (editor, monaco) => {
