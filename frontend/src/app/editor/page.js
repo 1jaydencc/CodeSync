@@ -3,20 +3,19 @@ import React, { useState, useEffect } from 'react';
 import Editor from '@/app/editor/editor.js';
 import Taskbar from '@/app/editor/taskbar.js';
 import NewFilePopup from '@/app/editor/new-file-popup.js';
+import Dropdown from './themeDropDown.js';
+import themelist from "monaco-themes/themes/themelist.json";
 import '@/app/editor/editor.css';
 import languages from '@/app/editor/languages.json';
 import JSZip from 'jszip';
 import { saveAs } from 'file-saver';
 import { signOut } from 'firebase/auth';
-import { auth } from '@/firebase-config';
 import { useRouter } from 'next/navigation';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-solid-svg-icons';
-import { doc, setDoc, collection, query, where, getDocs } from "firebase/firestore";
+import { doc, setDoc, collection, query, where, getDocs, onSnapshot } from "firebase/firestore";
 import { onAuthStateChanged } from 'firebase/auth';
-import { db } from '@/firebase-config';
-
-
+import { auth,db } from '@/firebase-config';
 
 const App = () => {
     const [language, setLanguage] = useState('javascript');
@@ -32,6 +31,8 @@ const App = () => {
 
     const toggleDropdown = () => setShowDropdown(!showDropdown);
 
+    const [dropdownVisible, setDropdownVisible] = useState(true);
+    const [theme, setTheme] = useState('vs-dark');
 
     const handleOpenFile = () => {
         // Placeholder for open file logic
@@ -49,6 +50,14 @@ const App = () => {
         // Placeholder for terminal logic
     };
 
+    const toggleVisibility = () => {
+        setDropdownVisible(!dropdownVisible);
+        console.log(dropdownVisible)
+    };
+
+    const handleTheme = () => {
+        toggleVisibility();
+    }
     const handleHelp = () => {
         // Placeholder for help/documentation logic
     };
@@ -249,6 +258,36 @@ const App = () => {
         // Logic to change the language in the editor
     };
 
+    setTimeout(
+        function() {
+            const unsub = onSnapshot(doc(db, "user_settings", auth.currentUser.uid), (doc) => {
+                // console.log("Current data: ", doc.data().theme);
+                if (doc.data().theme === 'vs-light') {
+                    setTheme('vs-light');
+                } else if (doc.data().theme === 'vs-dark') {
+                    setTheme('vs-dark');
+                } else if (doc.data().theme === 'hc-black') {
+                    setTheme('hc-black');
+                } else if (doc.data().theme === 'hc-light') {
+                    setTheme('hc-light');
+                }
+            });
+    }, 2000);
+
+
+    const handleThemeChange = (e) => {
+        const selectedOption = e.target.value;
+        if (selectedOption === 'vs-light') {
+            setTheme('vs-light');
+        } else if (selectedOption === 'vs-dark') {
+            setTheme('vs-dark');
+        } else if (selectedOption === 'hc-black') {
+            setTheme('hc-black');
+        } else if (selectedOption === 'hc-light') {
+            setTheme('hc-light');
+        }
+    };
+
     return (
         <div className="app">
             <div className="container0">
@@ -264,10 +303,19 @@ const App = () => {
                             onRun={handleRun}
                             onDebug={handleDebug}
                             onTerminal={handleTerminal}
+                            onTheme={handleTheme}
                             onHelp={handleHelp}
                             onDownloadAllFiles={handleDownloadAllFiles}
                             onChat={handleChat}
                         />
+                        <div hidden={dropdownVisible} onChange={handleThemeChange} >
+                            <select className='options'>
+                                <option value="vs-light">vs-light</option>
+                                <option value="vs-dark">vs-dark</option>
+                                <option value="hc-black">hc-black</option>
+                                <option value="hc-light">hc-light</option>
+                            </select>
+                        </div>
                     </div>
                 </div>
                 <NewFilePopup
@@ -306,10 +354,12 @@ const App = () => {
                                 </div>
                             ))}
                         </div>
-                        <div className="container6">
+                        <div>
                             <Editor
                                 language={language}
                                 code={editorCode}
+                                theme={theme}
+                                currentFile={activeTab}
                                 onCodeChange={setEditorCode}
                             />
                         </div>
