@@ -113,6 +113,16 @@ const App = () => {
         return () => unsubscribe();
     }, []);
 
+    const deleteProject = async (projectId) => {
+        try {
+            await deleteDoc(doc(db, "projects", projectId));
+            setProjects(projects.filter(project => project.id !== projectId));
+            setSelectedProject(null);
+        } catch (error) {
+            console.error("Error deleting project:", error);
+        }
+    };
+
     // Function to save file data online
     const saveOnline = async (fileData) => {
         const fileRef = doc(db, "files", currentFileName);
@@ -130,6 +140,7 @@ const App = () => {
         localStorage.setItem(currentFileName, JSON.stringify(fileData));
         console.log("File saved locally for offline use.");
     };
+
 
     const handleOnline = () => {
         console.log("Back online, syncing local changes...");
@@ -303,6 +314,20 @@ const App = () => {
 
     return (
         <div className="app">
+            <div className="projects-panel">
+                <h2>Projects</h2>
+                <ul>
+                    {projects.map(project => (
+                        <li key={project.id} onClick={() => handleProjectSelect(project.id)}>
+                            {project.name}
+                        </li>
+                    ))}
+                </ul>
+                <button onClick={() => setIsPopupOpen(true)}>New Project</button>
+                {selectedProject && (
+                    <button onClick={() => deleteProject(selectedProject.id)}>Delete Project</button>
+                )}
+            </div>
             <div className="container0">
                 <div className="container1">
                     <div className="logo">
