@@ -294,3 +294,16 @@ html, body, #root {
 .notification.unread {
   font-weight: bold;
 }
+
+.task-card {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 8px;
+  background-color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.task-card h3 {
+  margin-top: 0;
+}
