@@ -39,7 +39,7 @@ const App = () => {
     };
 
     const handleRun = () => {
-        // Placeholder for run without debugging logic
+        
     };
 
     const handleDebug = () => {
