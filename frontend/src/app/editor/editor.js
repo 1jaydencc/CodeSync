@@ -131,7 +131,7 @@ const EditorPage = ( { language, code, theme, currentFile, onCodeChange } ) => {
                     startColumn,
                     endLineNumber,
                     endColumn,
-                    "arsh"
+                    "temporary collaborators"
                 )}>Add Comment</button>
                 </h2>
                 {((startColumn != endColumn) || (startLineNumber != endLineNumber)) &&

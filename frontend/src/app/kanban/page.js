@@ -1,10 +1,38 @@
 'use client';
 import '@/app/globals.css'
 import '@/app/kanban/kanban.css'
-import React, { } from 'react';
+import React, { useRef, useState, useEffect } from 'react';
+import { auth, db } from "@/firebase-config";
+import { collection, doc, addDoc, setDoc, deleteDoc } from "firebase/firestore";
 
+const Task = ( /* params */ ) => {
+  // console.log("making new task", taskId);
+  return  (
+      <div className="task">
+        <span onClick={() => handleCloseComment(commentID)}> ✖ </span> {}
+      </div>
+  );
+}
 
 export default function KanbanPage() {
+  const [commentList, setCommentList] = useState([]);
+  const [commentText, setCommentText] = useState('');
+  const [collaborators, setCollaborators] = useState('');
+
+  // BACKEND FUNCTIONS // 
+  const onAddTaskClick = () => {
+    const docRef = addDoc(collection(db, "tasks"), {
+      // task fields
+    });
+
+    const newComment = <Comment
+        // create new DOM task object to input into list
+    />
+
+    setCommentList([...commentList, newComment]);
+}
+
+  // DRAGGABLE FUNCTIONS https://codesandbox.io/p/sandbox/todo-list-dragdrop-local-storage-u91q0?file=%2Fsrc%2Fdraggable.js%3A22%2C37 // 
   const onDragStart = (event) => {
     event
       .dataTransfer
@@ -40,51 +68,103 @@ export default function KanbanPage() {
     return (
       <div className="example-parent">
         <h1>To-do list</h1>
-        <div className="example-origin"
-              onDragOver={onDragOver}
-              onDrop={onDrop}>
-          To-do
+        
+        <div className='kanban-sections'>
+          
           <div
-            id="draggable-1"
-            className="example-draggable"
-            draggable="true"
-            onDragStart={onDragStart}
+            className="example-dropzone"
+            onDragOver={onDragOver}
+            onDrop={onDrop}
           >
-            thing 1
+            <h2> Assigned Tasks </h2>
           </div>
-          <div
-            id="draggable-2"
-            className="example-draggable"
-            draggable="true"
-            onDragStart={onDragStart}
-          >
-            thing 2
+          <div className="example-dropzone"
+                onDragOver={onDragOver}
+                onDrop={onDrop}>
+            <h2> To-do </h2>
+            <div
+              id="draggable-1"
+              className="example-draggable"
+              draggable="true"
+              onDragStart={onDragStart}
+            >
+              thing 1
+            </div>
+            <div
+              id="draggable-2"
+              className="example-draggable"
+              draggable="true"
+              onDragStart={onDragStart}
+            >
+              thing 2
+            </div>
+            <div
+              id="draggable-3"
+              className="example-draggable"
+              draggable="true"
+              onDragStart={onDragStart}
+            >
+              thing 3
+            </div>
+            <div
+              id="draggable-4"
+              className="example-draggable"
+              draggable="true"
+              onDragStart={onDragStart}
+            >
+              thing 4
+            </div>
           </div>
+
           <div
-            id="draggable-3"
-            className="example-draggable"
-            draggable="true"
-            onDragStart={onDragStart}
+            className="example-dropzone"
+            onDragOver={onDragOver}
+            onDrop={onDrop}
           >
-            thing 3
+            <h2> Doing </h2>
           </div>
+
           <div
-            id="draggable-4"
-            className="example-draggable"
-            draggable="true"
-            onDragStart={onDragStart}
+            className="example-dropzone"
+            onDragOver={onDragOver}
+            onDrop={onDrop}
           >
-            thing 4
+            <h2> Done </h2>
           </div>
         </div>
 
-        <div
-          className="example-dropzone"
-          onDragOver={onDragOver}
-          onDrop={onDrop}
-        >
-          Done
+        <div className="comment-container">
+          <h2>Comments
+            <button onClick={() => onAddTaskClick( // onAddTaskClick submits to firestore collection
+              // pass to backend
+            )}>Add Comment</button>
+          </h2>
+          {/* {((startColumn != endColumn) || (startLineNumber != endLineNumber)) && */}
+          <div className="comment">
+            <p>Add a task <br></br>
+              <input
+                value={commentText}
+                onChange={(e) => setCommentText(e.target.value)}
+                type={"comment"}
+                placeholder="leave your comment"
+              />
+                <input
+                  value={collaborators}
+                  onChange={(e) => setCollaborators(e.target.value)}
+                  type={"collaborators"}
+                  placeholder="list your collaborators"
+                />
+            </p>
+            <span onClick={() => handleCloseComment(commentID)}> ✖ </span> {}
+          </div>
+          {/* } */}
+          {commentList.map(commentID => (
+            <div key={commentID} className='comment-item'>
+              {commentID}
+            </div>
+          ))}
         </div>
+
       </div>
     );
 }
