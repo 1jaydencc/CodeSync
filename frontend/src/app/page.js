@@ -25,7 +25,8 @@ export default function Home() {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
         // User is signed in, redirect them to the editor
-        // router.push('/editor');
+        console.log('User is signed in');
+        router.push('/editor');
       } else {
         // User is signed out, stay on this page or handle accordingly
         console.log('User is not signed in');
