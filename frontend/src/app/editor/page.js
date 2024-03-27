@@ -3,8 +3,6 @@ import React, { useState, useEffect } from 'react';
 import Editor from '@/app/editor/editor.js';
 import Taskbar from '@/app/editor/taskbar.js';
 import NewFilePopup from '@/app/editor/new-file-popup.js';
-import Dropdown from './themeDropDown.js';
-import themelist from "monaco-themes/themes/themelist.json";
 import '@/app/editor/editor.css';
 import languages from '@/app/editor/languages.json';
 import JSZip from 'jszip';
@@ -193,7 +191,13 @@ const App = () => {
         }
     };
 
-
+    const handleKanban = () => {
+        try {
+            router.push('/kanban');
+        } catch (error) {
+            console.error("Error navigating to Kanban:", error);
+        }
+    }
 
     const handleDownloadAllFiles = () => {
         const zip = new JSZip();
@@ -322,6 +326,7 @@ const App = () => {
                         CodeSync
                     </div>
                     <div className="taskBar">
+                        <button onClick={handleKanban}>Kanban</button>
                         <Taskbar
                             onNewFile={handleNewFile}
                             onSaveFile={handleSaveFile}
