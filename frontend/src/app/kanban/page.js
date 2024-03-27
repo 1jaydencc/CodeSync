@@ -4,98 +4,87 @@ import '@/app/kanban/kanban.css'
 import React, { } from 'react';
 
 
-const tasks = [
-  { id: 1, title: 'Fix the bug', status: 'Todo' },
-  { id: 2, title: 'Write documentation', status: 'In Progress' },
-  { id: 3, title: 'Deploy to production', status: 'Done' },
-  // Add more tasks as needed
-];
-
 export default function KanbanPage() {
-  const [tasksByStatus, setTasksByStatus] = React.useState({
-    Todo: tasks.filter((task) => task.status === 'Todo'),
-    'In Progress': tasks.filter((task) => task.status === 'In Progress'),
-    Done: tasks.filter((task) => task.status === 'Done'),
-  });
+  const onDragStart = (event) => {
+    event
+      .dataTransfer
+      .setData('text/plain', event.target.id);
+  
+    event
+      .currentTarget
+      .style
+      .backgroundColor = 'yellow';
+  }
 
-  const handleDragStart = (event, taskId, sourceStatus) => {
-    event.dataTransfer.setData('text/plain', taskId);
-    event.dataTransfer.effectAllowed = 'move';
-  };
-
-  const handleDragOver = (event, destinationStatus) => {
+  function onDragOver(event) {
     event.preventDefault();
-    if (event.dataTransfer.items[0].kind === 'text') {
-      event.dataTransfer.dropEffect = 'move';
+  }
+
+  const onDrop = (event) => {
+    event.preventDefault();
+
+    const id = event.dataTransfer.getData("text");
+    const draggableElement = document.getElementById(id);
+    draggableElement.removeAttribute('style')
+
+    if (event.target.className === "example-draggable") {
+      const referenceNode = event.target;
+      referenceNode.parentNode.insertBefore(draggableElement, referenceNode);
+    } else {
+      event.target.appendChild(draggableElement);
     }
-  };
 
-  const handleDrop = (event, destinationStatus) => {
-    event.preventDefault();
-    const taskId = event.dataTransfer.getData('text/plain');
-    const sourceTasks = tasksByStatus[destinationStatus]; // Assume tasks are already loaded
+    event.dataTransfer.clearData();
+  }
 
-    const updatedTasksByStatus = { ...tasksByStatus };
-    const [removedTask] = updatedTasksByStatus[sourceStatus].splice(
-      updatedTasksByStatus[sourceStatus].findIndex((task) => task.id === taskId),
-      1
+    return (
+      <div className="example-parent">
+        <h1>To-do list</h1>
+        <div className="example-origin"
+              onDragOver={onDragOver}
+              onDrop={onDrop}>
+          To-do
+          <div
+            id="draggable-1"
+            className="example-draggable"
+            draggable="true"
+            onDragStart={onDragStart}
+          >
+            thing 1
+          </div>
+          <div
+            id="draggable-2"
+            className="example-draggable"
+            draggable="true"
+            onDragStart={onDragStart}
+          >
+            thing 2
+          </div>
+          <div
+            id="draggable-3"
+            className="example-draggable"
+            draggable="true"
+            onDragStart={onDragStart}
+          >
+            thing 3
+          </div>
+          <div
+            id="draggable-4"
+            className="example-draggable"
+            draggable="true"
+            onDragStart={onDragStart}
+          >
+            thing 4
+          </div>
+        </div>
+
+        <div
+          className="example-dropzone"
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+        >
+          Done
+        </div>
+      </div>
     );
-    removedTask.status = destinationStatus;
-    updatedTasksByStatus[destinationStatus].push(removedTask);
-
-    setTasksByStatus(updatedTasksByStatus);
-
-    // Simulate server update (replace with your actual data update logic)
-    setTimeout(() => {
-      // Update tasks array based on updatedTasksByStatus
-    }, 1000);
-  };
-
-  return (
-    <div className="kanban-board">
-      <div className="kanban-section">
-        <h3>Todo</h3>
-        <ul onDragOver={(e) => handleDragOver(e, 'Todo')}>
-          {tasksByStatus.Todo.map((task) => (
-            <li
-              key={task.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, task.id, 'Todo')}
-            >
-              {task.title}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="kanban-section">
-        <h3>In Progress</h3>
-        <ul onDragOver={(e) => handleDragOver(e, 'In Progress')}>
-          {tasksByStatus['In Progress'].map((task) => (
-            <li
-              key={task.id}
-draggable
-              onDragStart={(e) => handleDragStart(e, task.id, 'In Progress')}
-            >
-              {task.title}
-            </li>
-          ))}
-        </ul>
-      </div>
-      <div className="kanban-section">
-        <h3>Done</h3>
-        <ul onDragOver={(e) => handleDragOver(e, 'Done')}>
-          {tasksByStatus.Done.map((task) => (
-            <li
-              key={task.id}
-              draggable
-              onDragStart={(e) => handleDragStart(e, task.id, 'Done')}
-            >
-              {task.title}
-            </li>
-          ))}
-        </ul>
-      </div>
-    </div>
-  );
-
 }
