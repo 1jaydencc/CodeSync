@@ -77,27 +77,26 @@ const App = () => {
     return () => {};
   });
 
-  // Effect for saving the currently active file
   useEffect(() => {
-    const handleFileSave = async () => {
-      if (currentFilePath && editorCode) {
-        await electronAPI.saveFile({
-          path: currentFilePath,
-          content: editorCode,
-        });
-        console.log(`File saved: ${currentFilePath}`);
-        // Show a notification or message to the user if needed
+    const saveCurrentFile = () => {
+      if (activeFileIndex >= 0) {
+        const fileToSave = openFiles[activeFileIndex];
+        electronAPI
+          .saveFile({
+            path: fileToSave.path,
+            content: fileToSave.content,
+          })
+          .then(() => console.log("File saved successfully"))
+          .catch((err) => console.error("Failed to save file:", err));
       }
     };
 
-    // Register the handler for save requests
-    electronAPI.receive("save-request", handleFileSave);
+    electronAPI.receive("invoke-save", saveCurrentFile);
 
-    // Cleanup
     return () => {
-      electronAPI.receive("save-request", null);
+      // Cleanup if necessary, e.g., remove the event listener
     };
-  }, [currentFilePath, editorCode]);
+  }, [activeFileIndex, openFiles]);
 
   /*
   useEffect(() => {

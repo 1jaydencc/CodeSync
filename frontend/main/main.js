@@ -65,6 +65,7 @@ const createWindow = () => {
       submenu: [
         {
           label: "Open...",
+          accelerator: isMac ? "Cmd+O" : "Ctrl+O",
           click: async () => {
             // Mark this function as async
             const result = await dialog.showOpenDialog(win, {
@@ -87,8 +88,9 @@ const createWindow = () => {
         },
         {
           label: "Save",
+          accelerator: isMac ? "Cmd+S" : "Ctrl+S",
           click: () => {
-            win.webContents.send("save-request");
+            win.webContents.send("invoke-save"); // Change from "save-request" to "invoke-save"
           },
         },
         { type: "separator" },
@@ -211,6 +213,7 @@ ipcMain.handle("open-file", async () => {
 ipcMain.handle("save-file", async (event, { path, content }) => {
   const fs = require("fs").promises;
   await fs.writeFile(path, content);
+  console.log("file:", path, "saved:", content);
 });
 
 app.on("window-all-closed", () => {

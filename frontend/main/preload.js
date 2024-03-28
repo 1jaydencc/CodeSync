@@ -4,7 +4,7 @@ const { contextBridge, ipcRenderer } = require("electron");
 
 // Define allowed channels for send and receive
 const validSendChannels = ["save-file"];
-const validReceiveChannels = ["fromMain", "file-opened"]; // Include "file-opened" here
+const validReceiveChannels = ["fromMain", "file-opened", "invoke-save"]; // Include "file-opened" here
 const validInvokeChannels = ["open-file", "save-file"];
 
 contextBridge.exposeInMainWorld("electronAPI", {
