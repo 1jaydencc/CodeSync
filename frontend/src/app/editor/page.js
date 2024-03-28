@@ -72,18 +72,6 @@ const App = () => {
             console.log("Auth state changed. Current user:", user);
             if (user) {
                 // User is signed in, now fetch files
-                const fetchProjects = async () => {
-                    try {
-                        const querySnapshot = await getDocs(collection(db, "projects"));
-                        const fetchedProjects = querySnapshot.docs.map(doc => ({
-                            id: doc.id,
-                            ...doc.data(),
-                        }));
-                        setProjects(fetchedProjects);
-                    } catch (error) {
-                        console.error("Error fetching projects:", error);
-                    }
-                };
                 const fetchFiles = async () => {
                     console.log("Fetching files for user:", user.uid);
                     const q = query(collection(db, "files"), where("uid", "==", user.uid));
@@ -101,7 +89,6 @@ const App = () => {
                     }
                 };
                 fetchFiles();
-                fetchProjects();
             } else {
                 // User is signed out
                 console.log("User is signed out.");
