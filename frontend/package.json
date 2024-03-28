@@ -1,8 +1,14 @@
 {
-  "name": "frontend",
+  "name": "CodeSync",
+  "productName": "CodeSync",
   "version": "0.1.0",
   "private": true,
   "main": "main/main.js",
+  "description": "CS307 Project - CodeSync",
+  "build": {
+    "productName": "CodeSync",
+    "appId": "com.yourcompany.codesync"
+  },
   "scripts": {
     "dev": "concurrently -n \"NEXT,ELECTRON\" -c \"yellow,blue\" --kill-others \"next dev\" \"electron .\"",
     "build": "next build && electron-builder",
@@ -23,7 +29,7 @@
     "jszip": "^3.10.1",
     "monaco-editor": "^0.44.0",
     "monaco-themes": "^0.4.4",
-    "next": "^14.1.0",
+    "next": "^14.1.4",
     "react": "^18",
     "react-dom": "^18",
     "xterm": "^5.3.0"

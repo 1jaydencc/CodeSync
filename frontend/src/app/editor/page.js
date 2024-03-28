@@ -25,55 +25,81 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebase-config";
 
+const { electronAPI } = window;
+
 const App = () => {
   const [language, setLanguage] = useState("javascript");
   const [editorCode, setEditorCode] = useState("");
   const [files, setFiles] = useState([]);
   const [currentFileName, setCurrentFileName] = useState("");
-  const [isPopupOpen, setIsPopupOpen] = useState(false);
-  const [isSaving, setIsSaving] = useState(false);
+  const [currentFilePath, setCurrentFilePath] = useState("");
+  //const [isPopupOpen, setIsPopupOpen] = useState(false);
+  //const [isSaving, setIsSaving] = useState(false);
   const [openTabs, setOpenTabs] = useState([]);
   const [activeTab, setActiveTab] = useState("");
   const [showDropdown, setShowDropdown] = useState(false);
   const router = useRouter();
+  const [openFiles, setOpenFiles] = useState([]); // Each item: { path, content, language, fileName }
+  const [activeFileIndex, setActiveFileIndex] = useState(-1); // Index of the currently active file in openFiles
+  const activeFile = openFiles[activeFileIndex];
 
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
   const [dropdownVisible, setDropdownVisible] = useState(true);
   const [theme, setTheme] = useState("vs-dark");
 
-  const handleOpenFile = () => {
-    // Placeholder for open file logic
-  };
+  // In your useEffect within the React component
+  useEffect(() => {
+    const handleFileOpen = (event, { path, content }) => {
+      console.log("File opened in renderer:", path);
 
-  const handleRun = () => {
-    // Placeholder for run without debugging logic
-  };
+      if (openFiles.some((file) => file.path === path)) {
+        return;
+      }
 
-  const handleDebug = () => {
-    // Placeholder for run with debugging logic
-  };
+      const fileName = path.split("/").pop();
+      const extension = fileName.split(".").pop();
+      const languageObj = languages.find(
+        (lang) => lang.extension === `.${extension}`,
+      );
+      const language = languageObj ? languageObj.language : "plaintext";
 
-  const handleTerminal = () => {
-    // Placeholder for terminal logic
-  };
+      const newFile = { path, content, language, fileName };
 
-  const toggleVisibility = () => {
-    setDropdownVisible(!dropdownVisible);
-    console.log(dropdownVisible);
-  };
+      setOpenFiles([...openFiles, newFile]);
+      setActiveFileIndex(openFiles.length);
+    };
 
-  const handleTheme = () => {
-    toggleVisibility();
-  };
-  const handleHelp = () => {
-    // Placeholder for help/documentation logic
-  };
+    // Listen for the "file-opened" event
+    electronAPI.receive("file-opened", handleFileOpen);
 
-  const handleChat = () => {
-    router.push("/chat");
-  };
+    // Cleanup
+    return () => {};
+  });
 
+  // Effect for saving the currently active file
+  useEffect(() => {
+    const handleFileSave = async () => {
+      if (currentFilePath && editorCode) {
+        await electronAPI.saveFile({
+          path: currentFilePath,
+          content: editorCode,
+        });
+        console.log(`File saved: ${currentFilePath}`);
+        // Show a notification or message to the user if needed
+      }
+    };
+
+    // Register the handler for save requests
+    electronAPI.receive("save-request", handleFileSave);
+
+    // Cleanup
+    return () => {
+      electronAPI.receive("save-request", null);
+    };
+  }, [currentFilePath, editorCode]);
+
+  /*
   useEffect(() => {
     // Listen for auth state changes
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -111,6 +137,9 @@ const App = () => {
     return () => unsubscribe();
   }, []);
 
+   */
+
+  /*
   // Function to save file data online
   const saveOnline = async (fileData) => {
     const fileRef = doc(db, "files", currentFileName);
@@ -122,6 +151,7 @@ const App = () => {
       console.error("Error saving file to Firestore:", error);
     }
   };
+
 
   // Function to save file data offline
   const saveOffline = (fileData) => {
@@ -139,6 +169,7 @@ const App = () => {
     });
   };
 
+
   useEffect(() => {
     window.addEventListener("online", handleOnline);
 
@@ -154,6 +185,8 @@ const App = () => {
     const debounceSave = setTimeout(handleAutoSave, 1000);
     return () => clearTimeout(debounceSave);
   }, [currentFileName]);
+
+   */
 
   useEffect(() => {
     const closeDropdown = (e) => {
@@ -175,7 +208,7 @@ const App = () => {
     }
   };
 
-  const handleDownloadAllFiles = () => {
+  /*const handleDownloadAllFiles = () => {
     const zip = new JSZip();
     files.forEach((file) => {
       zip.file(file.name, file.content);
@@ -184,6 +217,7 @@ const App = () => {
       saveAs(content, "project.zip");
     });
   };
+  */
 
   const getLanguageFromFileName = (fileName) => {
     const extension = fileName.split(".").pop();
@@ -193,78 +227,19 @@ const App = () => {
     return languageObj ? languageObj.language : "plaintext";
   };
 
-  const handleFileSelect = (fileName) => {
-    const file = files.find((f) => f.name === fileName);
-    if (file) {
-      setEditorCode(file.content);
-      setCurrentFileName(fileName);
-      setLanguage(getLanguageFromFileName(fileName));
-      if (!openTabs.includes(fileName)) {
-        setOpenTabs([...openTabs, fileName]);
-      }
-      setActiveTab(fileName);
+  const handleFileSelect = (index) => {
+    setActiveFileIndex(index);
+  };
+
+  const handleCloseTab = (index) => {
+    const newOpenFiles = openFiles.filter((_, i) => i !== index);
+    setOpenFiles(newOpenFiles);
+    // Adjust the active file index as needed
+    if (activeFileIndex === index) {
+      setActiveFileIndex(
+        newOpenFiles.length ? Math.min(index, newOpenFiles.length - 1) : -1,
+      );
     }
-  };
-
-  const handleCloseTab = (fileName) => {
-    const newOpenTabs = openTabs.filter((name) => name !== fileName);
-    setOpenTabs(newOpenTabs);
-    if (activeTab === fileName && newOpenTabs.length > 0) {
-      setActiveTab(newOpenTabs[0]);
-    } else if (newOpenTabs.length === 0) {
-      setEditorCode("");
-      setCurrentFileName("");
-    }
-  };
-
-  const handleNewFile = () => {
-    setEditorCode("");
-    setIsPopupOpen(true);
-  };
-
-  const handleFileCreate = (fileName) => {
-    const extension = fileName.split(".").pop();
-    const languageObj = languages.find(
-      (lang) => lang.extension === `.${extension}`,
-    );
-    const language = languageObj ? languageObj.language : "plaintext";
-
-    const newFile = { name: fileName, content: "", language };
-    setFiles([...files, newFile]);
-    setCurrentFileName(fileName);
-    setLanguage(language);
-    setIsPopupOpen(false);
-  };
-
-  // Modify the handleSaveFile function
-  const handleSaveFile = async () => {
-    if (!currentFileName) {
-      console.log("No file name or content to save");
-      return;
-    }
-
-    const fileData = {
-      language: language,
-      content: editorCode,
-      uid: auth.currentUser?.uid, // Ensure you have a fallback or check for currentUser being null
-    };
-
-    setIsSaving(true); // Indicate saving process has started
-
-    if (navigator.onLine) {
-      // Save online if the navigator is online
-      await saveOnline(fileData);
-    } else {
-      // Save offline if the navigator is offline
-      saveOffline(fileData);
-    }
-
-    setIsSaving(false); // Reset saving indicator
-  };
-
-  const handleLanguageChange = (language) => {
-    setLanguage(language);
-    // Logic to change the language in the editor
   };
 
   useEffect(() => {
@@ -327,45 +302,19 @@ const App = () => {
       <div className="container0">
         <div className="container1">
           <div className="logo">CodeSync</div>
-          <div className="taskBar">
-            <Taskbar
-              onNewFile={handleNewFile}
-              onSaveFile={handleSaveFile}
-              onOpenFile={handleOpenFile}
-              onRun={handleRun}
-              onDebug={handleDebug}
-              onTerminal={handleTerminal}
-              onTheme={handleTheme}
-              onHelp={handleHelp}
-              onDownloadAllFiles={handleDownloadAllFiles}
-              onChat={handleChat}
-            />
-            <div hidden={dropdownVisible} onChange={handleThemeChange}>
-              <select className="options">
-                <option value="vs-light">vs-light</option>
-                <option value="vs-dark">vs-dark</option>
-                <option value="hc-black">hc-black</option>
-                <option value="hc-light">hc-light</option>
-              </select>
-            </div>
-          </div>
+          <div className="taskBar"></div>
         </div>
-        <NewFilePopup
-          isOpen={isPopupOpen}
-          onClose={() => setIsPopupOpen(false)}
-          onCreate={handleFileCreate}
-        />
         <div className="container2">
           <div className="container3">
             <div className="container7">EXPLORER</div>
             <div className="container8">
-              {files.map((file) => (
+              {openFiles.map((file, index) => (
                 <div
-                  key={file.name}
+                  key={file.path}
                   className="file-item"
-                  onClick={() => handleFileSelect(file.name)}
+                  onClick={() => handleFileSelect(index)}
                 >
-                  {file.name}
+                  {file.fileName}
                 </div>
               ))}
             </div>
@@ -385,27 +334,62 @@ const App = () => {
               )}
             </div>
           </div>
+          {/* File Tabs Bar */}
           <div className="container4">
             <div className="container5">
-              {openTabs.map((tabName) => (
+              {openFiles.map((file, index) => (
                 <div
-                  key={tabName}
-                  className={`tab-item ${tabName === activeTab ? "active" : ""}`}
-                  onClick={() => handleFileSelect(tabName)}
+                  key={file.path}
+                  className={`tab-item ${index === activeFileIndex ? "active" : ""}`}
+                  onClick={() => handleFileSelect(index)}
                 >
-                  {tabName}
-                  <span onClick={() => handleCloseTab(tabName)}> ✖ </span> {}
+                  {file.fileName}
+                  <span
+                    className="close-tab"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCloseTab(index);
+                    }}
+                  >
+                    {" "}
+                    ✖{" "}
+                  </span>
                 </div>
               ))}
             </div>
-            <div>
-              <Editor
-                language={language}
-                code={editorCode}
-                theme={theme}
-                currentFile={activeTab}
-                onCodeChange={setEditorCode}
-              />
+            {/* File Path Display */}
+            <div className="file-path-display">
+              {activeFileIndex >= 0
+                ? openFiles[activeFileIndex].path
+                : "No file selected"}
+            </div>
+            <div className="editor-container-wrap">
+              <div className="editor-container">
+                <Editor
+                  language={
+                    activeFileIndex >= 0
+                      ? openFiles[activeFileIndex].language
+                      : "plaintext"
+                  }
+                  code={
+                    activeFileIndex >= 0
+                      ? openFiles[activeFileIndex].content
+                      : ""
+                  }
+                  theme={theme}
+                  onCodeChange={(newContent) => {
+                    if (activeFileIndex >= 0) {
+                      // Only update the content of the currently active file if there is one selected
+                      const updatedFiles = openFiles.map((file, index) =>
+                        index === activeFileIndex
+                          ? { ...file, content: newContent }
+                          : file,
+                      );
+                      setOpenFiles(updatedFiles);
+                    }
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>
