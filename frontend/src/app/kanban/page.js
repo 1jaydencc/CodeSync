@@ -1,6 +1,7 @@
 'use client';
 import '@/app/globals.css'
 import '@/app/kanban/kanban.css'
+import { onDragStart, onDragOver, onDrop } from '@/app/kanban/draggable.js'
 import React, { useRef, useState, useEffect } from 'react';
 import { auth, db } from "@/firebase-config";
 import { collection, doc, addDoc, setDoc, deleteDoc } from "firebase/firestore";
@@ -14,9 +15,20 @@ const Task = ( /* params */ ) => {
   );
 }
 
+const Noti = ( { type, }) => {
+
+  return (
+    <div className='noti'>
+      <div className='noti-content'>
+
+      </div>
+    </div>
+  )
+}
+
 export default function KanbanPage() {
-  const [commentList, setCommentList] = useState([]);
-  const [commentText, setCommentText] = useState('');
+  const [taskList, setTaskList] = useState([]);
+  const [taskText, setTaskText] = useState('');
   const [collaborators, setCollaborators] = useState('');
 
   // BACKEND FUNCTIONS // 
@@ -29,47 +41,19 @@ export default function KanbanPage() {
         // create new DOM task object to input into list
     />
 
-    setCommentList([...commentList, newComment]);
+    setTaskList([...taskList, newComment]);
 }
-
-  // DRAGGABLE FUNCTIONS https://codesandbox.io/p/sandbox/todo-list-dragdrop-local-storage-u91q0?file=%2Fsrc%2Fdraggable.js%3A22%2C37 // 
-  const onDragStart = (event) => {
-    event
-      .dataTransfer
-      .setData('text/plain', event.target.id);
-  
-    event
-      .currentTarget
-      .style
-      .backgroundColor = 'yellow';
-  }
-
-  function onDragOver(event) {
-    event.preventDefault();
-  }
-
-  const onDrop = (event) => {
-    event.preventDefault();
-
-    const id = event.dataTransfer.getData("text");
-    const draggableElement = document.getElementById(id);
-    draggableElement.removeAttribute('style')
-
-    if (event.target.className === "example-draggable") {
-      const referenceNode = event.target;
-      referenceNode.parentNode.insertBefore(draggableElement, referenceNode);
-    } else {
-      event.target.appendChild(draggableElement);
-    }
-
-    event.dataTransfer.clearData();
-  }
 
     return (
       <div className="example-parent">
+        <div className='noti-section'>
+        <h1>Notifications Testing</h1>
+        
+
+        </div>
         <h1>To-do list</h1>
         
-        <div className='kanban-sections'>
+        <div className='kanban-section'>
           
           <div
             className="example-dropzone"
@@ -143,8 +127,8 @@ export default function KanbanPage() {
           <div className="comment">
             <p>Add a task <br></br>
               <input
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
+                value={taskText}
+                onChange={(e) => setTaskText(e.target.value)}
                 type={"comment"}
                 placeholder="leave your comment"
               />
@@ -158,7 +142,7 @@ export default function KanbanPage() {
             <span onClick={() => handleCloseComment(commentID)}> ✖ </span> {}
           </div>
           {/* } */}
-          {commentList.map(commentID => (
+          {taskList.map(commentID => (
             <div key={commentID} className='comment-item'>
               {commentID}
             </div>
