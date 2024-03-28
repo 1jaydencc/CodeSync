@@ -25,8 +25,7 @@
     },
     {  
         "language": "c",
-        "extension": ".c",
-        "version": "10.2.0"
+        "extension": ".c"
     },
     {
         "language": "cameligo",
@@ -106,8 +105,7 @@
     },
     {
         "language": "java",  
-        "extension": ".java",
-        "version": "15.0.2"
+        "extension": ".java"
     },    
     {
         "language": "javascript",
@@ -215,8 +213,7 @@
     },
     {  
         "language": "python",
-        "extension": ".py",
-        "version": "3.10.0"
+        "extension": ".py"
     },      
     {
         "language": "qsharp",  

@@ -14,7 +14,6 @@
     "@fortawesome/free-solid-svg-icons": "^6.5.1",
     "@fortawesome/react-fontawesome": "^0.2.0",
     "@monaco-editor/react": "^4.6.0",
-    "@tauri-apps/cli": "^1.5.11",
     "axios": "^1.6.7",
     "daisyui": "^4.7.2",
     "date-fns": "^3.3.1",
