@@ -18,6 +18,41 @@ const App = () => {
     const [isSaving, setIsSaving] = useState(false);
     const [openTabs, setOpenTabs] = useState([]);
     const [activeTab, setActiveTab] = useState('');
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [notifications, setNotifications] = useState([
+        { id: 1, description: "Your first notification goes here, it's pretty long to test the ellipsis...", isRead: false, timestamp: "10:30 AM" },
+        { id: 2, description: "Second notification, also lengthy enough...", isRead: true, timestamp: "Yesterday" },
+        // Add more notifications as needed
+    ]);
+    const [selectedNotification, setSelectedNotification] = useState(null);
+    const [showConfirmation, setShowConfirmation] = useState(false);
+
+    const handleNotificationClick = (notificationId) => {
+        setSelectedNotification(notifications.find(n => n.id === notificationId));
+        setNotifications(notifications.map(n => {
+          if (n.id === notificationId) {
+            return { ...n, isRead: true };
+          }
+          return n;
+        }));
+      };
+      
+
+    const toggleNotifications = () => {
+      setShowNotifications(!showNotifications);
+    };
+
+    const handleClosePopup = () => {
+        setSelectedNotification(null);
+    };
+
+    const handleClearNotifications = () => {
+        setNotifications([]);
+        setShowConfirmation(true);
+        setTimeout(() => {
+          setShowConfirmation(false);
+        }, 3000);
+    };
 
     const handleOpenFile = () => {
         // Placeholder for open file logic
@@ -205,8 +240,34 @@ const App = () => {
                             onTerminal={handleTerminal}
                             onHelp={handleHelp}
                             onDownloadAllFiles={handleDownloadAllFiles}
+                            onToggleNotifications={toggleNotifications}
                         />
                     </div>
+                    {showNotifications && (
+                    <div className="notifications-area">
+                        Notifications
+                        <button className="clear-notifications" onClick={handleClearNotifications}>Clear</button>
+                        {notifications.map((notification) => (
+                        <div key={notification.id} className={`notification-item ${notification.isRead ? 'read' : 'unread'}`}onClick={() => handleNotificationClick(notification.id)}>
+                            <span className="notification-description">{notification.description.slice(0, 15)}...</span>
+                            <span className="notification-timestamp">{notification.timestamp}</span>
+                        </div>
+                        ))}
+                    </div>
+                    )}
+                    {selectedNotification && (
+                    <div className="popup-overlay" onClick={handleClosePopup}>
+                        <div className="popup" onClick={(e) => e.stopPropagation()}> {/* Prevent popup from closing when clicking inside */}
+                        <p>{selectedNotification.description}</p>
+                        <p className="notification-timestamp">{selectedNotification.timestamp}</p>
+                        </div>
+                    </div>
+                    )}
+                    {showConfirmation && (
+                    <div className="confirmation-message">
+                        Notifications cleared
+                    </div>
+                    )}
                 </div>
                 <NewFilePopup
                         isOpen={isPopupOpen}

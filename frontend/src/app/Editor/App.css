@@ -11,6 +11,7 @@ html, body, #root {
 .app {
   height: 100vh;
   width: 100%;
+  position: relative;
 }
 
 .container0 {
@@ -19,6 +20,7 @@ html, body, #root {
   flex-direction: column;
   height: 100%;
   width: 100%;
+  position: relative;
 }
 
 .logo {
@@ -251,59 +253,87 @@ html, body, #root {
   font-family: 'Poppins', sans-serif;
 }
 
-.notifications-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.notifications-container {
-  background-color: white;
-  padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-}
-
-.notifications-container h2 {
-  margin-top: 0;
-}
-
-.notifications-container ul {
-  list-style: none;
-  padding: 0;
-}
-
-.notification {
-  cursor: pointer;
-  margin-bottom: 10px;
+.notifications-area {
+  position: absolute;
+  top: 40px;
+  right: 0;
+  width: 300px;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #1e1e1e;
+  color: white;
+  border: 1px solid #3c3c3c;
+  z-index: 10;
   padding: 10px;
-  border: 1px solid #ccc;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  font-family: 'Poppins', sans-serif;
+  font-size: 10px;
+}
+
+.notification-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+  margin-bottom: 5px;
   border-radius: 4px;
 }
 
-.notification:hover {
-  background-color: #f0f0f0;
+.notification-item.read {
+  background-color: #2e2e2e;
 }
 
-.notification.unread {
-  font-weight: bold;
+.notification-item.unread {
+  background-color: #000000;
 }
 
-.task-card {
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 10px;
-  margin-bottom: 8px;
-  background-color: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+.notification-description {
+  flex-grow: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-.task-card h3 {
-  margin-top: 0;
+.notification-timestamp {
+  margin-left: 10px;
+  white-space: nowrap;
+}
+
+.clear-notifications {
+  position: absolute;
+  right: 10px;
+  top: 5px;
+  background: none;
+  border: none;
+  color: #c5c5c5;
+  text-decoration: underline;
+  cursor: pointer;
+  font-size: 10px;
+}
+
+.confirmation-message {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #454545;
+  color: #ffffff;
+  padding: 10px 20px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  z-index: 1050;
+  animation: fadeOut 3s forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    visibility: hidden;
+  }
 }
