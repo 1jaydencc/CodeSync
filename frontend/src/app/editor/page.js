@@ -72,7 +72,6 @@ const App = () => {
             console.log("Auth state changed. Current user:", user);
             if (user) {
                 // User is signed in, now fetch files
-                /*
                 const fetchProjects = async () => {
                     try {
                         const querySnapshot = await getDocs(collection(db, "projects"));
@@ -85,7 +84,6 @@ const App = () => {
                         console.error("Error fetching projects:", error);
                     }
                 };
-                */
                 const fetchFiles = async () => {
                     console.log("Fetching files for user:", user.uid);
                     const q = query(collection(db, "files"), where("uid", "==", user.uid));
@@ -103,7 +101,7 @@ const App = () => {
                     }
                 };
                 fetchFiles();
-                //fetchProjects();
+                fetchProjects();
             } else {
                 // User is signed out
                 console.log("User is signed out.");
@@ -316,6 +314,20 @@ const App = () => {
 
     return (
         <div className="app">
+            <div className="projects-panel">
+                <h2>Projects</h2>
+                <ul>
+                    {projects.map(project => (
+                        <li key={project.id} onClick={() => handleProjectSelect(project.id)}>
+                            {project.name}
+                        </li>
+                    ))}
+                </ul>
+                <button onClick={() => setIsPopupOpen(true)}>New Project</button>
+                {selectedProject && (
+                    <button onClick={() => deleteProject(selectedProject.id)}>Delete Project</button>
+                )}
+            </div>
             <div className="container0">
                 <div className="container1">
                     <div className="logo">
