@@ -22,6 +22,8 @@ const ChatRoom = () => {
     console.log("User:", auth.currentUser);
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       setCurrentUserUid(user?.uid);
+      console.log("here")
+      console.log(currentUserUid)
     });
 
     const q = query(collection(db, "messages"), orderBy("createdAt"));

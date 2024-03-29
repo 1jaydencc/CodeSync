@@ -10,7 +10,7 @@ import { useRouter } from "next/navigation";
 
 import { auth, db  } from "@/firebase-config";
 import { onAuthStateChanged } from 'firebase/auth';
-import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from "firebase/firestore";
+import { collection, addDoc, getDocs, query, orderBy, onSnapshot, where } from "firebase/firestore";
 
 const Task = ( /* params */ ) => {
   // console.log("making new task", taskId);
@@ -55,21 +55,27 @@ export default function KanbanPage() {
   const [notiTitle, setNotiTitle] = useState('');
   const [notiDesc, setNotiDesc] = useState('');
 
+  const [currentUserEmail, setCurrentUserEmail] = useState(null);
+
   const [email, setEmail] = useState('');
   const [foundEmail, setFoundEmail] = useState('');
 
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-        // setCurrentUserUid(user?.uid);
+        setCurrentUserEmail(user?.email);
+        console.log("here")
+        console.log(currentUserEmail)
     });
 
-    const q = query(collection(db, "notifications"), orderBy("timestamp"));
+    const q = query(collection(db, "notifications"),
+                    where("recipient", "==", currentUserEmail));
 
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const notifications = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data(),
         }));
+        console.log("notifications", notifications)
         setNotiList(notifications);
     });
 
@@ -108,7 +114,7 @@ export default function KanbanPage() {
     console.log(auth.currentUser.uid, notiType, notiTitle, notiDesc, new Date())
 
     const docRef = addDoc(collection(db, "notifications"), {  // add doc to firestore
-      sender: auth.currentUser.email,
+      sender: currentUserEmail,
       type: notiType,
       recipient: foundEmail,
       title: notiTitle,
@@ -172,6 +178,32 @@ export default function KanbanPage() {
           </div>
         }
         <div className="noti-list">
+          {notiList.map((noti, index) => {
+            const showDisplayName =
+              index === 0 || notiList[index - 1].uid !== noti.uid;
+
+            return (
+              <div
+                key={noti.id}
+                className={`message-wrapper ${noti.uid === auth.currentUser.uid ? "sent-wrapper" : "received-wrapper"}`}
+              >
+                {true && (
+                  <div className="noti-header">
+                    {noti.sender || "anon@anon.com"}
+                  </div>
+                )}
+                <div
+                  className={`message ${noti.uid === auth.currentUser.uid ? "sent" : "received"}`}
+                >
+                  <div className="noti-content">
+                    <div className="noti-header">title: {noti.title}</div>
+                    <div className="noti-header">desc: {noti.desc}</div>
+                    <div className="noti-header">recipient: {noti.recipient}</div>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
 
         </div>
       </div>

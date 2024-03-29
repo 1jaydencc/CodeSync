@@ -118,3 +118,19 @@ body,
     border: #ff0000;
     border-radius: 5px;
 }
+
+.noti-header {
+    font-size: 0.7rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+    margin-bottom: 0.25rem;
+    font-weight: 500;
+    color: #a1a1aa;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
+    /* Align with message bubble padding */
+}
+
+.noti-desc {
+    display: inline-block;
+}
