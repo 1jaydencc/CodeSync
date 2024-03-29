@@ -11,12 +11,16 @@ import {
 } from "firebase/firestore";
 import "@/app/chat/chat-room.css";
 import { onAuthStateChanged } from "firebase/auth";
+import Image from "next/image";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 
 const ChatRoom = () => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [currentUserUid, setCurrentUserUid] = useState(null);
   const messagesEndRef = useRef(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [currentPhotoURL, setCurrentPhotoURL] = useState("");
 
   useEffect(() => {
     console.log("User:", auth.currentUser);
@@ -43,15 +47,23 @@ const ChatRoom = () => {
     e.preventDefault();
     if (!newMessage.trim()) return;
 
+    const githubUsername = auth.currentUser.reloadUserInfo.screenName;
+
     await addDoc(collection(db, "messages"), {
       text: newMessage,
       createdAt: new Date(),
       uid: currentUserUid,
       displayName:
         auth.currentUser?.displayName || auth.currentUser?.email || "Anonymous",
+      photoURL: auth.currentUser?.photoURL,
+      githubUsername, // Store this for each message for later use
     });
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     setNewMessage("");
+  };
+  const handleProfileClick = (githubUsername) => {
+    const profileUrl = `https://github.com/${githubUsername}`;
+    window.open(profileUrl, "_blank");
   };
 
   return (
@@ -69,6 +81,18 @@ const ChatRoom = () => {
             >
               {showDisplayName && (
                 <div className="message-header">
+                  <Image
+                    src={msg.photoURL || faUser}
+                    alt="Profile"
+                    onClick={() => handleProfileClick(msg.githubUsername)}
+                    width={30}
+                    height={30}
+                    style={{
+                      cursor: "pointer",
+                      borderRadius: "50%",
+                      marginRight: "0px",
+                    }}
+                  />
                   {msg.displayName || "Anonymous"}
                 </div>
               )}
@@ -83,6 +107,18 @@ const ChatRoom = () => {
 
         <div ref={messagesEndRef} />
       </div>
+      {showDropdown && (
+        <div
+          className="dropdown-menu"
+          style={{ position: "absolute", bottom: "50px", right: "20px" }}
+        >
+          <ul>
+            <li onClick={() => window.open(currentPhotoURL, "_blank")}>
+              View GitHub Profile
+            </li>
+          </ul>
+        </div>
+      )}
       <form onSubmit={sendMessage} className="message-form">
         <input
           type="text"
