@@ -224,6 +224,7 @@ const App = () => {
   // ]);
   const [notifications, setNotifications] = useState([]);
   const [friends, setFriends] = useState([]);
+  const [user, setUser] = useState();
 
   const [currentUserEmail, setCurrentUserEmail] = useState('');
   const [selectedNotification, setSelectedNotification] = useState(null);
@@ -270,7 +271,7 @@ const App = () => {
   };
 
   const toggleFriends = () => {
-    console.log("toggled friends")
+    console.log("toggled friends", friends)
     setShowFriends(!showFriends);
   };
 
@@ -310,6 +311,32 @@ const App = () => {
     };
   }, []);
 
+  useEffect(() => {   // user listener
+    // console.log("User:", auth.currentUser);
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      // console.log(user);
+      setCurrentUserEmail(user?.email);
+      setCurrentUserEmail(auth?.currentUser.email);
+    });
+
+    const q = query(collection(db, "emails"), where("email", "==", auth.currentUser.email));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const userA = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log(userA);
+      console.log(userA.friends)
+      setUser(userA);
+      setFriends(userA.friends);
+    });
+
+    console.log(friends);
+    return () => {
+      unsubscribe();
+      unsubscribeAuth && unsubscribeAuth();
+    };
+  }, []);
   return (
     <div className="app">
       <TitleBar />
@@ -422,11 +449,6 @@ const App = () => {
                 Friends
               </button>
 
-              {showFriends && (
-                <div className="notifications-area">
-                  Friends
-                </div>
-              )}
 
               <button
                 className="btn btn-neutral btn-xs"
