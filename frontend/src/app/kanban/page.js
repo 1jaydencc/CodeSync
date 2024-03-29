@@ -248,10 +248,10 @@ const App = () => {
     });
     const [projectTasks, setProjectTasks] = useState({});
     const allAssignees = [
-        { label: 'Adrien', value: 'Adrien' },
-        { label: 'Arsh', value: 'Arsh' },
-        { label: 'Arshnoor', value: 'Arshnoor' },
-        { label: 'Jayden', value: 'Jayden' },
+        { label: 'adrien.qi304@gmail.com', value: 'adrien.qi304@gmail.com' },
+        { label: 'arsh@gmail.com', value: 'arsh@gmail.com' },
+        { label: 'arandhawa1313@gmail.com', value: 'arandhawa1313@gmail.com' },
+        { label: 'jaydenccc@gmail.com', value: 'jaydenccc@gmail.com' },
     ];
 
     const [allAssigness, setAllAssigness] = useState(allAssignees);
@@ -408,20 +408,21 @@ const App = () => {
             tags: newTaskData.tags.map(tag => typeof tag === 'object' ? tag.value : tag)
         };
         const selectedStatus = newTask.status;
-        setProjectTasks(prevProjectTasks => {
-            const updatedTasks = {
-                ...prevProjectTasks,
-                [selectedStatus]: [...prevProjectTasks[selectedStatus], newTask]
-            };
-            return updateOrdering(updatedTasks);
-        });
+
+        // setProjectTasks(prevProjectTasks => {
+        //     const updatedTasks = {
+        //         ...prevProjectTasks,
+        //         [selectedStatus]: [...prevProjectTasks[selectedStatus], newTask]
+        //     };
+        //     return updateOrdering(updatedTasks);
+        // });
 
         // w/ firebase
         const githubUsername = auth.currentUser.reloadUserInfo.screenName;
         console.log(githubUsername)
         await addDoc(collection(db, "tasks"), {
             assignedto: newTask.assignedTo,
-            deadline: newTask.deadline,
+            deadline: (newTask.deadline).toISOString(),
             description: newTask.description,
             priority: newTask.priority,
             status: newTask.status,
@@ -429,8 +430,6 @@ const App = () => {
             taskId: newTask.id,
             type: newTask.type,
           });
-
-        console.log("checking", tasks)
     };
 
     const handleTaskChange = (taskId, updates = {}) => {
