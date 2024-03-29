@@ -1,9 +1,12 @@
 'use client';
 import '@/app/globals.css'
 import '@/app/kanban/kanban.css'
+import TitleBar from "../title-bar/title-bar";
+
 import { onDragStart, onDragOver, onDrop } from '@/app/kanban/draggable.js'
 
 import React, { useRef, useState, useEffect } from 'react';
+import { useRouter } from "next/navigation";
 
 import { auth, db  } from "@/firebase-config";
 import { onAuthStateChanged } from 'firebase/auth';
@@ -44,6 +47,8 @@ const Noti = ( { sender, uid, notiId, type, title, desc, recipients, timestamp }
 }
 
 export default function KanbanPage() {
+  const router = useRouter(); // Using the useRouter hook for navigation
+
 // ------------------------- NOTIFICATION FUNCTIONS ------------------------- // 
   const [notiList, setNotiList] = useState([]);
   const [notiType, setNotiType] = useState('');
@@ -60,19 +65,7 @@ export default function KanbanPage() {
 
     const q = query(collection(db, "notifications"), orderBy("timestamp"));
 
-
-
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {      // DEBUG THISSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const notifications = querySnapshot.docs.map(doc => ({
             id: doc.id,
             ...doc.data(),
@@ -132,8 +125,20 @@ export default function KanbanPage() {
     setEmail('');
   }
 
+  const navigateToEditor = () => {
+    router.push("/editor");
+  };
+
   return (
-    <div className="example-parent">
+    <div className="container0">
+      <TitleBar />
+      <div className="container1"></div>
+      <div className="chat-page">
+        <button onClick={navigateToEditor} className="back-to-editor-btn">
+          {" "}
+          &lt; Editor
+        </button>
+      </div>
       <div className='noti-section'>
         <h1>Notifications Testing</h1>
         

@@ -1,12 +1,35 @@
-.example-parent {
-    border: 2px solid #DFA612;
-    border-radius: 10px;
-    color: rgb(0, 0, 0);
-    display: flex;
-    flex-direction: column;
+/* App.css */
+html,
+body,
+#root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevent scrollbars */
+    background-color: #252525;
 }
 
-.example-parent h1 {
+.app {
+    height: 100vh;
+    width: 100%;
+}
+
+.container0 {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+    margin: 0;
+    padding: 0;
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    width: 100%;
+    color: rgb(0, 0, 0);
+    outline: 1px solid #444;
+}
+
+.container0 h1 {
     display: flex;
     justify-content: center;
     background-color: rgb(255, 255, 255);
@@ -14,7 +37,7 @@
     margin: 10px;
 }
 
-.example-parent button {
+.container0 button {
     display: flex;
     justify-content: center;
     background-color: rgb(255, 255, 255);
@@ -24,7 +47,7 @@
     transition: background-color 0.3s;
 }
 
-.example-parent button:hover {
+.container0 button:hover {
     background-color: #9c9c9c;
 }
 

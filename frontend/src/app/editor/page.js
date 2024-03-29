@@ -4,7 +4,6 @@ import Editor from "@/app/editor/editor.js";
 import TitleBar from "@/app/title-bar/title-bar.js";
 
 import NewFilePopup from "@/app/editor/new-file-popup.js";
-import Dropdown from "./themeDropDown.js";
 import themelist from "monaco-themes/themes/themelist.json";
 import "@/app/editor/editor.css";
 import languages from "@/app/editor/languages.json";
@@ -397,6 +396,14 @@ const App = () => {
                 }}
               >
                 Chat
+              </button>
+              <button
+                className="btn btn-neutral btn-xs"
+                onClick={() => {
+                  router.push("/kanban");
+                }}
+              >
+                Kanban
               </button>
 
               <div className="flex items-center">
