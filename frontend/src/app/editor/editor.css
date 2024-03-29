@@ -474,7 +474,7 @@ body,
   }
   
 .notifications-area {
-    position: relative;
+    position: fixed;
     top: 40px;
     right: 90px;
     width: 300px;

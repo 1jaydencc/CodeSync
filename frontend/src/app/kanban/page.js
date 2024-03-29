@@ -14,6 +14,9 @@ import {
     where,
     onSnapshot,
     addDoc,
+    deleteDoc,
+    setDoc,
+    doc
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -241,16 +244,21 @@ const App = () => {
     };
     // const sortedUserTasks = updateOrdering(initialTasks.userTasks);
     // const sortedProjectTasks = updateOrdering(initialTasks.projectTasks)
-    const [userTasks, setUserTasks] = useState({});
+    const [userTasks, setUserTasks] = useState({
+        toDo: [],
+        inProgress: [],
+        done: []
+    });
     const [projectTasks, setProjectTasks] = useState({});
     const allAssignees = [
-        { label: 'Adrien', value: 'Adrien' },
-        { label: 'Arsh', value: 'Arsh' },
-        { label: 'Arshnoor', value: 'Arshnoor' },
-        { label: 'Jayden', value: 'Jayden' },
+        { label: 'adrien.qi304@gmail.com', value: 'adrien.qi304@gmail.com' },
+        { label: 'abatth@purdue.edu', value: 'abatth@purdue.edu' },
+        { label: 'arandha@purdue.edu', value: 'arandha@purdue.edu' },
+        { label: 'jaydenccc@gmail.com', value: 'jaydenccc@gmail.com' },
     ];
+
     const [allAssigness, setAllAssigness] = useState(allAssignees);
-    const handleDeleteTask = (taskId) => {
+    const handleDeleteTask = async (taskId) => {
         const updateTasks = (tasks) => {
             const updatedTasks = {};
             Object.keys(tasks).forEach(status => {
@@ -259,18 +267,27 @@ const App = () => {
             return updatedTasks;
         };
 
-        setUserTasks(prevTasks => updateTasks(prevTasks));
-        setProjectTasks(prevTasks => updateTasks(prevTasks));
+        const docRef = await doc(db, "tasks", taskId); 
+        await deleteDoc(docRef);
+        // setUserTasks(prevTasks => updateTasks(prevTasks));
+        // setProjectTasks(prevTasks => updateTasks(prevTasks));
     };
     
     // firebase logic
     const [currentUserEmail, setCurrentUserEmail] = useState('adrien.qi304@gmail.com');
-    const [tasks, setTasks] = useState([]);
+    
+    // const [tasks, setTasks] = useState([]);
+    const [userToDo, setUserToDo] = useState();
+    const [userInProgress, setUserInProgress] = useState();
+    const [userDone, setUserDone] = useState();
+    const [projToDo, setProjToDo] = useState();
+    const [projInProgress, setProjInProgress] = useState();
+    const [projDone, setProjDone] = useState();
 
     useEffect(() => {   // USER TODO
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             setCurrentUserEmail(user?.email);
-            console.log("User:", user?.email, currentUserEmail)
+            // console.log("User:", user?.email, currentUserEmail)
         });
 
         const q = query(collection(db, "tasks"), where ("assignedto", "array-contains", currentUserEmail), where("status", "==", "To-Do"));
@@ -279,15 +296,19 @@ const App = () => {
                 id: doc.id,
                 ...doc.data(),
             }));
-            console.log('user tasks todo:', tasks)
+            // console.log('To-Do from DB:', tasks)
+            // console.log('userTasks before', userTasks)
+            setUserToDo(tasks);
+            setProjToDo(tasks);
             setUserTasks({
                 ...userTasks,
-                'To-Do': tasks
+                toDo: tasks
             });
             setProjectTasks({
                 ...projectTasks,
                 'To-Do': tasks
             });
+            // console.log("userTasks To-Do:", userTasks)
         });
 
         return () => {
@@ -298,7 +319,7 @@ const App = () => {
     useEffect(() => {   // USER INPROGRESS
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             setCurrentUserEmail(user?.email);
-            console.log("User:", user?.email, currentUserEmail)
+            // console.log("User:", user?.email, currentUserEmail)
         });
 
         const q = query(collection(db, "tasks"), where ("assignedto", "array-contains", currentUserEmail), where("status", "==", "In-Progress"));
@@ -307,15 +328,19 @@ const App = () => {
                 id: doc.id,
                 ...doc.data(),
             }));
-            console.log('user tasks in progress:', tasks)
+            // console.log('In-Progress from DB:', tasks)
+            // console.log('userTasks before', userTasks)
+            setUserInProgress(tasks);
+            setProjInProgress(tasks);
             setUserTasks({
                 ...userTasks,
-                'In-Progress': tasks
+                inProgress: tasks
             });
             setProjectTasks({
                 ...projectTasks,
                 'In-Progress': tasks
             });
+            // console.log("userTasks In-Progress:", userTasks)
         });
 
         return () => {
@@ -327,7 +352,7 @@ const App = () => {
     useEffect(() => {   // USER INPROGRESS
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             setCurrentUserEmail(user?.email);
-            console.log("User:", user?.email, currentUserEmail)
+            // console.log("User:", user?.email, currentUserEmail)
         });
 
         const q = query(collection(db, "tasks"), where ("assignedto", "array-contains", currentUserEmail), 
@@ -337,17 +362,21 @@ const App = () => {
                 id: doc.id,
                 ...doc.data(),
             }));
-            console.log('user tasks Done:', tasks)
+            // console.log('Done from DB:', tasks)
+            // console.log('userTasks before', userTasks)
+            setUserDone(tasks);
+            setProjDone(tasks);
             setUserTasks({
                 ...userTasks,
-                'Done': tasks
+                done: tasks
             });
             setProjectTasks({
                 ...projectTasks,
                 'Done': tasks
             });
+            // console.log('userTasks Done:', userTasks)
         });
-
+        
         return () => {
             unsubscribe();
             unsubscribeAuth && unsubscribeAuth();
@@ -374,7 +403,7 @@ const App = () => {
             unsubscribeAuth && unsubscribeAuth();
         };
     }, []);
-    var lastID = 18;
+    var lastID = 10;
     const addTask = async (newTaskData) => {
         console.log('New Task Data:', newTaskData);
         lastID = lastID + 1;
@@ -384,20 +413,21 @@ const App = () => {
             tags: newTaskData.tags.map(tag => typeof tag === 'object' ? tag.value : tag)
         };
         const selectedStatus = newTask.status;
-        setProjectTasks(prevProjectTasks => {
-            const updatedTasks = {
-                ...prevProjectTasks,
-                [selectedStatus]: [...prevProjectTasks[selectedStatus], newTask]
-            };
-            return updateOrdering(updatedTasks);
-        });
+
+        // setProjectTasks(prevProjectTasks => {
+        //     const updatedTasks = {
+        //         ...prevProjectTasks,
+        //         [selectedStatus]: [...prevProjectTasks[selectedStatus], newTask]
+        //     };
+        //     return updateOrdering(updatedTasks);
+        // });
 
         // w/ firebase
         const githubUsername = auth.currentUser.reloadUserInfo.screenName;
         console.log(githubUsername)
         await addDoc(collection(db, "tasks"), {
             assignedto: newTask.assignedTo,
-            deadline: newTask.deadline,
+            deadline: (newTask.deadline).toISOString(),
             description: newTask.description,
             priority: newTask.priority,
             status: newTask.status,
@@ -405,12 +435,10 @@ const App = () => {
             taskId: newTask.id,
             type: newTask.type,
           });
-
-        console.log("checking", tasks)
     };
 
-    const handleTaskChange = (taskId, updates = {}) => {
-        const updateTasks = (tasks) => {
+    const handleTaskChange = async (taskId, updates = {}) => {
+        const updateTasks = async (tasks) => {
             let taskUpdated = false; // Flag to check if task update was successful
             const newTasks = Object.entries(tasks).reduce((acc, [status, taskList]) => {
                 const taskIndex = taskList.findIndex(task => task.id === taskId);
@@ -432,7 +460,7 @@ const App = () => {
         setProjectTasks(prevProjectTasks => updateTasks(prevProjectTasks));
     };
 
-    const handleStatusChange = (taskId, newStatus) => {
+    const handleStatusChange = async (taskId, newStatus) => {
         const updateTasks = (tasks) => {
             let updatedTasks = { ...tasks };
 
@@ -455,6 +483,9 @@ const App = () => {
 
         setUserTasks(updatedUserTasks);
         setProjectTasks(updatedProjectTasks);
+
+        // w/ firebase
+        await setDoc(doc(db, "tasks", taskId), {status: newStatus}, { merge: true });
     };
 
     useEffect(() => {
@@ -584,11 +615,11 @@ const App = () => {
                     <div className="container4">
                         <div className="title">User Kanban Board</div>
                         <div className="container5">
-                            <KanbanBoard tasks={userTasks} handleTaskChange={handleTaskChange} taskType="userTasks" allAssignees={allAssignees} handleStatusChange={handleStatusChange} handleDeleteTask={handleDeleteTask} />
+                            <KanbanBoard todo={userToDo} ip={userInProgress} done={userDone} tasks={userTasks} handleTaskChange={handleTaskChange} taskType="userTasks" allAssignees={allAssignees} handleStatusChange={handleStatusChange} handleDeleteTask={handleDeleteTask} />
                         </div>
                         <div className="title">Project Kanban Board</div>
                         <div className="container6">
-                            <KanbanBoard tasks={projectTasks} handleTaskChange={handleTaskChange} taskType="projectTasks" allAssignees={allAssignees} handleStatusChange={handleStatusChange} handleDeleteTask={handleDeleteTask} />
+                            <KanbanBoard todo={projToDo} ip={projInProgress} done={projDone} tasks={projectTasks} handleTaskChange={handleTaskChange} taskType="projectTasks" allAssignees={allAssignees} handleStatusChange={handleStatusChange} handleDeleteTask={handleDeleteTask} />
                         </div>
                     </div>
                 </div>

@@ -5,6 +5,7 @@ import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CreatableSelect from 'react-select/creatable';
 
+
 const customStyles = {
     control: (provided) => ({
       ...provided,
@@ -89,7 +90,8 @@ const Task = ({ task, handleTaskChange, allAssignees, handleStatusChange, handle
         handleTaskChange(localTask.id, localTask);
     };
 
-    const handleDelete = () => {
+    const handleDelete = async ( ) => {
+        // console.log("handleDelete:", localTask.id)
         handleDeleteTask(task.id);
     };
 
