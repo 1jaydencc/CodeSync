@@ -1,6 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import Editor from "@/app/editor/editor.js";
+import dynamic from "next/dynamic";
+
 import TitleBar from "@/app/title-bar/title-bar.js";
 
 import NewFilePopup from "@/app/editor/new-file-popup.js";
@@ -28,6 +29,9 @@ import { auth, db } from "@/firebase-config";
 import Image from "next/image";
 
 const { electronAPI } = window;
+const Editor = dynamic(() => import("@/app/editor/editor.js"), {
+  ssr: false,
+});
 
 const App = () => {
   const [language, setLanguage] = useState("javascript");
@@ -76,13 +80,14 @@ const App = () => {
     electronAPI.receive("file-opened", handleFileOpen);
 
     // Cleanup
-    return () => { };
+    return () => {};
   });
 
   useEffect(() => {
     const saveCurrentFile = () => {
       if (activeFileIndex >= 0) {
         const fileToSave = openFiles[activeFileIndex];
+        console.log("Saving content to file:", fileToSave.content);
         electronAPI
           .saveFile({
             path: fileToSave.path,
@@ -93,11 +98,9 @@ const App = () => {
       }
     };
 
-    electronAPI.receive("invoke-save", saveCurrentFile);
+    const cleanup = electronAPI.receive("invoke-save", saveCurrentFile);
 
-    return () => {
-      // Cleanup if necessary, e.g., remove the event listener
-    };
+    return () => cleanup(); // Explicitly remove the listener on component unmount
   }, [activeFileIndex, openFiles]);
 
   /*
@@ -301,11 +304,37 @@ const App = () => {
   // ADDING
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState([
-    { id: 1, description: "Your first notification goes here, it's pretty long to test the ellipsis...", isRead: false, timestamp: "2024-03-28T20:19:52.279787+00:00" },
-    { id: 2, description: "Second notification, also lengthy enough...", isRead: true, timestamp: "2024-03-28T20:09:52.279787+00:00" },
-    { id: 3, description: "Third notification example...", isRead: false, timestamp: "2024-03-28T19:59:52.279787+00:00" },
-    { id: 4, description: "Fourth notification here...", isRead: true, timestamp: "2024-03-28T19:49:52.279787+00:00" },
-    { id: 5, description: "Fifth notification content...", isRead: false, timestamp: "2024-03-28T19:39:52.279787+00:00" },
+    {
+      id: 1,
+      description:
+        "Your first notification goes here, it's pretty long to test the ellipsis...",
+      isRead: false,
+      timestamp: "2024-03-28T20:19:52.279787+00:00",
+    },
+    {
+      id: 2,
+      description: "Second notification, also lengthy enough...",
+      isRead: true,
+      timestamp: "2024-03-28T20:09:52.279787+00:00",
+    },
+    {
+      id: 3,
+      description: "Third notification example...",
+      isRead: false,
+      timestamp: "2024-03-28T19:59:52.279787+00:00",
+    },
+    {
+      id: 4,
+      description: "Fourth notification here...",
+      isRead: true,
+      timestamp: "2024-03-28T19:49:52.279787+00:00",
+    },
+    {
+      id: 5,
+      description: "Fifth notification content...",
+      isRead: false,
+      timestamp: "2024-03-28T19:39:52.279787+00:00",
+    },
   ]);
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -313,14 +342,15 @@ const App = () => {
   const [hoverTimeoutId, setHoverTimeoutId] = useState(null);
 
   const handleClearCurrentNotification = () => {
-    setNotifications(notifications.filter(n => n.id !== selectedNotification.id));
+    setNotifications(
+      notifications.filter((n) => n.id !== selectedNotification.id),
+    );
     setSelectedNotification(null);
   };
 
-
   const handleNotificationMouseEnter = (notificationId) => {
     const timeoutId = setTimeout(() => {
-      const notification = notifications.find(n => n.id === notificationId);
+      const notification = notifications.find((n) => n.id === notificationId);
       setHoveredNotification(notification);
     }, 1000);
     setHoverTimeoutId(timeoutId);
@@ -332,20 +362,20 @@ const App = () => {
     setHoveredNotification(null);
   };
 
-
   const handleNotificationClick = (notificationId) => {
-    setSelectedNotification(notifications.find(n => n.id === notificationId));
-    setNotifications(notifications.map(n => {
-      if (n.id === notificationId) {
-        return { ...n, isRead: true };
-      }
-      return n;
-    }));
+    setSelectedNotification(notifications.find((n) => n.id === notificationId));
+    setNotifications(
+      notifications.map((n) => {
+        if (n.id === notificationId) {
+          return { ...n, isRead: true };
+        }
+        return n;
+      }),
+    );
   };
 
-
   const toggleNotifications = () => {
-    console.log("toggled")
+    console.log("toggled");
     setShowNotifications(!showNotifications);
   };
 
@@ -448,14 +478,10 @@ const App = () => {
                   }
                   theme={theme}
                   onCodeChange={(newContent) => {
+                    console.log(newContent);
                     if (activeFileIndex >= 0) {
-                      // Only update the content of the currently active file if there is one selected
-                      const updatedFiles = openFiles.map((file, index) =>
-                        index === activeFileIndex
-                          ? { ...file, content: newContent }
-                          : file,
-                      );
-                      setOpenFiles(updatedFiles);
+                      openFiles[activeFileIndex].content = newContent;
+                      console.log(openFiles[activeFileIndex].content);
                     }
                   }}
                 />
@@ -487,21 +513,37 @@ const App = () => {
               {showNotifications && (
                 <div className="notifications-area">
                   Notifications
-                  <button className="clear-notifications" onClick={handleClearNotifications}>Clear</button>
+                  <button
+                    className="clear-notifications"
+                    onClick={handleClearNotifications}
+                  >
+                    Clear
+                  </button>
                   {notifications.map((notification) => (
-                    <div key={notification.id} className={`notification-item ${notification.isRead ? 'read' : 'unread'}`} onClick={() => handleNotificationClick(notification.id)}
-                      onMouseEnter={() => handleNotificationMouseEnter(notification.id)}
-                      onMouseLeave={handleNotificationMouseLeave}>
-                      <span className="notification-description">{notification.description.slice(0, 15)}...</span>
+                    <div
+                      key={notification.id}
+                      className={`notification-item ${notification.isRead ? "read" : "unread"}`}
+                      onClick={() => handleNotificationClick(notification.id)}
+                      onMouseEnter={() =>
+                        handleNotificationMouseEnter(notification.id)
+                      }
+                      onMouseLeave={handleNotificationMouseLeave}
+                    >
+                      <span className="notification-description">
+                        {notification.description.slice(0, 15)}...
+                      </span>
                       <span className="notification-timestamp">
-                        {new Date(notification.timestamp).toLocaleString('en-US', {
-                          month: 'long',
-                          day: 'numeric',
-                          year: 'numeric',
-                          hour: 'numeric',
-                          minute: 'numeric',
-                          hour12: true
-                        })}
+                        {new Date(notification.timestamp).toLocaleString(
+                          "en-US",
+                          {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                            hour: "numeric",
+                            minute: "numeric",
+                            hour12: true,
+                          },
+                        )}
                       </span>
                     </div>
                   ))}
@@ -509,17 +551,33 @@ const App = () => {
               )}
               {selectedNotification && (
                 <div className="popup-overlay" onClick={handleClosePopup}>
-                  <div className="popup" onClick={(e) => e.stopPropagation()}> {/* Prevent popup from closing when clicking inside */}
-                    <p><strong>Time:</strong> {new Date(selectedNotification.timestamp).toLocaleString('en-US', {
-                      month: 'long',
-                      day: 'numeric',
-                      year: 'numeric',
-                      hour: 'numeric',
-                      minute: 'numeric',
-                      hour12: true
-                    })}</p>
-                    <p><strong>Message:</strong> {selectedNotification.description}</p>
-                    <button onClick={handleClearCurrentNotification} className="clear-current-notification">Clear</button>
+                  <div className="popup" onClick={(e) => e.stopPropagation()}>
+                    {" "}
+                    {/* Prevent popup from closing when clicking inside */}
+                    <p>
+                      <strong>Time:</strong>{" "}
+                      {new Date(selectedNotification.timestamp).toLocaleString(
+                        "en-US",
+                        {
+                          month: "long",
+                          day: "numeric",
+                          year: "numeric",
+                          hour: "numeric",
+                          minute: "numeric",
+                          hour12: true,
+                        },
+                      )}
+                    </p>
+                    <p>
+                      <strong>Message:</strong>{" "}
+                      {selectedNotification.description}
+                    </p>
+                    <button
+                      onClick={handleClearCurrentNotification}
+                      className="clear-current-notification"
+                    >
+                      Clear
+                    </button>
                   </div>
                 </div>
               )}
@@ -529,9 +587,14 @@ const App = () => {
                 </div>
               )}
               {hoveredNotification && (
-                <div className="hover-popup" style={{ position: 'absolute', top: '40px', left: '1430px' }}>
+                <div
+                  className="hover-popup"
+                  style={{ position: "absolute", top: "40px", left: "1430px" }}
+                >
                   <p>{hoveredNotification.description}</p>
-                  <p className="notification-timestamp">{hoveredNotification.timestamp}</p>
+                  <p className="notification-timestamp">
+                    {hoveredNotification.timestamp}
+                  </p>
                 </div>
               )}
 
