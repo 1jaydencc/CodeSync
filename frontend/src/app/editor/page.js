@@ -1,7 +1,8 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Editor from "@/app/editor/editor.js";
-import Taskbar from "@/app/editor/taskbar.js";
+import TitleBar from "@/app/title-bar/title-bar.js";
+
 import NewFilePopup from "@/app/editor/new-file-popup.js";
 import Dropdown from "./themeDropDown.js";
 import themelist from "monaco-themes/themes/themelist.json";
@@ -298,11 +299,9 @@ const App = () => {
 
   return (
     <div className="app">
+      <TitleBar />
       <div className="container0">
-        <div className="container1">
-          <div className="logo">CodeSync</div>
-          <div className="taskBar"></div>
-        </div>
+        <div className="container1"></div>
         <div className="container2">
           <div className="container3">
             <div className="container7">EXPLORER</div>

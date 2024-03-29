@@ -35,6 +35,7 @@ const createWindow = () => {
       enableRemoteModule: false, // Turn off remote
       nodeIntegration: false, // Node integration should be off for security
     },
+    titleBarStyle: "hidden",
   });
 
   const isMac = process.platform === "darwin";
