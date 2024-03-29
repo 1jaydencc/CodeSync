@@ -19,8 +19,30 @@ const ChatRoom = () => {
   const [newMessage, setNewMessage] = useState("");
   const [currentUserUid, setCurrentUserUid] = useState(null);
   const messagesEndRef = useRef(null);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [currentPhotoURL, setCurrentPhotoURL] = useState("");
+  const [dropdownVisible, setDropdownVisible] = useState(false);
+  const [selectedGithubUsername, setSelectedGithubUsername] = useState("");
+  const [dropdownPosition, setDropdownPosition] = useState({ x: 0, y: 0 });
+
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (
+        dropdownVisible &&
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target)
+      ) {
+        setDropdownVisible(false);
+      }
+    };
+
+    // Add when the dropdown is visible and remove when it's not
+    if (dropdownVisible) {
+      document.addEventListener("click", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, [dropdownVisible]);
 
   useEffect(() => {
     console.log("User:", auth.currentUser);
@@ -61,9 +83,18 @@ const ChatRoom = () => {
     messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
     setNewMessage("");
   };
-  const handleProfileClick = (githubUsername) => {
-    const profileUrl = `https://github.com/${githubUsername}`;
-    window.open(profileUrl, "_blank");
+
+  const dropdownRef = useRef(null);
+
+  const handleProfilePictureClick = (githubUsername, event) => {
+    event.preventDefault(); // Prevent default to avoid any unwanted behavior
+    const bounds = event.target.getBoundingClientRect();
+    setDropdownPosition({
+      x: bounds.left, // Or any logic to position based on your UI needs
+      y: bounds.top + bounds.height, // Position below the image
+    });
+    setSelectedGithubUsername(githubUsername);
+    setDropdownVisible(true);
   };
 
   return (
@@ -84,7 +115,9 @@ const ChatRoom = () => {
                   <Image
                     src={msg.photoURL || faUser}
                     alt="Profile"
-                    onClick={() => handleProfileClick(msg.githubUsername)}
+                    onClick={(e) =>
+                      handleProfilePictureClick(msg.githubUsername, e)
+                    }
                     width={30}
                     height={30}
                     style={{
@@ -92,6 +125,7 @@ const ChatRoom = () => {
                       borderRadius: "50%",
                       marginRight: "0px",
                     }}
+                    draggable="false"
                   />
                   {msg.displayName || "Anonymous"}
                 </div>
@@ -107,13 +141,25 @@ const ChatRoom = () => {
 
         <div ref={messagesEndRef} />
       </div>
-      {showDropdown && (
+      {dropdownVisible && (
         <div
+          ref={dropdownRef}
           className="dropdown-menu"
-          style={{ position: "absolute", bottom: "50px", right: "20px" }}
+          style={{
+            position: "absolute",
+            top: dropdownPosition.y,
+            left: dropdownPosition.x,
+          }}
         >
           <ul>
-            <li onClick={() => window.open(currentPhotoURL, "_blank")}>
+            <li
+              onClick={() =>
+                window.open(
+                  `https://github.com/${selectedGithubUsername}`,
+                  "_blank",
+                )
+              }
+            >
               View GitHub Profile
             </li>
           </ul>

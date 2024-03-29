@@ -25,6 +25,7 @@ import {
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebase-config";
+import Image from "next/image";
 
 const { electronAPI } = window;
 
@@ -317,10 +318,18 @@ const App = () => {
               ))}
             </div>
             <div className="user-profile">
-              <FontAwesomeIcon
-                icon={faUser}
-                onClick={toggleDropdown}
-                className="user-icon"
+              <Image
+                src={auth.currentUser?.photoURL || faUser}
+                alt="Profile"
+                onClick={() => setShowDropdown(!showDropdown)}
+                width={30}
+                height={30}
+                style={{
+                  cursor: "pointer",
+                  borderRadius: "50%",
+                  marginRight: "0px",
+                }}
+                draggable="false"
               />
               {showDropdown && (
                 <div className="dropdown-menu">
