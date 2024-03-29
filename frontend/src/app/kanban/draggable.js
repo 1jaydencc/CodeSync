@@ -1,5 +1,5 @@
   // DRAGGABLE FUNCTIONS https://codesandbox.io/p/sandbox/todo-list-dragdrop-local-storage-u91q0?file=%2Fsrc%2Fdraggable.js%3A22%2C37 // 
-  const onDragStart = (event) => {
+  export const onDragStart = (event) => {
     event
       .dataTransfer
       .setData('text/plain', event.target.id);
@@ -10,11 +10,11 @@
       .backgroundColor = 'yellow';
   }
 
-  function onDragOver(event) {
+  export const onDragOver = (event) => {
     event.preventDefault();
   }
 
-  const onDrop = (event) => {
+  export const onDrop = (event) => {
     event.preventDefault();
 
     const id = event.dataTransfer.getData("text");

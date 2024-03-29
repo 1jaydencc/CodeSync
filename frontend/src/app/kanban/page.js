@@ -2,9 +2,12 @@
 import '@/app/globals.css'
 import '@/app/kanban/kanban.css'
 import { onDragStart, onDragOver, onDrop } from '@/app/kanban/draggable.js'
+
 import React, { useRef, useState, useEffect } from 'react';
-import { auth, db } from "@/firebase-config";
-import { collection, doc, addDoc, setDoc, deleteDoc } from "firebase/firestore";
+
+import { auth, db  } from "@/firebase-config";
+import { onAuthStateChanged } from 'firebase/auth';
+import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from "firebase/firestore";
 
 const Task = ( /* params */ ) => {
   // console.log("making new task", taskId);
@@ -15,140 +18,223 @@ const Task = ( /* params */ ) => {
   );
 }
 
-const Noti = ( { type, }) => {
-
+const Noti = ( { sender, uid, notiId, type, title, desc, recipients, timestamp } ) => {
+  // console.log("making new notification", notiID);
   return (
     <div className='noti'>
-      <div className='noti-content'>
+      <p> 
+        {sender} <br></br>
+        {uid} <br></br>
+        {notiId} <br></br>
+        {title} <br></br>
+        {timestamp} <br></br>
+        {recipients} <br></br>
+        <h3> Noti </h3><p>{desc}</p>
+      </p>
+      <span onClick={() => handleCloseComment(notiId)}> ✖ </span> {}
+      {(type == "friend-request") &&
+        <div>
+          <button onClick={() => onAcceptClick()}>Accept</button>
+          <button onClick={() => onDeclineClick()}>Decline</button>
+        </div>
+      }
 
-      </div>
     </div>
   )
 }
 
 export default function KanbanPage() {
-  const [taskList, setTaskList] = useState([]);
-  const [taskText, setTaskText] = useState('');
-  const [collaborators, setCollaborators] = useState('');
+// ------------------------- NOTIFICATION FUNCTIONS ------------------------- // 
+  const [notiList, setNotiList] = useState([]);
+  const [notiType, setNotiType] = useState('');
+  const [notiTitle, setNotiTitle] = useState('');
+  const [notiDesc, setNotiDesc] = useState('');
 
-  // BACKEND FUNCTIONS // 
-  const onAddTaskClick = () => {
-    const docRef = addDoc(collection(db, "tasks"), {
-      // task fields
+  const [email, setEmail] = useState('');
+  const [foundEmail, setFoundEmail] = useState('');
+
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+        // setCurrentUserUid(user?.uid);
     });
 
-    const newComment = <Comment
-        // create new DOM task object to input into list
-    />
+    const q = query(collection(db, "notifications"), orderBy("timestamp"));
 
-    setTaskList([...taskList, newComment]);
-}
 
-    return (
-      <div className="example-parent">
-        <div className='noti-section'>
+
+
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {      // DEBUG THISSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS
+    
+    
+    
+    
+    
+    
+    
+    
+    
+      const notifications = querySnapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data(),
+        }));
+        setNotiList(notifications);
+    });
+
+    return () => {
+        unsubscribe();
+        unsubscribeAuth && unsubscribeAuth();
+    };
+  }, []);
+
+  const onCheckEmailClick = async () => {
+    const emailSnapshot = await getDocs(collection(db, "emails"));
+    emailSnapshot.forEach((doc) => {
+      // doc.data() is never undefined for query doc snapshots
+      // console.log(doc.id, " => ", doc.data());
+      if (doc.data().email == email) {
+        console.log("found email");
+        setFoundEmail(email);
+        return;
+      }
+    });
+    if (setFoundEmail == '') {
+      console.log("email not found");
+    }
+  }
+
+  const onSendNotiClick = () => {
+    if ( (notiTitle == '') && (notiDesc == '') ) {
+      console.log("friend-request");
+      setNotiType('friend-request');
+    } else {
+      console.log("g");
+      setNotiType("general");
+    }
+    
+    console.log("foundEmail:", foundEmail); 
+    console.log(auth.currentUser.uid, notiType, notiTitle, notiDesc, new Date())
+
+    const docRef = addDoc(collection(db, "notifications"), {  // add doc to firestore
+      sender: auth.currentUser.email,
+      type: notiType,
+      recipient: foundEmail,
+      title: notiTitle,
+      desc: notiDesc,
+      timestamp: new Date(),
+      isRead: false,
+      isResolved: false
+    });
+
+    setFoundEmail(false);
+    // setNotiType('');
+    setNotiTitle('');
+    setNotiDesc('');
+    setEmail('');
+  }
+
+  return (
+    <div className="example-parent">
+      <div className='noti-section'>
         <h1>Notifications Testing</h1>
         
-
-        </div>
-        <h1>To-do list</h1>
-        
-        <div className='kanban-section'>
-          
-          <div
-            className="example-dropzone"
-            onDragOver={onDragOver}
-            onDrop={onDrop}
-          >
-            <h2> Assigned Tasks </h2>
-          </div>
-          <div className="example-dropzone"
-                onDragOver={onDragOver}
-                onDrop={onDrop}>
-            <h2> To-do </h2>
-            <div
-              id="draggable-1"
-              className="example-draggable"
-              draggable="true"
-              onDragStart={onDragStart}
-            >
-              thing 1
-            </div>
-            <div
-              id="draggable-2"
-              className="example-draggable"
-              draggable="true"
-              onDragStart={onDragStart}
-            >
-              thing 2
-            </div>
-            <div
-              id="draggable-3"
-              className="example-draggable"
-              draggable="true"
-              onDragStart={onDragStart}
-            >
-              thing 3
-            </div>
-            <div
-              id="draggable-4"
-              className="example-draggable"
-              draggable="true"
-              onDragStart={onDragStart}
-            >
-              thing 4
-            </div>
-          </div>
-
-          <div
-            className="example-dropzone"
-            onDragOver={onDragOver}
-            onDrop={onDrop}
-          >
-            <h2> Doing </h2>
-          </div>
-
-          <div
-            className="example-dropzone"
-            onDragOver={onDragOver}
-            onDrop={onDrop}
-          >
-            <h2> Done </h2>
-          </div>
-        </div>
-
-        <div className="comment-container">
-          <h2>Comments
-            <button onClick={() => onAddTaskClick( // onAddTaskClick submits to firestore collection
-              // pass to backend
-            )}>Add Comment</button>
-          </h2>
-          {/* {((startColumn != endColumn) || (startLineNumber != endLineNumber)) && */}
-          <div className="comment">
-            <p>Add a task <br></br>
-              <input
-                value={taskText}
-                onChange={(e) => setTaskText(e.target.value)}
-                type={"comment"}
-                placeholder="leave your comment"
-              />
+        <button onClick={() => onSendNotiClick()}>Send Notification</button>
+        {(true) &&  // can create a boolean set to true once a button to send notis is clicked
+          <div className="noti-input">
+              <button onClick={() => onCheckEmailClick()}> Find Friend </button>
                 <input
-                  value={collaborators}
-                  onChange={(e) => setCollaborators(e.target.value)}
-                  type={"collaborators"}
-                  placeholder="list your collaborators"
+                    value={email}
+                    onChange={ (e) => setEmail(e.target.value) }
+                    type={"request email"}
+                    placeholder="friend's email"
                 />
-            </p>
-            <span onClick={() => handleCloseComment(commentID)}> ✖ </span> {}
+              <br></br>
+              <h1> Title </h1>
+                <input
+                    value={notiTitle}
+                    onChange={(e) => setNotiTitle(e.target.value)}
+                    type={"title"}
+                    placeholder="leave your title"
+                />
+              <br></br>
+              <h1> Description </h1>
+                <input
+                    value={notiDesc}
+                    onChange={(e) => setNotiDesc(e.target.value)}
+                    type={"description"}
+                    placeholder="leave your description"
+                />
+              {/* <span onClick={() => handleCloseComment(commentID)}> ✖ </span> {} */}
           </div>
-          {/* } */}
-          {taskList.map(commentID => (
-            <div key={commentID} className='comment-item'>
-              {commentID}
-            </div>
-          ))}
+        }
+        <div className="noti-list">
+
+        </div>
+      </div>
+      <h1>To-do list</h1>
+      
+      <div className='kanban-section'>
+        
+        <div
+          className="example-dropzone"
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+        >
+          <h2> Assigned Tasks </h2>
+        </div>
+        <div className="example-dropzone"
+              onDragOver={onDragOver}
+              onDrop={onDrop}>
+          <h2> To-do </h2>
+          <div
+            id="draggable-1"
+            className="example-draggable"
+            draggable="true"
+            onDragStart={onDragStart}
+          >
+            thing 1
+          </div>
+          <div
+            id="draggable-2"
+            className="example-draggable"
+            draggable="true"
+            onDragStart={onDragStart}
+          >
+            thing 2
+          </div>
+          <div
+            id="draggable-3"
+            className="example-draggable"
+            draggable="true"
+            onDragStart={onDragStart}
+          >
+            thing 3
+          </div>
+          <div
+            id="draggable-4"
+            className="example-draggable"
+            draggable="true"
+            onDragStart={onDragStart}
+          >
+            thing 4
+          </div>
         </div>
 
+        <div
+          className="example-dropzone"
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+        >
+          <h2> Doing </h2>
+        </div>
+
+        <div
+          className="example-dropzone"
+          onDragOver={onDragOver}
+          onDrop={onDrop}
+        >
+          <h2> Done </h2>
+        </div>
       </div>
-    );
+    </div>
+  );
 }

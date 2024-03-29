@@ -57,7 +57,7 @@ const EditorPage = ( { language, code, theme, currentFile, onCodeChange } ) => {
         console.log("mounted");
     };
 
-    const onAddCommentClick = (file, startLineNumber, startColumn, endLineNumber, endColumn, collaborators) => {
+    const onAddCommentClick = (file, startLineNumber, startColumn, endLineNumber, endColumn, collaborators ) => {
         const docRef = addDoc(collection(db, "comments"), {
             author: auth.currentUser.uid,   // must be signed in
             file: file,

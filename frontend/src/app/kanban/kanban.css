@@ -8,15 +8,41 @@
 
 .example-parent h1 {
     display: flex;
-    justify-content: flex-start;
+    justify-content: center;
     background-color: rgb(255, 255, 255);
     border-radius: 5px;
     margin: 10px;
 }
 
+.example-parent button {
+    display: flex;
+    justify-content: center;
+    background-color: rgb(255, 255, 255);
+    border-radius: 5px;
+    margin: 10px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.example-parent button:hover {
+    background-color: #9c9c9c;
+}
+
 .noti-section {
     display: flex;
     flex-direction: row;
+    align-items: center;
+    border: 2px solid rgb(17, 157, 250);
+    border-radius: 10px;
+    margin: 10px;
+}
+
+.noti-input {
+    display: flex;
+    flex-direction: column;
+    border: 2px solid rgb(17, 157, 250);
+    border-radius: 10px;
+    margin: 10px;
 }
 
 .kanban-section {
