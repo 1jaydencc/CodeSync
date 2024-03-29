@@ -1,6 +1,6 @@
 'use client';
 import React, { useState, useEffect } from 'react';
-import '../editor.css';
+import '@/app/editor/editor.css';
 
 export const invitePopup = ({ isOpen, onClose, onSend }) => {
     const [email, setEmail] = useState('');

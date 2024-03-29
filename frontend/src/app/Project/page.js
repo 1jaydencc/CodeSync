@@ -1,7 +1,6 @@
 "use client";
 import React, { useRef, useState } from "react";
 import LanguageSelector from "./language";
-import { CODE_SNIPPETS } from "./constants";
 import Output from "./output";
 import { Editor } from "@monaco-editor/react";
 import "@/app/globals.css";
@@ -26,13 +25,14 @@ const CodeEditor = () => {
     switch (extension) {
       case 'py':
         setLanguage('python');
-        setValue(CODE_SNIPPETS['python']);
         break;
       case 'js':
         setLanguage('javascript');
-        setValue(CODE_SNIPPETS['javascript']);
         break;
       // Add cases for other file extensions as needed
+      case 'java':
+        setLanguage('java');
+        break;
       default:
         setLanguage('');
         setValue('');
@@ -67,7 +67,7 @@ const CodeEditor = () => {
             height="75vh"
             theme="vs-dark"
             language={language}
-            defaultValue={CODE_SNIPPETS[language]}
+            defaultValue={""}
             onMount={onMount}
             value={value}
             onChange={(value) => setValue(value)}
