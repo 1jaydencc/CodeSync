@@ -282,10 +282,13 @@ const App = () => {
   useEffect(() => {   // all notification listener
     // console.log("User:", auth.currentUser);
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      // console.log(user);
       setCurrentUserEmail(user?.email);
+      setCurrentUserEmail(auth?.currentUser.email);
     });
 
-    const q = query(collection(db, "notifications"));
+    console.log('current user email:', currentUserEmail, auth.currentUser.email);
+    const q = query(collection(db, "notifications"), where("recipients", "array-contains", auth.currentUser.email));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const notifications = querySnapshot.docs.map((doc) => ({
         id: doc.id,
@@ -416,6 +419,7 @@ const App = () => {
               >
                 Friends
               </button>
+
               {showFriends && (
                 <div className="notifications-area">
                   Friends
