@@ -252,8 +252,8 @@ const App = () => {
     const [projectTasks, setProjectTasks] = useState({});
     const allAssignees = [
         { label: 'adrien.qi304@gmail.com', value: 'adrien.qi304@gmail.com' },
-        { label: 'arsh@gmail.com', value: 'arsh@gmail.com' },
-        { label: 'arandhawa1313@gmail.com', value: 'arandhawa1313@gmail.com' },
+        { label: 'abatth@purdue.edu', value: 'abatth@purdue.edu' },
+        { label: 'arandha@purdue.edu', value: 'arandha@purdue.edu' },
         { label: 'jaydenccc@gmail.com', value: 'jaydenccc@gmail.com' },
     ];
 
@@ -437,8 +437,8 @@ const App = () => {
           });
     };
 
-    const handleTaskChange = (taskId, updates = {}) => {
-        const updateTasks = (tasks) => {
+    const handleTaskChange = async (taskId, updates = {}) => {
+        const updateTasks = async (tasks) => {
             let taskUpdated = false; // Flag to check if task update was successful
             const newTasks = Object.entries(tasks).reduce((acc, [status, taskList]) => {
                 const taskIndex = taskList.findIndex(task => task.id === taskId);

@@ -100,95 +100,6 @@ const App = () => {
     };
   }, [activeFileIndex, openFiles]);
 
-  /*
-  useEffect(() => {
-    // Listen for auth state changes
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
-      console.log("Auth state changed. Current user:", user);
-      if (user) {
-        // User is signed in, now fetch files
-        const fetchFiles = async () => {
-          console.log("Fetching files for user:", user.uid);
-          const q = query(
-            collection(db, "files"),
-            where("uid", "==", user.uid),
-          );
-          try {
-            const querySnapshot = await getDocs(q);
-            console.log(`Fetched ${querySnapshot.docs.length} files`);
-            const fetchedFiles = querySnapshot.docs.map((doc) => ({
-              name: doc.id,
-              ...doc.data(),
-            }));
-            console.log("Fetched files:", fetchedFiles);
-            setFiles(fetchedFiles);
-          } catch (error) {
-            console.error("Error fetching files:", error);
-          }
-        };
-        fetchFiles();
-      } else {
-        // User is signed out
-        console.log("User is signed out.");
-        // Handle sign out scenario
-      }
-    });
-
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, []);
-
-   */
-
-  /*
-  // Function to save file data online
-  const saveOnline = async (fileData) => {
-    const fileRef = doc(db, "files", currentFileName);
-    try {
-      await setDoc(fileRef, fileData, { merge: true });
-      console.log("File saved successfully online.");
-      // Optionally, remove from local storage after successful sync
-    } catch (error) {
-      console.error("Error saving file to Firestore:", error);
-    }
-  };
-
-
-  // Function to save file data offline
-  const saveOffline = (fileData) => {
-    localStorage.setItem(currentFileName, JSON.stringify(fileData));
-    console.log("File saved locally for offline use.");
-  };
-
-  const handleOnline = () => {
-    console.log("Back online, syncing local changes...");
-    // Loop through all locally stored files and sync them
-    Object.keys(localStorage).forEach(async (key) => {
-      const fileData = JSON.parse(localStorage.getItem(key));
-      await saveOnline(fileData);
-      localStorage.removeItem(key); // Remove from local storage after sync
-    });
-  };
-
-
-  useEffect(() => {
-    window.addEventListener("online", handleOnline);
-
-    // Cleanup on component unmount
-    return () => window.removeEventListener("online", handleOnline);
-  }, [handleOnline]); // Add dependencies as needed
-
-  useEffect(() => {
-    const handleAutoSave = () => {
-      if (!currentFileName) return;
-      handleSaveFile();
-    };
-    const debounceSave = setTimeout(handleAutoSave, 1000);
-    return () => clearTimeout(debounceSave);
-  }, [currentFileName]);
-
-   */
-
   useEffect(() => {
     const closeDropdown = (e) => {
       if (!e.target.closest(".user-profile")) {
@@ -300,13 +211,18 @@ const App = () => {
 
   // ADDING
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notifications, setNotifications] = useState([
-    { id: 1, description: "Your first notification goes here, it's pretty long to test the ellipsis...", isRead: false, timestamp: "2024-03-28T20:19:52.279787+00:00" },
-    { id: 2, description: "Second notification, also lengthy enough...", isRead: true, timestamp: "2024-03-28T20:09:52.279787+00:00" },
-    { id: 3, description: "Third notification example...", isRead: false, timestamp: "2024-03-28T19:59:52.279787+00:00" },
-    { id: 4, description: "Fourth notification here...", isRead: true, timestamp: "2024-03-28T19:49:52.279787+00:00" },
-    { id: 5, description: "Fifth notification content...", isRead: false, timestamp: "2024-03-28T19:39:52.279787+00:00" },
-  ]);
+  const [showFriends, setShowFriends] = useState(false);
+  // const [notifications, setNotifications] = useState([
+  //   { id: 1, description: "Your first notification goes here, it's pretty long to test the ellipsis...", isRead: false, timestamp: "2024-03-28T20:19:52.279787+00:00" },
+  //   { id: 2, description: "Second notification, also lengthy enough...", isRead: true, timestamp: "2024-03-28T20:09:52.279787+00:00" },
+  //   { id: 3, description: "Third notification example...", isRead: false, timestamp: "2024-03-28T19:59:52.279787+00:00" },
+  //   { id: 4, description: "Fourth notification here...", isRead: true, timestamp: "2024-03-28T19:49:52.279787+00:00" },
+  //   { id: 5, description: "Fifth notification content...", isRead: false, timestamp: "2024-03-28T19:39:52.279787+00:00" },
+  // ]);
+  const [notifications, setNotifications] = useState([]);
+  const [friends, setFriends] = useState([]);
+
+  const [currentUserEmail, setCurrentUserEmail] = useState('');
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [hoveredNotification, setHoveredNotification] = useState(null);
@@ -316,7 +232,6 @@ const App = () => {
     setNotifications(notifications.filter(n => n.id !== selectedNotification.id));
     setSelectedNotification(null);
   };
-
 
   const handleNotificationMouseEnter = (notificationId) => {
     const timeoutId = setTimeout(() => {
@@ -332,7 +247,6 @@ const App = () => {
     setHoveredNotification(null);
   };
 
-
   const handleNotificationClick = (notificationId) => {
     setSelectedNotification(notifications.find(n => n.id === notificationId));
     setNotifications(notifications.map(n => {
@@ -343,10 +257,14 @@ const App = () => {
     }));
   };
 
-
   const toggleNotifications = () => {
     console.log("toggled")
     setShowNotifications(!showNotifications);
+  };
+
+  const toggleFriends = () => {
+    console.log("toggled friends")
+    setShowFriends(!showFriends);
   };
 
   const handleClosePopup = () => {
@@ -360,6 +278,28 @@ const App = () => {
       setShowConfirmation(false);
     }, 3000);
   };
+
+  useEffect(() => {   // all notification listener
+    // console.log("User:", auth.currentUser);
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      setCurrentUserEmail(user?.email);
+    });
+
+    const q = query(collection(db, "notifications"));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const notifications = querySnapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+      console.log('all notifications:', notifications)
+      setNotifications(notifications);
+    });
+
+    return () => {
+      unsubscribe();
+      unsubscribeAuth && unsubscribeAuth();
+    };
+  }, []);
 
   return (
     <div className="app">
@@ -472,6 +412,18 @@ const App = () => {
               </button>
               <button
                 className="btn btn-neutral btn-xs"
+                onClick={toggleFriends}
+              >
+                Friends
+              </button>
+              {showFriends && (
+                <div className="notifications-area">
+                  Friends
+                </div>
+              )}
+
+              <button
+                className="btn btn-neutral btn-xs"
                 onClick={() => {
                   router.push("/kanban");
                 }}
@@ -555,7 +507,7 @@ const App = () => {
           </div>
         </div>
       </div>
-    </div>
+    </div >
   );
 };
 
