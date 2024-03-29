@@ -76,7 +76,7 @@ const App = () => {
     electronAPI.receive("file-opened", handleFileOpen);
 
     // Cleanup
-    return () => {};
+    return () => { };
   });
 
   useEffect(() => {
@@ -298,6 +298,69 @@ const App = () => {
     }
   };
 
+  // ADDING
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [notifications, setNotifications] = useState([
+    { id: 1, description: "Your first notification goes here, it's pretty long to test the ellipsis...", isRead: false, timestamp: "2024-03-28T20:19:52.279787+00:00" },
+    { id: 2, description: "Second notification, also lengthy enough...", isRead: true, timestamp: "2024-03-28T20:09:52.279787+00:00" },
+    { id: 3, description: "Third notification example...", isRead: false, timestamp: "2024-03-28T19:59:52.279787+00:00" },
+    { id: 4, description: "Fourth notification here...", isRead: true, timestamp: "2024-03-28T19:49:52.279787+00:00" },
+    { id: 5, description: "Fifth notification content...", isRead: false, timestamp: "2024-03-28T19:39:52.279787+00:00" },
+  ]);
+  const [selectedNotification, setSelectedNotification] = useState(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [hoveredNotification, setHoveredNotification] = useState(null);
+  const [hoverTimeoutId, setHoverTimeoutId] = useState(null);
+
+  const handleClearCurrentNotification = () => {
+    setNotifications(notifications.filter(n => n.id !== selectedNotification.id));
+    setSelectedNotification(null);
+  };
+
+
+  const handleNotificationMouseEnter = (notificationId) => {
+    const timeoutId = setTimeout(() => {
+      const notification = notifications.find(n => n.id === notificationId);
+      setHoveredNotification(notification);
+    }, 1000);
+    setHoverTimeoutId(timeoutId);
+  };
+
+  const handleNotificationMouseLeave = () => {
+    clearTimeout(hoverTimeoutId);
+    setHoverTimeoutId(null);
+    setHoveredNotification(null);
+  };
+
+
+  const handleNotificationClick = (notificationId) => {
+    setSelectedNotification(notifications.find(n => n.id === notificationId));
+    setNotifications(notifications.map(n => {
+      if (n.id === notificationId) {
+        return { ...n, isRead: true };
+      }
+      return n;
+    }));
+  };
+
+
+  const toggleNotifications = () => {
+    console.log("toggled")
+    setShowNotifications(!showNotifications);
+  };
+
+  const handleClosePopup = () => {
+    setSelectedNotification(null);
+  };
+
+  const handleClearNotifications = () => {
+    setNotifications([]);
+    setShowConfirmation(true);
+    setTimeout(() => {
+      setShowConfirmation(false);
+    }, 3000);
+  };
+
   return (
     <div className="app">
       <TitleBar />
@@ -407,6 +470,62 @@ const App = () => {
               >
                 Chat
               </button>
+              <button
+                className="btn btn-neutral btn-xs"
+                onClick={toggleNotifications}
+              >
+                Notifications
+              </button>
+              {showNotifications && (
+                <div className="notifications-area">
+                  Notifications
+                  <button className="clear-notifications" onClick={handleClearNotifications}>Clear</button>
+                  {notifications.map((notification) => (
+                    <div key={notification.id} className={`notification-item ${notification.isRead ? 'read' : 'unread'}`} onClick={() => handleNotificationClick(notification.id)}
+                      onMouseEnter={() => handleNotificationMouseEnter(notification.id)}
+                      onMouseLeave={handleNotificationMouseLeave}>
+                      <span className="notification-description">{notification.description.slice(0, 15)}...</span>
+                      <span className="notification-timestamp">
+                        {new Date(notification.timestamp).toLocaleString('en-US', {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric',
+                          hour: 'numeric',
+                          minute: 'numeric',
+                          hour12: true
+                        })}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {selectedNotification && (
+                <div className="popup-overlay" onClick={handleClosePopup}>
+                  <div className="popup" onClick={(e) => e.stopPropagation()}> {/* Prevent popup from closing when clicking inside */}
+                    <p><strong>Time:</strong> {new Date(selectedNotification.timestamp).toLocaleString('en-US', {
+                      month: 'long',
+                      day: 'numeric',
+                      year: 'numeric',
+                      hour: 'numeric',
+                      minute: 'numeric',
+                      hour12: true
+                    })}</p>
+                    <p><strong>Message:</strong> {selectedNotification.description}</p>
+                    <button onClick={handleClearCurrentNotification} className="clear-current-notification">Clear</button>
+                  </div>
+                </div>
+              )}
+              {showConfirmation && (
+                <div className="confirmation-message">
+                  Notifications cleared
+                </div>
+              )}
+              {hoveredNotification && (
+                <div className="hover-popup" style={{ position: 'absolute', top: '40px', left: '1430px' }}>
+                  <p>{hoveredNotification.description}</p>
+                  <p className="notification-timestamp">{hoveredNotification.timestamp}</p>
+                </div>
+              )}
 
               <div className="flex items-center">
                 <label htmlFor="theme-selection" className="mr-2">

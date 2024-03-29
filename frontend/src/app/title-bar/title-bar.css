@@ -22,3 +22,12 @@
     font-size: 10pt;
     margin-left: 80px;
 }
+
+.title-bar button {
+    font-size: 10pt;
+    margin-left: 80px;
+}
+
+.title-bar button:hover {
+    background-color: #b85454;
+}
