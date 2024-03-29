@@ -3,8 +3,17 @@ import React from 'react';
 import Task from './Task';
 import './App.css';
 
-const KanbanBoard = ({ tasks, handleTaskChange, allAssignees, handleStatusChange, handleDeleteTask}) => {
-  // console.log(tasks);
+const KanbanBoard = ({ todo, ip, done, handleTaskChange, allAssignees, handleStatusChange, handleDeleteTask}) => {
+  if (todo === undefined || ip === undefined || done === undefined) {
+    return;
+  }
+
+  console.log("todo", todo)
+  console.log("ip", ip)
+  console.log("done", done) 
+  // console.log("kanban board receives", Object.entries(tasks))
+  const tasks = {todo, ip, done}
+
   return (
     <div className="kanban-board">
       {Object.entries(tasks).map(([status, tasksInStatus]) => (
