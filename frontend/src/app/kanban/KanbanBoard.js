@@ -4,6 +4,7 @@ import Task from './Task';
 import './App.css';
 
 const KanbanBoard = ({ tasks, handleTaskChange, allAssignees, handleStatusChange, handleDeleteTask}) => {
+  // console.log(tasks);
   return (
     <div className="kanban-board">
       {Object.entries(tasks).map(([status, tasksInStatus]) => (
