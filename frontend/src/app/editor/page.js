@@ -324,32 +324,32 @@ const App = () => {
     return () => unsubscribeAuth();
   }, []);
 
-  useEffect(() => {   // user listener
-    // console.log("User:", auth.currentUser);
+  useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      // console.log(user);
-      setCurrentUserEmail(user?.email);
-      setCurrentUserEmail(auth?.currentUser.email);
-    });
+      if (user) {
+        setCurrentUserEmail(user.email);
 
-    const q = query(collection(db, "emails"), where("email", "==", auth.currentUser.email));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const userA = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      console.log(userA);
-      console.log(userA.friends)
-      setUser(userA);
-      setFriends(userA.friends);
+        const q = query(collection(db, "notifications"), where("recipients", "array-contains", user.email));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const notifications = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setNotifications(notifications);
+        });
+  
+        return unsubscribe;
+      } else {
+        // Handle case when user is logged out if necessary
+        console.log("No user logged in");
+      }
     });
-
-    console.log(friends);
-    return () => {
-      unsubscribe();
-      unsubscribeAuth && unsubscribeAuth();
-    };
+  
+    // This will unsubscribe from auth state changes when component unmounts
+    // or auth state changes
+    return () => unsubscribeAuth();
   }, []);
+
   return (
     <div className="app">
       <TitleBar />
