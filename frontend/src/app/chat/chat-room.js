@@ -144,27 +144,31 @@ const ChatRoom = () => {
       {dropdownVisible && (
         <div
           ref={dropdownRef}
-          className="dropdown-menu"
+          className="dropdown-menu dropdown custom-dropdown"
           style={{
             position: "absolute",
             top: dropdownPosition.y,
             left: dropdownPosition.x,
           }}
         >
-          <ul>
-            <li
-              onClick={() =>
-                window.open(
-                  `https://github.com/${selectedGithubUsername}`,
-                  "_blank",
-                )
-              }
-            >
-              View GitHub Profile
+          <ul
+            tabIndex="-1"
+            className="menu bg-base-100 rounded-box w-32 p-2 text-xs text-white shadow"
+          >
+            <li>
+              <a
+                href={`https://github.com/${selectedGithubUsername}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="p-2"
+              >
+                View GitHub Profile
+              </a>
             </li>
           </ul>
         </div>
       )}
+
       <form onSubmit={sendMessage} className="message-form">
         <input
           type="text"
