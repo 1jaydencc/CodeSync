@@ -1,8 +1,7 @@
-import React, { useState } from 'react';
+import React from "react";
 import "./title-bar.css";
 
-const TitleBar = ({ onToggleNotifications }) => {
-
+const TitleBar = () => {
   return (
     <div className="title-bar">
       <p>CodeSync</p>
