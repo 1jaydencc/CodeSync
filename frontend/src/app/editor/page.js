@@ -294,7 +294,6 @@ const App = () => {
       setCurrentUserEmail(auth?.currentUser.email);
     });
 
-    console.log('current user email:', currentUserEmail, auth.currentUser.email);
     const q = query(collection(db, "notifications"), where("recipients", "array-contains", auth.currentUser.email));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const notifications = querySnapshot.docs.map((doc) => ({
