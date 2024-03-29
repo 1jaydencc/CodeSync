@@ -409,3 +409,9 @@ body,
 .user-icon:focus {
     color: #ffffff; /* Change color on hover/focus */
 }
+
+.bottom-bar {
+    @apply fixed inset-x-0 bottom-0 flex items-center justify-between px-4 py-1 text-sm text-white;
+    background-color: #333333; /* Directly setting the color */
+    z-index: 1000;
+}

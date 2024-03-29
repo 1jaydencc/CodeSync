@@ -389,6 +389,33 @@ const App = () => {
                 />
               </div>
             </div>
+            <div className="bottom-bar">
+              <button
+                className="btn btn-neutral btn-xs"
+                onClick={() => {
+                  router.push("/chat");
+                }}
+              >
+                Chat
+              </button>
+
+              <div className="flex items-center">
+                <label htmlFor="theme-selection" className="mr-2">
+                  Theme:
+                </label>
+                <select
+                  id="theme-selection"
+                  className="select select-bordered select-xs"
+                  value={theme}
+                  onChange={handleThemeChange}
+                >
+                  <option value="vs-light">vs-light</option>
+                  <option value="vs-dark">vs-dark</option>
+                  <option value="hc-black">hc-black</option>
+                  <option value="hc-light">hc-light</option>
+                </select>
+              </div>
+            </div>
           </div>
         </div>
       </div>

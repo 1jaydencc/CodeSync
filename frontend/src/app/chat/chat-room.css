@@ -1,19 +1,19 @@
 /*chat/chat-room.css*/
 .chat-container {
     background: #151515;
-    padding: .5rem;
+    padding: 0.5rem;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
     align-items: stretch;
-    height: 95vh; /* Adjusting height to fill 90% of the viewport height */
-    width: 95vw; /* Optionally adjust width to your preference */
+    height: 95%; /* Adjusting height to fill 90% of the viewport height */
+    width: 95%; /* Optionally adjust width to your preference */
     max-width: 2000px; /* Maintaining a max-width if needed */
     margin-top: auto; /* Helps push the chat towards the top, adjust as needed */
     margin-bottom: auto;
     justify-content: space-between;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
-    overflow: hidden
+    overflow: hidden;
 }
 
 .messages-container {
@@ -25,7 +25,7 @@
     /* iMessage background color */
     overflow-y: auto;
     border-radius: 20px;
-    padding: .5rem;
+    padding: 0.5rem;
     display: flex;
     flex-direction: column;
     /* Newer messages appear at the bottom */
@@ -33,7 +33,7 @@
 
 .message {
     max-width: 70%;
-    padding: 0.3rem .6rem;
+    padding: 0.3rem 0.6rem;
     margin: 0rem;
     font-size: 0.85rem;
     font-weight: 550;
@@ -42,18 +42,20 @@
     flex-direction: column;
     word-wrap: break-word;
     box-shadow: 0 1px 0.5px rgba(0, 0, 0, 0.13);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
     /* Subtle shadow like iMessage */
 }
 
 .message-header {
     font-size: 0.7rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    margin-bottom: .25rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
+    margin-bottom: 0.25rem;
     font-weight: 500;
     color: #a1a1aa;
-    padding-left: .5rem;
-    padding-right: .5rem;
+    padding-left: 0.5rem;
+    padding-right: 0.5rem;
     /* Align with message bubble padding */
 }
 
@@ -95,11 +97,11 @@
     border: 1.5px solid #252525;
     border-radius: 20px;
     padding: 0.3rem;
-    font-size: .85rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-size: 0.85rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
     color: #fff;
     background: #151515;
-    
 }
 
 .send-button {
@@ -107,19 +109,19 @@
     color: #fff;
     border: none;
     border-radius: 20px;
-    padding: .3rem 1.5rem;
-    font-size: .85rem;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    padding: 0.3rem 1.5rem;
+    font-size: 0.85rem;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Helvetica, Arial, sans-serif;
 }
 
 .message-wrapper {
     display: flex;
     flex-direction: column;
     align-items: flex-end; /* Align sent messages to the right */
-    margin-bottom: .25rem;
+    margin-bottom: 0.25rem;
 }
 
 .received-wrapper {
     align-items: flex-start; /* Align received messages to the left */
 }
-
