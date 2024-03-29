@@ -232,8 +232,8 @@ const App = () => {
   //   { id: 5, description: "Fifth notification content...", isRead: false, timestamp: "2024-03-28T19:39:52.279787+00:00" },
   // ]);
   const [notifications, setNotifications] = useState([]);
-  const [friends, setFriends] = useState([]);
-  const [user, setUser] = useState();
+  const [friends, setFriends] = useState();
+  const [user, setUser] = useState({});
 
   const [currentUserEmail, setCurrentUserEmail] = useState('');
   const [selectedNotification, setSelectedNotification] = useState(null);
@@ -302,7 +302,6 @@ const App = () => {
         // Now that we're sure we have a user, set the email in state
 
         setCurrentUserEmail(user.email);
-  
  
         const q = query(collection(db, "notifications"), where("recipients", "array-contains", user.email));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
@@ -339,9 +338,9 @@ const App = () => {
         ...doc.data(),
       }));
       console.log(userA);
-      console.log(userA.friends)
+      console.log(userA[0].friends)
       setUser(userA);
-      setFriends(userA.friends);
+      setFriends(userA[0].friends);
     });
 
     console.log(friends);
@@ -461,7 +460,18 @@ const App = () => {
               >
                 Friends
               </button>
-
+              {showFriends && (
+                <div className="notifications-area">
+                  Friends
+                  {friends.map((friend) => (
+                    <div className="notification-item">
+                      <span className="notification-description">
+                        {friend}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
 
               <button
                 className="btn btn-neutral btn-xs"
