@@ -1,0 +1,24 @@
+/* title-bar.css */
+.title-bar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0; /* Ensure it spans the full width */
+    display: flex;
+    align-items: center; /* Align items vertically */
+    justify-content: left; /* Align content to the left */
+    padding: 0px; /* Add padding on all sides */
+    background-color: transparent; /* Or any color that fits your app */
+    color: white;
+    -webkit-user-select: none; /* Prevent text selection */
+    -webkit-app-region: drag; /* Make it draggable */
+    font-size: 14px; /* Adjust font size */
+    z-index: 1000; /* Ensure it's above other content */
+    height: 28px;
+    outline: 1px solid #222;
+}
+
+.title-bar p {
+    font-size: 10pt;
+    margin-left: 80px;
+}
