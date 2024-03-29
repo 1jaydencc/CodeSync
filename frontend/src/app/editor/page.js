@@ -278,6 +278,11 @@ const App = () => {
     setSelectedNotification(null);
   };
 
+  const handleNewProject = () => {
+      router.push("/Project")
+  };
+
+
   const handleClearNotifications = () => {
     setNotifications([]);
     setShowConfirmation(true);
@@ -413,6 +418,16 @@ const App = () => {
               >
                 Chat
               </button>
+
+              <button
+                className="btn btn-neutral btn-xs"
+                onClick={handleNewProject}
+              >
+                New Project
+              </button>
+
+
+
               <button
                 className="btn btn-neutral btn-xs"
                 onClick={toggleFriends}
