@@ -57,8 +57,8 @@ const customStyles = {
 const Task = ({ task, handleTaskChange, allAssignees, handleStatusChange, handleDeleteTask}) => {
     const [localTask, setLocalTask] = useState(task);
     const tagsOptions = localTask.tags.map(tag => ({ value: tag, label: tag }));
+    const assignedToOptions = localTask.assignedTo.map(person => ({ value: person, label: person }));
 
-    const assignedToOptions = localTask.assignedto.map(person => ({ value: person, label: person }));
     const handleChange = (event) => {
         const { name, value } = event.target;
         setLocalTask({ ...localTask, [name]: value });
@@ -75,7 +75,7 @@ const Task = ({ task, handleTaskChange, allAssignees, handleStatusChange, handle
 
     const handleAssignedToChange = (newValue) => {
         const newAssignedTo = newValue ? newValue.map(option => option.value) : [];
-        setLocalTask({ ...localTask, assignedto: newAssignedTo });
+        setLocalTask({ ...localTask, assignedTo: newAssignedTo });
     };
 
     const handleStatusChangeTask = (event) => {
@@ -121,7 +121,7 @@ const Task = ({ task, handleTaskChange, allAssignees, handleStatusChange, handle
                 isMulti
                 styles={customStyles}
                 theme={theme}
-                name="assignedto"
+                name="assignedTo"
                 options={allAssignees}
                 value={assignedToOptions}
                 onChange={handleAssignedToChange}
