@@ -8,10 +8,6 @@ const KanbanBoard = ({ todo, ip, done, handleTaskChange, allAssignees, handleSta
     return;
   }
 
-  console.log("todo", todo)
-  console.log("ip", ip)
-  console.log("done", done) 
-  // console.log("kanban board receives", Object.entries(tasks))
   const tasks = {todo, ip, done}
 
   return (

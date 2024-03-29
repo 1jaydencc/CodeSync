@@ -14,6 +14,9 @@ import {
     where,
     onSnapshot,
     addDoc,
+    deleteDoc,
+    setDoc,
+    doc
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -255,7 +258,7 @@ const App = () => {
     ];
 
     const [allAssigness, setAllAssigness] = useState(allAssignees);
-    const handleDeleteTask = (taskId) => {
+    const handleDeleteTask = async (taskId) => {
         const updateTasks = (tasks) => {
             const updatedTasks = {};
             Object.keys(tasks).forEach(status => {
@@ -264,8 +267,10 @@ const App = () => {
             return updatedTasks;
         };
 
-        setUserTasks(prevTasks => updateTasks(prevTasks));
-        setProjectTasks(prevTasks => updateTasks(prevTasks));
+        const docRef = await doc(db, "tasks", taskId); 
+        await deleteDoc(docRef);
+        // setUserTasks(prevTasks => updateTasks(prevTasks));
+        // setProjectTasks(prevTasks => updateTasks(prevTasks));
     };
     
     // firebase logic
@@ -398,7 +403,7 @@ const App = () => {
             unsubscribeAuth && unsubscribeAuth();
         };
     }, []);
-    var lastID = 18;
+    var lastID = 10;
     const addTask = async (newTaskData) => {
         console.log('New Task Data:', newTaskData);
         lastID = lastID + 1;
@@ -455,7 +460,7 @@ const App = () => {
         setProjectTasks(prevProjectTasks => updateTasks(prevProjectTasks));
     };
 
-    const handleStatusChange = (taskId, newStatus) => {
+    const handleStatusChange = async (taskId, newStatus) => {
         const updateTasks = (tasks) => {
             let updatedTasks = { ...tasks };
 
@@ -478,6 +483,9 @@ const App = () => {
 
         setUserTasks(updatedUserTasks);
         setProjectTasks(updatedProjectTasks);
+
+        // w/ firebase
+        await setDoc(doc(db, "tasks", taskId), {status: newStatus}, { merge: true });
     };
 
     useEffect(() => {
