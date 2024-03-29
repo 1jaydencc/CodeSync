@@ -28,7 +28,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebase-config";
 import Image from "next/image";
 
-const { electronAPI } = window;
 const Editor = dynamic(() => import("@/app/editor/editor.js"), {
   ssr: false,
 });
@@ -53,9 +52,18 @@ const App = () => {
 
   const [dropdownVisible, setDropdownVisible] = useState(true);
   const [theme, setTheme] = useState("vs-dark");
+  const [electronAPI, setElectronAPI] = useState(null);
+
+  useEffect(() => {
+    // Assign window.electronAPI to the state variable after the component mounts
+    if (typeof window !== "undefined") {
+      setElectronAPI(window.electronAPI);
+    }
+  }, []);
 
   // In your useEffect within the React component
   useEffect(() => {
+    if (!electronAPI) return;
     const handleFileOpen = (event, { path, content }) => {
       console.log("File opened in renderer:", path);
 
@@ -84,6 +92,7 @@ const App = () => {
   });
 
   useEffect(() => {
+    if (!electronAPI) return;
     const saveCurrentFile = () => {
       if (activeFileIndex >= 0) {
         const fileToSave = openFiles[activeFileIndex];
@@ -223,7 +232,8 @@ const App = () => {
   //   { id: 5, description: "Fifth notification content...", isRead: false, timestamp: "2024-03-28T19:39:52.279787+00:00" },
   // ]);
   const [notifications, setNotifications] = useState([]);
-  const [friends, setFriends] = useState([]);
+  const [friends, setFriends] = useState();
+  const [user, setUser] = useState({});
 
   const [currentUserEmail, setCurrentUserEmail] = useState('');
   const [selectedNotification, setSelectedNotification] = useState(null);
@@ -270,7 +280,7 @@ const App = () => {
   };
 
   const toggleFriends = () => {
-    console.log("toggled friends")
+    console.log("toggled friends", friends)
     setShowFriends(!showFriends);
   };
 
@@ -291,28 +301,59 @@ const App = () => {
     }, 3000);
   };
 
-  useEffect(() => {   // all notification listener
+  useEffect(() => {
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Now that we're sure we have a user, set the email in state
+
+        setCurrentUserEmail(user.email);
+ 
+        const q = query(collection(db, "notifications"), where("recipients", "array-contains", user.email));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const notifications = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setNotifications(notifications);
+        });
+  
+        return unsubscribe;
+      } else {
+        // Handle case when user is logged out if necessary
+        console.log("No user logged in");
+      }
+    });
+  
+
+    return () => unsubscribeAuth();
+  }, []);
+
+  useEffect(() => {   // user listener
     // console.log("User:", auth.currentUser);
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      // console.log(user);
       setCurrentUserEmail(user?.email);
+      setCurrentUserEmail(auth?.currentUser.email);
     });
 
-    const q = query(collection(db, "notifications"));
+    const q = query(collection(db, "emails"), where("email", "==", auth.currentUser.email));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const notifications = querySnapshot.docs.map((doc) => ({
+      const userA = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
-      console.log('all notifications:', notifications)
-      setNotifications(notifications);
+      console.log(userA);
+      console.log(userA[0].friends)
+      setUser(userA);
+      setFriends(userA[0].friends);
     });
 
+    console.log(friends);
     return () => {
       unsubscribe();
       unsubscribeAuth && unsubscribeAuth();
     };
   }, []);
-
   return (
     <div className="app">
       <TitleBar />
@@ -437,6 +478,13 @@ const App = () => {
               {showFriends && (
                 <div className="notifications-area">
                   Friends
+                  {friends.map((friend) => (
+                    <div className="notification-item">
+                      <span className="notification-description">
+                        {friend}
+                      </span>
+                    </div>
+                  ))}
                 </div>
               )}
 

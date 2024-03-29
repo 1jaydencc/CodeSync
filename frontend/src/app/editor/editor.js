@@ -140,50 +140,6 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
           <Footer curLine={startLineNumber} curCol={startColumn} />
         </div>
       </div>
-      <div className="comment-container">
-        <h2>
-          Comments
-          <button
-            onClick={() =>
-              onAddCommentClick(
-                currentFile,
-                startLineNumber,
-                startColumn,
-                endLineNumber,
-                endColumn,
-                "arsh",
-              )
-            }
-          >
-            Add Comment
-          </button>
-        </h2>
-        {(startColumn != endColumn || startLineNumber != endLineNumber) && (
-          <div className="comment">
-            <p>
-              {currentFile} @ Ln: {startLineNumber} Col: {startColumn} <br></br>
-              <input
-                value={commentText}
-                onChange={(e) => setCommentText(e.target.value)}
-                type={"comment"}
-                placeholder="leave your comment"
-              />
-              <input
-                value={collaborators}
-                onChange={(e) => setCollaborators(e.target.value)}
-                type={"collaborators"}
-                placeholder="list your collaborators"
-              />
-            </p>
-            <span onClick={() => handleCloseComment(commentID)}> ✖ </span> {}
-          </div>
-        )}
-        {commentList.map((commentID) => (
-          <div key={commentID} className="comment-item">
-            {commentID}
-          </div>
-        ))}
-      </div>
     </div>
   );
 };
