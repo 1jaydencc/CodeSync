@@ -28,7 +28,6 @@ import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebase-config";
 import Image from "next/image";
 
-const { electronAPI } = window;
 const Editor = dynamic(() => import("@/app/editor/editor.js"), {
   ssr: false,
 });
@@ -53,9 +52,18 @@ const App = () => {
 
   const [dropdownVisible, setDropdownVisible] = useState(true);
   const [theme, setTheme] = useState("vs-dark");
+  const [electronAPI, setElectronAPI] = useState(null);
+
+  useEffect(() => {
+    // Assign window.electronAPI to the state variable after the component mounts
+    if (typeof window !== "undefined") {
+      setElectronAPI(window.electronAPI);
+    }
+  }, []);
 
   // In your useEffect within the React component
   useEffect(() => {
+    if (!electronAPI) return;
     const handleFileOpen = (event, { path, content }) => {
       console.log("File opened in renderer:", path);
 
@@ -84,6 +92,7 @@ const App = () => {
   });
 
   useEffect(() => {
+    if (!electronAPI) return;
     const saveCurrentFile = () => {
       if (activeFileIndex >= 0) {
         const fileToSave = openFiles[activeFileIndex];
@@ -287,28 +296,32 @@ const App = () => {
     }, 3000);
   };
 
-  useEffect(() => {   // all notification listener
-    // console.log("User:", auth.currentUser);
+  useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
-      // console.log(user);
-      setCurrentUserEmail(user?.email);
-      setCurrentUserEmail(auth?.currentUser.email);
-    });
+      if (user) {
+        // Now that we're sure we have a user, set the email in state
 
-    const q = query(collection(db, "notifications"), where("recipients", "array-contains", auth.currentUser.email));
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      const notifications = querySnapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...doc.data(),
-      }));
-      console.log('all notifications:', notifications)
-      setNotifications(notifications);
+        setCurrentUserEmail(user.email);
+  
+ 
+        const q = query(collection(db, "notifications"), where("recipients", "array-contains", user.email));
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const notifications = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setNotifications(notifications);
+        });
+  
+        return unsubscribe;
+      } else {
+        // Handle case when user is logged out if necessary
+        console.log("No user logged in");
+      }
     });
+  
 
-    return () => {
-      unsubscribe();
-      unsubscribeAuth && unsubscribeAuth();
-    };
+    return () => unsubscribeAuth();
   }, []);
 
   useEffect(() => {   // user listener
