@@ -472,14 +472,6 @@ const App = () => {
               </button>
               <button
                 className="btn btn-neutral btn-xs"
-                onClick={() => {
-                  router.push("/kanban");
-                }}
-              >
-                Kanban Board
-              </button>
-              <button
-                className="btn btn-neutral btn-xs"
                 onClick={toggleNotifications}
               >
                 Notifications
