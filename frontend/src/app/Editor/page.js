@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useEffect, useCallback} from 'react';
-import Editor from './Editor.js';
-import Taskbar from './Taskbar.js';
+import Editor from './editor.js';
+import Taskbar from './taskbar.js';
 import NewFilePopup from './NewFilePopup.js';
 import './App.css';
 import languages from './languages.json';
