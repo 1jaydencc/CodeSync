@@ -61,6 +61,16 @@ const App = () => {
     }
   }, []);
 
+  const handleDownloadAllFiles = () => {
+    const zip = new JSZip();
+    files.forEach((file) => {
+      zip.file(file.name, file.content);
+    });
+    zip.generateAsync({ type: "blob" }).then((content) => {
+      saveAs(content, "project.zip");
+    });
+  };
+
   // In your useEffect within the React component
   useEffect(() => {
     if (!electronAPI) return;
