@@ -26,6 +26,9 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebase-config";
 import Image from "next/image";
+import * as Y from 'yjs';
+import { WebsocketProvider } from 'y-websocket';
+import { MonacoBinding } from 'y-monaco';
 
 const Editor = dynamic(() => import("@/app/editor/editor.js"), {
   ssr: false,
@@ -97,7 +100,7 @@ const App = () => {
     electronAPI.receive("file-opened", handleFileOpen);
 
     // Cleanup
-    return () => {};
+    return () => { };
   });
 
   useEffect(() => {
