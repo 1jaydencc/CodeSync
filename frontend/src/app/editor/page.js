@@ -1,7 +1,6 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
-
 import TitleBar from "@/app/title-bar/title-bar.js";
 
 import NewFilePopup from "@/app/editor/new-file-popup.js";
@@ -245,7 +244,7 @@ const App = () => {
   const [friends, setFriends] = useState();
   const [user, setUser] = useState({});
 
-  const [currentUserEmail, setCurrentUserEmail] = useState('');
+  const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [selectedNotification, setSelectedNotification] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [hoveredNotification, setHoveredNotification] = useState(null);
@@ -290,7 +289,7 @@ const App = () => {
   };
 
   const toggleFriends = () => {
-    console.log("toggled friends", friends)
+    console.log("toggled friends", friends);
     setShowFriends(!showFriends);
   };
 
@@ -299,9 +298,8 @@ const App = () => {
   };
 
   const handleNewProject = () => {
-      router.push("/Project")
+    router.push("/Project");
   };
-
 
   const handleClearNotifications = () => {
     setNotifications([]);
@@ -317,8 +315,11 @@ const App = () => {
         // Now that we're sure we have a user, set the email in state
 
         setCurrentUserEmail(user.email);
- 
-        const q = query(collection(db, "notifications"), where("recipients", "array-contains", user.email));
+
+        const q = query(
+          collection(db, "notifications"),
+          where("recipients", "array-contains", user.email),
+        );
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
           const notifications = querySnapshot.docs.map((doc) => ({
             id: doc.id,
@@ -326,14 +327,13 @@ const App = () => {
           }));
           setNotifications(notifications);
         });
-  
+
         return unsubscribe;
       } else {
         // Handle case when user is logged out if necessary
         console.log("No user logged in");
       }
     });
-  
 
     return () => unsubscribeAuth();
   }, []);
@@ -341,26 +341,30 @@ const App = () => {
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
+        // Now that we're sure we have a user, set the email in state
+
         setCurrentUserEmail(user.email);
 
-        const q = query(collection(db, "notifications"), where("recipients", "array-contains", user.email));
+        const q = query(
+          collection(db, "emails"),
+          where("email", "==", user.email),
+        );
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
-          const notifications = querySnapshot.docs.map((doc) => ({
+          const userA = querySnapshot.docs.map((doc) => ({
             id: doc.id,
             ...doc.data(),
           }));
-          setNotifications(notifications);
+          setUser(userA);
+          setFriends(userA[0].friends);
         });
-  
+
         return unsubscribe;
       } else {
         // Handle case when user is logged out if necessary
         console.log("No user logged in");
       }
     });
-  
-    // This will unsubscribe from auth state changes when component unmounts
-    // or auth state changes
+
     return () => unsubscribeAuth();
   }, []);
 
@@ -477,8 +481,6 @@ const App = () => {
                 New Project
               </button>
 
-
-
               <button
                 className="btn btn-neutral btn-xs"
                 onClick={toggleFriends}
@@ -490,9 +492,7 @@ const App = () => {
                   Friends
                   {friends.map((friend) => (
                     <div className="notification-item">
-                      <span className="notification-description">
-                        {friend}
-                      </span>
+                      <span className="notification-description">{friend}</span>
                     </div>
                   ))}
                 </div>
@@ -620,7 +620,7 @@ const App = () => {
           </div>
         </div>
       </div>
-    </div >
+    </div>
   );
 };
 
