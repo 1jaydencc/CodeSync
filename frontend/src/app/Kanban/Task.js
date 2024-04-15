@@ -1,9 +1,12 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './App.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CreatableSelect from 'react-select/creatable';
+import { PrismAsyncLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { prism } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
 
 const customStyles = {
     control: (provided) => ({
@@ -58,10 +61,17 @@ const Task = ({ task, handleTaskChange, allAssignees, handleStatusChange, handle
     const [localTask, setLocalTask] = useState(task);
     const tagsOptions = localTask.tags.map(tag => ({ value: tag, label: tag }));
     const assignedToOptions = localTask.assignedTo.map(person => ({ value: person, label: person }));
+    const [code, setCode] = useState(task.code);
 
     const handleChange = (event) => {
         const { name, value } = event.target;
         setLocalTask({ ...localTask, [name]: value });
+    };
+
+    const handleCodeChange = (e) => {
+        setCode(e.target.value);
+        const updatedTask = { ...localTask, code: e.target.value };
+        setLocalTask(updatedTask);
     };
 
     const handleDateChange = (date) => {
@@ -138,6 +148,17 @@ const Task = ({ task, handleTaskChange, allAssignees, handleStatusChange, handle
                 <option value="In-Progress">In Progress</option>
                 <option value="Done">Done</option>
             </select>
+            <SyntaxHighlighter language="python" style={vscDarkPlus} customStyle={{ maxHeight: '150px', overflowY: 'auto', width: '100%' }}>
+                {code}
+            </SyntaxHighlighter>
+            <textarea
+                name="code"
+                value={code}
+                onChange={handleCodeChange}
+                onBlur={updateTask}
+                style={{ height: '150px', width: '100%', fontFamily: 'monospace', marginTop: '10px' }}
+                placeholder="Paste your code here..."
+            />
             <center><button onClick={handleDelete}>Delete</button></center>
 
         </div>

@@ -30,7 +30,8 @@ const App = () => {
                 deadline: '2024-04-05T11:30:00.000Z',
                 assignedTo: ['Arshnoor'],
                 description: 'Fix alignment issues on homepage.',
-                status: 'To-Do'
+                status: 'To-Do',
+                code: ''
             },
             {
                 id: '2',
@@ -40,7 +41,8 @@ const App = () => {
                 deadline: '2024-04-15T16:45:00.000Z',
                 assignedTo: ['Arshnoor', 'Adrien'],
                 description: 'Optimize database queries for speed.',
-                status: 'To-Do'
+                status: 'To-Do',
+                code: ''
             },
             {
                 id: '3',
@@ -50,7 +52,8 @@ const App = () => {
                 deadline: '2024-04-22T09:20:00.000Z',
                 assignedTo: ['Arshnoor'],
                 description: 'Resolve failing tests after the recent merge.',
-                status: 'To-Do'
+                status: 'To-Do',
+                code: ''
             },
             ],
             'In-Progress': [
@@ -62,7 +65,8 @@ const App = () => {
                 deadline: '2024-05-01T14:00:00.000Z',
                 assignedTo: ['Jayden'],
                 description: 'Implement authentication API.',
-                status: 'In-Progress'
+                status: 'In-Progress',
+                code: ''
             },
             {
                 id: '5',
@@ -72,7 +76,8 @@ const App = () => {
                 deadline: '2024-05-10T17:00:00.000Z',
                 assignedTo: ['Jayden'],
                 description: 'Form validations are not working on client side.',
-                status: 'In-Progress'
+                status: 'In-Progress',
+                code: ''
             },
             {
                 id: '6',
@@ -82,7 +87,8 @@ const App = () => {
                 deadline: '2024-05-20T13:15:00.000Z',
                 assignedTo: ['Adrien'],
                 description: 'Setup CI/CD pipeline for the project.',
-                status: 'In-Progress'
+                status: 'In-Progress',
+                code: ''
             },
             ],
             'Done': [
@@ -94,7 +100,8 @@ const App = () => {
                 deadline: '2024-03-30T18:30:00.000Z',
                 assignedTo: ['Adrien'],
                 description: 'Implement real-time chat feature.',
-                status: 'Done'
+                status: 'Done',
+                code: ''
             },
             {
                 id: '8',
@@ -104,7 +111,8 @@ const App = () => {
                 deadline: '2024-04-10T12:00:00.000Z',
                 assignedTo: ['Adrien'],
                 description: 'Database migrations are causing downtime.',
-                status: 'Done'
+                status: 'Done',
+                code: ''
             },
             {
                 id: '9',
@@ -114,7 +122,8 @@ const App = () => {
                 deadline: '2024-04-17T15:30:00.000Z',
                 assignedTo: ['Arshnoor'],
                 description: 'Refactor codebase to include new best practices.',
-                status: 'Done'
+                status: 'Done',
+                code: ''
             },
             ],
         },
@@ -128,7 +137,8 @@ const App = () => {
                   deadline: '2024-04-07T10:00:00.000Z',
                   assignedTo: ['Adrien', 'Arshnoor'],
                   description: 'Design mobile-first user interfaces.',
-                  status: 'To-Do'
+                  status: 'To-Do',
+                  code: ''
                 },
                 {
                   id: '11',
@@ -138,7 +148,8 @@ const App = () => {
                   deadline: '2024-04-20T15:00:00.000Z',
                   assignedTo: ['Arsh'],
                   description: 'Fix 500 errors in the payment API.',
-                  status: 'To-Do'
+                  status: 'To-Do',
+                  code: ''
                 },
                 {
                   id: '12',
@@ -148,7 +159,8 @@ const App = () => {
                   deadline: '2024-05-05T09:00:00.000Z',
                   assignedTo: ['Arsh', 'Jayden'],
                   description: 'Improve website loading times.',
-                  status: 'To-Do'
+                  status: 'To-Do',
+                  code: ''
                 },
               ],
               'In-Progress': [
@@ -160,7 +172,8 @@ const App = () => {
                   deadline: '2024-05-15T11:00:00.000Z',
                   assignedTo: ['Arsh'],
                   description: 'Implement OAuth2 authentication.',
-                  status: 'In-Progress'
+                  status: 'In-Progress',
+                  code: ''
                 },
                 {
                   id: '14',
@@ -170,7 +183,8 @@ const App = () => {
                   deadline: '2024-06-01T14:00:00.000Z',
                   assignedTo: ['Arsh'],
                   description: 'Resolve data duplication issue.',
-                  status: 'In-Progress'
+                  status: 'In-Progress',
+                  code: ''
                 },
                 {
                   id: '15',
@@ -180,7 +194,8 @@ const App = () => {
                   deadline: '2024-06-20T18:00:00.000Z',
                   assignedTo: ['Jayden'],
                   description: 'Conduct a thorough code review for the new release.',
-                  status: 'In-Progress'
+                  status: 'In-Progress',
+                  code: ''
                 },
               ],
               'Done': [
@@ -192,7 +207,8 @@ const App = () => {
                   deadline: '2024-03-25T13:00:00.000Z',
                   assignedTo: ['Jayden'],
                   description: 'Setup and deploy to AWS CloudFormation.',
-                  status: 'Done'
+                  status: 'Done',
+                  code: ''
                 },
                 {
                   id: '17',
@@ -202,7 +218,8 @@ const App = () => {
                   deadline: '2024-04-18T16:00:00.000Z',
                   assignedTo: ['Adrien'],
                   description: 'Fix the email notification delay issue.',
-                  status: 'Done'
+                  status: 'Done',
+                  code: ''
                 },
                 {
                   id: '18',
@@ -212,7 +229,8 @@ const App = () => {
                   deadline: '2024-05-02T12:00:00.000Z',
                   assignedTo: ['Adrien'],
                   description: 'Update the project documentation and wiki.',
-                  status: 'Done'
+                  status: 'Done',
+                  code: ''
                 },
               ],
         },
