@@ -29,6 +29,7 @@ import Image from "next/image";
 import * as Y from 'yjs';
 import { WebsocketProvider } from 'y-websocket';
 import { MonacoBinding } from 'y-monaco';
+import { set } from "date-fns";
 
 const Editor = dynamic(() => import("@/app/editor/editor.js"), {
   ssr: false,
@@ -49,12 +50,18 @@ const App = () => {
   const [openFiles, setOpenFiles] = useState([]); // Each item: { path, content, language, fileName }
   const [activeFileIndex, setActiveFileIndex] = useState(-1); // Index of the currently active file in openFiles
   const activeFile = openFiles[activeFileIndex];
+  
+  const [activeFileIndexB, setActiveFileIndexB] = useState(-1); // Index of the currently active file in openFiles
+  const activeFileB = openFiles[activeFileIndexB];
 
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
   const [dropdownVisible, setDropdownVisible] = useState(true);
   const [theme, setTheme] = useState("vs-dark");
   const [electronAPI, setElectronAPI] = useState(null);
+
+  const [splitScreen, setSplitScreen] = useState(false);
+  const [activeEditor, setActiveEditor] = useState(0);  // 0 for first, 1 for second
 
   useEffect(() => {
     // Assign window.electronAPI to the state variable after the component mounts
@@ -117,12 +124,23 @@ const App = () => {
           .then(() => console.log("File saved successfully"))
           .catch((err) => console.error("Failed to save file:", err));
       }
+      if (activeFileIndexB >= 0) {
+        const fileToSave = openFiles[activeFileIndexB];
+        console.log("Saving content to file B:", fileToSave.content);
+        electronAPI
+          .saveFile({
+            path: fileToSave.path,
+            content: fileToSave.content,
+          })
+          .then(() => console.log("File B saved successfully"))
+          .catch((err) => console.error("Failed B to save file:", err));
+      }
     };
 
     const cleanup = electronAPI.receive("invoke-save", saveCurrentFile);
 
     return () => cleanup(); // Explicitly remove the listener on component unmount
-  }, [activeFileIndex, openFiles]);
+  }, [activeFileIndex, activeFileIndexB, openFiles]);
 
   useEffect(() => {
     const closeDropdown = (e) => {
@@ -163,8 +181,13 @@ const App = () => {
     return languageObj ? languageObj.language : "plaintext";
   };
 
-  const handleFileSelect = (index) => {
-    setActiveFileIndex(index);
+  const handleFileSelect = (index) => { // left explorer bar
+    if (activeEditor === 0) {
+      setActiveFileIndex(index);
+    } else {
+      setActiveFileIndexB(index);
+    }
+    console.log(activeEditor, activeFileIndex, activeFileIndexB);
   };
 
   const handleCloseTab = (index) => {
@@ -173,6 +196,11 @@ const App = () => {
     // Adjust the active file index as needed
     if (activeFileIndex === index) {
       setActiveFileIndex(
+        newOpenFiles.length ? Math.min(index, newOpenFiles.length - 1) : -1,
+      );
+    }
+    if (activeFileIndexB === index) {
+      setActiveFileIndexB(
         newOpenFiles.length ? Math.min(index, newOpenFiles.length - 1) : -1,
       );
     }
@@ -296,6 +324,11 @@ const App = () => {
     setShowFriends(!showFriends);
   };
 
+  const toggleSplitScreen = () => {
+    console.log("toggled splitscreen");
+    setSplitScreen(!splitScreen);
+  };
+
   const handleClosePopup = () => {
     setSelectedNotification(null);
   };
@@ -385,7 +418,7 @@ const App = () => {
                   key={file.path}
                   className="file-item"
                   onClick={() => handleFileSelect(index)}
-                >
+                > 
                   {file.fileName}
                 </div>
               ))}
@@ -458,14 +491,41 @@ const App = () => {
                   }
                   theme={theme}
                   onCodeChange={(newContent) => {
+                    setActiveEditor(0);
                     console.log(newContent);
                     if (activeFileIndex >= 0) {
                       openFiles[activeFileIndex].content = newContent;
                       console.log(openFiles[activeFileIndex].content);
                     }
                   }}
+                  onClick={(e) => {console.log("clicked first")}}
                 />
               </div>
+              {splitScreen && (
+                <div className="editor-container">
+                  <Editor
+                    language={
+                      activeFileIndexB >= 0
+                        ? openFiles[activeFileIndexB].language
+                        : "plaintext"
+                    }
+                    code={
+                      activeFileIndexB >= 0
+                        ? openFiles[activeFileIndexB].content
+                        : ""
+                    }
+                    theme={theme}
+                    onCodeChange={(newContent) => {
+                      setActiveEditor(1);
+                      console.log(newContent);
+                      if (activeFileIndexB >= 0) {
+                        openFiles[activeFileIndexB].content = newContent;
+                        console.log(openFiles[activeFileIndexB].content);
+                      }
+                    }}
+                  />
+                </div>
+              )}
             </div>
             <div className="bottom-bar">
               <button
@@ -602,6 +662,15 @@ const App = () => {
                   </p>
                 </div>
               )}
+              <button
+                className="btn btn-neutral btn-xs"
+                onClick={() => {
+                  toggleSplitScreen();
+                  console.log(splitScreen)
+                }}
+              >
+                Toggle Split Screen
+              </button>
 
               <div className="flex items-center">
                 <label htmlFor="theme-selection" className="mr-2">
