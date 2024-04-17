@@ -265,6 +265,7 @@ const App = () => {
   // ADDING
   const [showNotifications, setShowNotifications] = useState(false);
   const [showCodeSnippets, setShowCodeSnippets] = useState(false);
+  const [showSelectedCodeSnippet, setShowSelectedCodeSnippet] = useState(false);
   const [showFriends, setShowFriends] = useState(false);
   const [notifications, setNotifications] = useState([]);
   const [codeSnippets, setCodeSnippets] = useState([]);
@@ -293,6 +294,10 @@ const App = () => {
       setHoveredNotification(notification);
     }, 1000);
     setHoverTimeoutId(timeoutId);
+  };
+
+  const handleCodeSnippetMouseEnter = (csId) => {
+    setSelectedCodeSnippet(codeSnippets.find((n) => n.id === csId));
   };
 
   const handleNotificationMouseLeave = () => {
@@ -329,13 +334,15 @@ const App = () => {
   };
 
   const handleCodeSnippetClick = (codeSnippetId) => {
-    setSelectedCodeSnippet(codeSnippets.find((n) => n.id === codeSnippetId));
+    setShowSelectedCodeSnippet(codeSnippets.find((n) => n.id === codeSnippetId));
   };
 
   const toggleAddCodeSnippet = () => {
     setShowAddCodeSnippet(true);
   }
-
+  const toggleShowSelectedCodeSnippet = () => {
+    setShowSelectedCodeSnippet(true);
+  }
   const handleUpdateCodeSnippet = (e) => {
     setSelectedCodeSnippet({ ...selectedCodeSnippet, text: e.target.value });
   }
@@ -383,7 +390,7 @@ const App = () => {
   const handleClosePopup = () => {
     setShowAddCodeSnippet(null);
     setSelectedNotification(null);
-    setSelectedCodeSnippet(null);
+    setShowSelectedCodeSnippet(null);
   };
 
   const handleNewProject = () => {
@@ -658,7 +665,6 @@ const App = () => {
               {showCodeSnippets && ( 
                 <div className="notifications-area">
                   Code Snippets
-                  
                   <span                                       /* TODO: ADD A CODE SNIPPET */
                     className="close-tab"
                     onClick={(e) => {
@@ -671,18 +677,18 @@ const App = () => {
                     ➕Add{" "}
                   </span>
                   {codeSnippets.map((cs) => (
-                  <div
-                    key={cs.id}
-                    // className={`notification-item ${notification.isRead ? "read" : "unread"}`}
-                    onClick={() => handleCodeSnippetClick(cs.id)}
-                  >
-                    <span className="notification-description">
-                      {cs.name.slice(0, 15)}...
-                    </span>
-                    <span className="notification-timestamp">
-                      Copy
-                    </span>
-                  </div>
+                    <div
+                      key={cs.id}
+                      // className={`notification-item ${notification.isRead ? "read" : "unread"}`}
+                      onClick={() => handleCodeSnippetClick(cs.id)}
+                      onMouseEnter={() => {
+                        handleCodeSnippetMouseEnter(cs.id);
+                      }}
+                    >
+                      <span className="notification-description">
+                        <strong>{cs.name.slice(0, 15)}</strong>
+                      </span>
+                    </div>
                   ))}
                 </div>
               )}
@@ -714,7 +720,7 @@ const App = () => {
                 </div>
               )}
 
-              {selectedCodeSnippet && (
+              {showSelectedCodeSnippet && (
                 <div className="popup-overlay" onClick={handleClosePopup}>
                   <div className="popup" onClick={(e) => e.stopPropagation()}>
                     {" "}
@@ -742,6 +748,10 @@ const App = () => {
                           onUpdateCodeSnippetClick(selectedCodeSnippet.name, selectedCodeSnippet.text);
                         }}>
                         Update
+                      </button>
+                      <button
+                        onClick={() => {navigator.clipboard.writeText(selectedCodeSnippet.text)}}>
+                          Copy
                       </button>
                     </div>
                   </div>
