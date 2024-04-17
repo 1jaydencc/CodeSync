@@ -16,8 +16,8 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUser } from "@fortawesome/free-solid-svg-icons";
 import {
   doc,
-  addDoc,
   setDoc,
+  deleteDoc,
   collection,
   query,
   where,
@@ -336,12 +336,35 @@ const App = () => {
     setShowAddCodeSnippet(true);
   }
 
-  const onAddCodeSnippetClick = (
+  const handleUpdateCodeSnippet = (e) => {
+    setSelectedCodeSnippet({ ...selectedCodeSnippet, text: e.target.value });
+  }
+
+  const onAddCodeSnippetClick = async (
     name,
     text
   ) => {
-    const docRef = addDoc(collection(db, "codesnippets"), {
-      author: auth.currentUser.uid, // must be signed in
+    await setDoc(doc(db, "codesnippets", name), {
+      author: auth.currentUser.email, // must be signed in
+      name: name,
+      text: text,
+    });
+  };
+
+  const onDeleteCodeSnippetClick = async (
+    name
+  ) => {
+    const docRef = await doc(db, "codesnippets", name); 
+    await deleteDoc(docRef);
+  };
+
+  const onUpdateCodeSnippetClick = async (
+    name,
+    text
+  ) => {
+    const docRef = doc(db, "codesnippets", name);
+    await setDoc(docRef, {
+      author: auth.currentUser.email, // must be signed in
       name: name,
       text: text,
     });
@@ -649,15 +672,15 @@ const App = () => {
                   </span>
                   {codeSnippets.map((cs) => (
                   <div
-                      key={cs.id}
-                      // className={`notification-item ${notification.isRead ? "read" : "unread"}`}
-                      onClick={() => handleCodeSnippetClick(cs.id)}
+                    key={cs.id}
+                    // className={`notification-item ${notification.isRead ? "read" : "unread"}`}
+                    onClick={() => handleCodeSnippetClick(cs.id)}
                   >
                     <span className="notification-description">
-                        {cs.name.slice(0, 15)}...
+                      {cs.name.slice(0, 15)}...
                     </span>
                     <span className="notification-timestamp">
-                        copy button
+                      Copy
                     </span>
                   </div>
                   ))}
@@ -699,16 +722,26 @@ const App = () => {
                     <p>
                       <strong>{selectedCodeSnippet.name}</strong>{" "}
                     </p>
-                    <p>
-                      <strong></strong>{" "}
+                    <textarea
+                      className="code-snippet-text-input"
+                      type="text"
+                      placeholder="text"
+                      onChange={(e) => handleUpdateCodeSnippet(e)}
+                    >
                       {selectedCodeSnippet.text}
-                    </p>
+                    </textarea>
                     <div className="button-wrapper">
-                      <button>
+                      <button
+                        onClick={() => {
+                          onDeleteCodeSnippetClick(selectedCodeSnippet.name);
+                        }}>
                         Delete
                       </button>
-                      <button>
-                        Edit
+                      <button
+                        onClick={() => {
+                          onUpdateCodeSnippetClick(selectedCodeSnippet.name, selectedCodeSnippet.text);
+                        }}>
+                        Update
                       </button>
                     </div>
                   </div>

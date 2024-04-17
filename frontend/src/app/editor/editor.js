@@ -107,10 +107,8 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
     setCommentList(newCommentList);
   };
 
-  useEffect(() => {
-    // update's theme on every render
+  useEffect(() => { // update's theme on every render
     if (auth.currentUser) {
-      console.log(auth.currentUser.uid, theme);
       const docRef = doc(db, "user_settings", auth.currentUser.uid);
       setDoc(docRef, {
         theme: theme,
