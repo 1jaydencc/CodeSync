@@ -656,6 +656,15 @@ const App = () => {
                 Kanban Board
               </button>
 
+              <button /* ----------------------- KANBAN ----------------------- */
+                className="btn btn-neutral btn-xs"
+                onClick={() => {
+                  router.push("/Whiteboard");
+                }}
+              >
+                Whiteboard
+              </button>
+
               <button /* ----------------------- CODE SNIPPETS ----------------------- */
                 className="btn btn-neutral btn-xs"
                 onClick={toggleCodeSnippets}
