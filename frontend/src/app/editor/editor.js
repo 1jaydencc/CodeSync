@@ -33,7 +33,7 @@ const Comment = ({
   );
 };
 
-const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
+const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) => {
   const [startLineNumber, setStartLineNumber] = useState(0);
   const [startColumn, setStartColumn] = useState(0);
   const [endLineNumber, setEndLineNumber] = useState(0);
@@ -156,14 +156,15 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
   const provider = useRef(null);
   const type = useRef(null);
   const binding = useRef(null);
-  const sharedLanguage = useRef(new Y.Text(language));
+  const sharedLanguage = useRef(new Y.Text("plaintext"));
 
   useEffect(() => {
+    console.log(canonicalLanguage);
     // Initialize Yjs type
     type.current = ydoc.current.getText("monaco");
     sharedLanguage.current = ydoc.current.getText("language");
-    sharedLanguage.current.observe(event => {
-      // This function will be called whenever the shared language changes
+
+    sharedLanguage.current.observe(() => {
       const newLanguage = sharedLanguage.current.toString();
       if (window.monaco && editorRef.current) {
         window.monaco.editor.setModelLanguage(editorRef.current.getModel(), newLanguage);
@@ -179,11 +180,12 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
   }, []);
 
   useEffect(() => {
-    if (language !== sharedLanguage.current.toString()) {
+    // Only update sharedLanguage if canonicalLanguage changes and it's not null
+    if (canonicalLanguage) {
       sharedLanguage.current.delete(0, sharedLanguage.current.length);
-      sharedLanguage.current.insert(0, language);
+      sharedLanguage.current.insert(0, canonicalLanguage);
     }
-  }, [language]);
+  }, [canonicalLanguage]);
 
   setTimeout(function () {
     if (editorRef.current) {
@@ -255,6 +257,11 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
     provider.current.on("status", (event) => {
       if (event.status === "connected") {
         setIsConnected(true);
+        if (canonicalLanguage) {
+          // Ensure the language is updated on each connect
+          sharedLanguage.current.delete(0, sharedLanguage.current.length);
+          sharedLanguage.current.insert(0, canonicalLanguage);
+        }
 
         // Initialize or reinitialize the binding
         if (editorRef.current) {
