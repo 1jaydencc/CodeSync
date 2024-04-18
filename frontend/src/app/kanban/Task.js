@@ -4,7 +4,8 @@ import './App.css';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import CreatableSelect from 'react-select/creatable';
-
+import MonacoEditor from '@monaco-editor/react';
+import languageData from './language.json'
 
 const customStyles = {
     control: (provided) => ({
@@ -58,6 +59,17 @@ const customStyles = {
 const Task = ({ task, handleTaskChange, allAssignees, handleStatusChange, handleDeleteTask}) => {
     const [localTask, setLocalTask] = useState(task);
     const tagsOptions = localTask.tags.map(tag => ({ value: tag, label: tag }));
+    const [language, setLanguage] = useState('plaintext');
+
+    const languageOptions = languageData.map(lang => ({
+      label: lang.language.charAt(0).toUpperCase() + lang.language.slice(1),
+      value: lang.language,
+    }));
+
+    const handleLanguageChange = (event) => {
+      setLanguage(event.target.value);
+      console.log("Language:", language);
+    };
 
     const assignedToOptions = localTask.assignedto.map(person => ({ value: person, label: person }));
     const handleChange = (event) => {
@@ -140,6 +152,21 @@ const Task = ({ task, handleTaskChange, allAssignees, handleStatusChange, handle
                 <option value="In-Progress">In Progress</option>
                 <option value="Done">Done</option>
             </select>
+            <select onChange={handleLanguageChange} value={language}>
+                {languageOptions.map((option, index) => (
+                    <option key={index} value={option.value}>
+                        {option.label}
+                    </option>
+                ))}
+            </select>
+            <MonacoEditor
+                height="200px"
+                width="100%"
+                theme="vs-dark"
+                language={language}
+                value={"hello there"}
+                onChange={newCode => setCode(newCode)}
+            />
             <center><button onClick={handleDelete}>Delete</button></center>
 
         </div>

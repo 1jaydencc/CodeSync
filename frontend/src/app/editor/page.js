@@ -18,6 +18,7 @@ import { faUser } from "@fortawesome/free-solid-svg-icons";
 import {
   doc,
   setDoc,
+  deleteDoc,
   collection,
   query,
   where,
@@ -27,6 +28,10 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebase-config";
 import Image from "next/image";
+import * as Y from 'yjs';
+import { WebsocketProvider } from 'y-websocket';
+import { MonacoBinding } from 'y-monaco';
+import { add, set } from "date-fns";
 
 const Editor = dynamic(() => import("@/app/editor/editor.js"), {
   ssr: false,
@@ -48,11 +53,17 @@ const App = () => {
   const [activeFileIndex, setActiveFileIndex] = useState(-1); // Index of the currently active file in openFiles
   const activeFile = openFiles[activeFileIndex];
 
+  const [activeFileIndexB, setActiveFileIndexB] = useState(-1); // Index of the currently active file in openFiles
+  const activeFileB = openFiles[activeFileIndexB];
+
   const toggleDropdown = () => setShowDropdown(!showDropdown);
 
   const [dropdownVisible, setDropdownVisible] = useState(true);
   const [theme, setTheme] = useState("vs-dark");
   const [electronAPI, setElectronAPI] = useState(null);
+
+  const [splitScreen, setSplitScreen] = useState(false);
+  const [activeEditor, setActiveEditor] = useState(0);  // 0 for first, 1 for second
 
   useEffect(() => {
     // Assign window.electronAPI to the state variable after the component mounts
@@ -98,7 +109,7 @@ const App = () => {
     electronAPI.receive("file-opened", handleFileOpen);
 
     // Cleanup
-    return () => {};
+    return () => { };
   });
 
   useEffect(() => {
@@ -115,12 +126,23 @@ const App = () => {
           .then(() => console.log("File saved successfully"))
           .catch((err) => console.error("Failed to save file:", err));
       }
+      if (activeFileIndexB >= 0) {
+        const fileToSave = openFiles[activeFileIndexB];
+        console.log("Saving content to file B:", fileToSave.content);
+        electronAPI
+          .saveFile({
+            path: fileToSave.path,
+            content: fileToSave.content,
+          })
+          .then(() => console.log("File B saved successfully"))
+          .catch((err) => console.error("Failed B to save file:", err));
+      }
     };
 
     const cleanup = electronAPI.receive("invoke-save", saveCurrentFile);
 
     return () => cleanup(); // Explicitly remove the listener on component unmount
-  }, [activeFileIndex, openFiles]);
+  }, [activeFileIndex, activeFileIndexB, openFiles]);
 
   useEffect(() => {
     const closeDropdown = (e) => {
@@ -161,8 +183,13 @@ const App = () => {
     return languageObj ? languageObj.language : "plaintext";
   };
 
-  const handleFileSelect = (index) => {
-    setActiveFileIndex(index);
+  const handleFileSelect = (index) => { // left explorer bar
+    if (activeEditor === 0) {
+      setActiveFileIndex(index);
+    } else {
+      setActiveFileIndexB(index);
+    }
+    console.log(activeEditor, activeFileIndex, activeFileIndexB);
   };
 
   const handleCloseTab = (index) => {
@@ -171,6 +198,11 @@ const App = () => {
     // Adjust the active file index as needed
     if (activeFileIndex === index) {
       setActiveFileIndex(
+        newOpenFiles.length ? Math.min(index, newOpenFiles.length - 1) : -1,
+      );
+    }
+    if (activeFileIndexB === index) {
+      setActiveFileIndexB(
         newOpenFiles.length ? Math.min(index, newOpenFiles.length - 1) : -1,
       );
     }
@@ -233,21 +265,20 @@ const App = () => {
 
   // ADDING
   const [showNotifications, setShowNotifications] = useState(false);
+  const [showCodeSnippets, setShowCodeSnippets] = useState(false);
+  const [showSelectedCodeSnippet, setShowSelectedCodeSnippet] = useState(false);
   const [showFriends, setShowFriends] = useState(false);
-  // const [notifications, setNotifications] = useState([
-  //   { id: 1, description: "Your first notification goes here, it's pretty long to test the ellipsis...", isRead: false, timestamp: "2024-03-28T20:19:52.279787+00:00" },
-  //   { id: 2, description: "Second notification, also lengthy enough...", isRead: true, timestamp: "2024-03-28T20:09:52.279787+00:00" },
-  //   { id: 3, description: "Third notification example...", isRead: false, timestamp: "2024-03-28T19:59:52.279787+00:00" },
-  //   { id: 4, description: "Fourth notification here...", isRead: true, timestamp: "2024-03-28T19:49:52.279787+00:00" },
-  //   { id: 5, description: "Fifth notification content...", isRead: false, timestamp: "2024-03-28T19:39:52.279787+00:00" },
-  // ]);
   const [notifications, setNotifications] = useState([]);
+  const [codeSnippets, setCodeSnippets] = useState([]);
   const [friends, setFriends] = useState();
   const [user, setUser] = useState({});
 
   const [currentUserEmail, setCurrentUserEmail] = useState("");
   const [selectedNotification, setSelectedNotification] = useState(null);
+  const [selectedCodeSnippet, setSelectedCodeSnippet] = useState(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
+  const [showAddCodeSnippet, setShowAddCodeSnippet] = useState(false);
+
   const [hoveredNotification, setHoveredNotification] = useState(null);
   const [hoverTimeoutId, setHoverTimeoutId] = useState(null);
 
@@ -264,6 +295,10 @@ const App = () => {
       setHoveredNotification(notification);
     }, 1000);
     setHoverTimeoutId(timeoutId);
+  };
+
+  const handleCodeSnippetMouseEnter = (csId) => {
+    setSelectedCodeSnippet(codeSnippets.find((n) => n.id === csId));
   };
 
   const handleNotificationMouseLeave = () => {
@@ -289,13 +324,74 @@ const App = () => {
     setShowNotifications(!showNotifications);
   };
 
+  /* CODE SNIPPETS */
+
+  const [codeSnippetName, setCodeSnippetName] = useState("");
+  const [codeSnippetText, setCodeSnippetText] = useState("");
+
+  const toggleCodeSnippets = () => {
+    console.log("toggled");
+    setShowCodeSnippets(!showCodeSnippets);
+  };
+
+  const handleCodeSnippetClick = (codeSnippetId) => {
+    setShowSelectedCodeSnippet(codeSnippets.find((n) => n.id === codeSnippetId));
+  };
+
+  const toggleAddCodeSnippet = () => {
+    setShowAddCodeSnippet(true);
+  }
+  const toggleShowSelectedCodeSnippet = () => {
+    setShowSelectedCodeSnippet(true);
+  }
+  const handleUpdateCodeSnippet = (e) => {
+    setSelectedCodeSnippet({ ...selectedCodeSnippet, text: e.target.value });
+  }
+
+  const onAddCodeSnippetClick = async (
+    name,
+    text
+  ) => {
+    await setDoc(doc(db, "codesnippets", name), {
+      author: auth.currentUser.email, // must be signed in
+      name: name,
+      text: text,
+    });
+  };
+
+  const onDeleteCodeSnippetClick = async (
+    name
+  ) => {
+    const docRef = await doc(db, "codesnippets", name);
+    await deleteDoc(docRef);
+  };
+
+  const onUpdateCodeSnippetClick = async (
+    name,
+    text
+  ) => {
+    const docRef = doc(db, "codesnippets", name);
+    await setDoc(docRef, {
+      author: auth.currentUser.email, // must be signed in
+      name: name,
+      text: text,
+    });
+  };
+
   const toggleFriends = () => {
     console.log("toggled friends", friends);
     setShowFriends(!showFriends);
   };
 
+  const toggleSplitScreen = () => {
+    console.log("toggled splitscreen");
+    setSplitScreen(!splitScreen);
+  };
+
   const handleClosePopup = () => {
+    setShowAddCodeSnippet(null);
     setSelectedNotification(null);
+    setShowSelectedCodeSnippet(null);
   };
 
   const handleNewProject = () => {
@@ -310,7 +406,7 @@ const App = () => {
     }, 3000);
   };
 
-  useEffect(() => {
+  useEffect(() => { // get notifications
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
         console.log(user);
@@ -328,6 +424,34 @@ const App = () => {
             ...doc.data(),
           }));
           setNotifications(notifications);
+        });
+
+        return unsubscribe;
+      } else {
+        // Handle case when user is logged out if necessary
+        console.log("No user logged in");
+      }
+    });
+
+    return () => unsubscribeAuth();
+  }, []);
+
+  useEffect(() => { // get code snippest
+    const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // Now that we're sure we have a user, set the email in state
+
+        setCurrentUserEmail(user.email);
+
+        const q = query(
+          collection(db, "codesnippets")
+        );
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+          const cs = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }));
+          setCodeSnippets(cs);
         });
 
         return unsubscribe;
@@ -457,16 +581,44 @@ const App = () => {
                   }
                   theme={theme}
                   onCodeChange={(newContent) => {
+                    setActiveEditor(0);
+                    console.log(newContent);
                     if (activeFileIndex >= 0) {
                       openFiles[activeFileIndex].content = newContent;
                       console.log(openFiles[activeFileIndex].content);
                     }
                   }}
+                  onClick={(e) => { console.log("clicked first") }}
                 />
               </div>
+              {splitScreen && (
+                <div className="editor-container">
+                  <Editor
+                    language={
+                      activeFileIndexB >= 0
+                        ? openFiles[activeFileIndexB].language
+                        : "plaintext"
+                    }
+                    code={
+                      activeFileIndexB >= 0
+                        ? openFiles[activeFileIndexB].content
+                        : ""
+                    }
+                    theme={theme}
+                    onCodeChange={(newContent) => {
+                      setActiveEditor(1);
+                      console.log(newContent);
+                      if (activeFileIndexB >= 0) {
+                        openFiles[activeFileIndexB].content = newContent;
+                        console.log(openFiles[activeFileIndexB].content);
+                      }
+                    }}
+                  />
+                </div>
+              )}
             </div>
             <div className="bottom-bar">
-              <button
+              <button /* ----------------------- CHAT ----------------------- */
                 className="btn btn-neutral btn-xs"
                 onClick={() => {
                   router.push("/chat");
@@ -475,21 +627,21 @@ const App = () => {
                 Chat
               </button>
 
-              <button
+              <button /* ----------------------- NEW PROJECT ----------------------- */
                 className="btn btn-neutral btn-xs"
                 onClick={handleNewProject}
               >
                 New Project
               </button>
 
-              <button
+              <button /* ----------------------- FRIENDS ----------------------- */
                 className="btn btn-neutral btn-xs"
                 onClick={toggleFriends}
               >
                 Friends
               </button>
 
-              <button
+              <button /* ----------------------- KANBAN ----------------------- */
                 className="btn btn-neutral btn-xs"
                 onClick={() => {
                   router.push("/kanban");
@@ -497,7 +649,110 @@ const App = () => {
               >
                 Kanban Board
               </button>
-              <button
+
+              <button /* ----------------------- CODE SNIPPETS ----------------------- */
+                className="btn btn-neutral btn-xs"
+                onClick={toggleCodeSnippets}
+              >
+                Code Snippets
+              </button>
+              {showCodeSnippets && (
+                <div className="notifications-area">
+                  Code Snippets
+                  <span                                       /* TODO: ADD A CODE SNIPPET */
+                    className="close-tab"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      toggleAddCodeSnippet();
+                      /* handleCloseTab(index); */
+                    }}
+                  >
+                    {" "}
+                    ➕Add{" "}
+                  </span>
+                  {codeSnippets.map((cs) => (
+                    <div
+                      key={cs.id}
+                      // className={`notification-item ${notification.isRead ? "read" : "unread"}`}
+                      onClick={() => handleCodeSnippetClick(cs.id)}
+                      onMouseEnter={() => {
+                        handleCodeSnippetMouseEnter(cs.id);
+                      }}
+                    >
+                      <span className="notification-description">
+                        <strong>{cs.name.slice(0, 15)}</strong>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {showAddCodeSnippet && ( /*  ADD A CODESNIPPET  */
+                <div className="popup-overlay" onClick={handleClosePopup}>
+                  <div className="popup" onClick={(e) => e.stopPropagation()}>
+                    {" "}
+                    {/* Prevent popup from closing when clicking inside */}
+                    <input
+                      type="text"
+                      placeholder="name"
+                      onChange={(e) => setCodeSnippetName(e.target.value)}
+                    />
+                    <textarea
+                      className="code-snippet-text-input"
+                      type="text"
+                      placeholder="text"
+                      onChange={(e) => setCodeSnippetText(e.target.value)}
+                    />
+                    <button
+                      onClick={() => {
+                        onAddCodeSnippetClick(codeSnippetName, codeSnippetText);
+                      }}
+                    >
+                      Add
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {showSelectedCodeSnippet && (
+                <div className="popup-overlay" onClick={handleClosePopup}>
+                  <div className="popup" onClick={(e) => e.stopPropagation()}>
+                    {" "}
+                    {/* Prevent popup from closing when clicking inside */}
+                    <p>
+                      <strong>{selectedCodeSnippet.name}</strong>{" "}
+                    </p>
+                    <textarea
+                      className="code-snippet-text-input"
+                      type="text"
+                      placeholder="text"
+                      onChange={(e) => handleUpdateCodeSnippet(e)}
+                    >
+                      {selectedCodeSnippet.text}
+                    </textarea>
+                    <div className="button-wrapper">
+                      <button
+                        onClick={() => {
+                          onDeleteCodeSnippetClick(selectedCodeSnippet.name);
+                        }}>
+                        Delete
+                      </button>
+                      <button
+                        onClick={() => {
+                          onUpdateCodeSnippetClick(selectedCodeSnippet.name, selectedCodeSnippet.text);
+                        }}>
+                        Update
+                      </button>
+                      <button
+                        onClick={() => { navigator.clipboard.writeText(selectedCodeSnippet.text) }}>
+                        Copy
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              <button /* ----------------------- NOTIFICATIONS ----------------------- */
                 className="btn btn-neutral btn-xs"
                 onClick={toggleNotifications}
               >
@@ -542,6 +797,7 @@ const App = () => {
                   ))}
                 </div>
               )}
+
               {selectedNotification && (
                 <div className="popup-overlay" onClick={handleClosePopup}>
                   <div className="popup" onClick={(e) => e.stopPropagation()}>
@@ -590,6 +846,16 @@ const App = () => {
                   </p>
                 </div>
               )}
+
+              <button
+                className="btn btn-neutral btn-xs"
+                onClick={() => {
+                  toggleSplitScreen();
+                  console.log(splitScreen)
+                }}
+              >
+                Toggle Split Screen
+              </button>
 
               <div className="flex items-center">
                 <label htmlFor="theme-selection" className="mr-2">
