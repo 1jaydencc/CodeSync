@@ -29,9 +29,12 @@ const WhiteboardPage = () => {
 
     useEffect(() => {
         if (!user) return;
+
+        const newRenderedLines = new Set(renderedLines);
+        const newLines = [];
     
         const linesRef = collection(db, "whiteboards", "defaultWhiteboard", "lines");
-        const q = query(linesRef, orderBy("createdAt", "desc"));
+        const q = query(linesRef, orderBy("createdAt"));
         const unsubscribe = onSnapshot(q, (snapshot) => {
             snapshot.docChanges().forEach(change => {
                 if (change.type === "added" && !renderedLines.has(change.doc.id)) {
@@ -45,10 +48,15 @@ const WhiteboardPage = () => {
                     };
                     console.log("New line added:", newLine);
                     drawLine(newLine);
-                    setLines(lines => [...lines, newLine]);
-                    setRenderedLines(new Set([...renderedLines, change.doc.id]));
+                    //setLines(lines => [...lines, newLine]);
+                    //setRenderedLines(new Set([...renderedLines, change.doc.id]));
+                    newLines.push(newLine);
+                    newRenderedLines.add(change.doc.id);
                 }
             });
+
+            setLines(lines => [...lines, ...newLines]);
+            setRenderedLines(newRenderedLines);
         });
 
         return () => unsubscribe();
