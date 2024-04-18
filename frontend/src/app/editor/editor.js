@@ -4,8 +4,10 @@ import Editor from "@monaco-editor/react";
 import Footer from "./footer.js";
 import { auth, db } from "@/firebase-config";
 import { collection, doc, addDoc, setDoc, deleteDoc } from "firebase/firestore";
-import { editor } from "monaco-editor";
-import { milliseconds } from "date-fns";
+
+import * as Y from "yjs";
+import { WebsocketProvider } from "y-websocket";
+import { MonacoBinding } from "y-monaco";
 
 const Comment = ({
   file,
@@ -39,9 +41,28 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
   const [commentList, setCommentList] = useState([]);
   const [commentText, setCommentText] = useState("");
   const [collaborators, setCollaborators] = useState("");
+  const [roomName, setRoomName] = useState("default-room");
+  const [isConnected, setIsConnected] = useState(false);
 
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
+
+  const ydoc = useRef(new Y.Doc());
+  const provider = useRef(null);
+  const type = useRef(null);
+  const binding = useRef(null);
+
+  useEffect(() => {
+    // Initialize Yjs type
+    type.current = ydoc.current.getText("monaco");
+
+    return () => {
+      // Cleanup Yjs document and provider on component unmount
+      binding.current?.destroy();
+      provider.current?.disconnect();
+      ydoc.current.destroy();
+    };
+  }, []);
 
   setTimeout(function () {
     if (editorRef.current) {
@@ -63,8 +84,56 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
 
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
-    monacoRef.current = monaco;
-    console.log("mounted");
+    if (!provider.current) {
+      console.log("Provider is not initialized.");
+      return;
+    }
+    if (!binding.current) {
+      binding.current = new MonacoBinding(
+        type.current,
+        editor.getModel(),
+        new Set([editor]),
+        provider.current.awareness,
+      );
+    }
+  };
+
+  const handleConnect = () => {
+    if (provider.current) {
+      provider.current.disconnect(); // Disconnect if connected
+    }
+    // Reinitialize the provider to the specified room
+    provider.current = new WebsocketProvider(
+      "ws://localhost:4000",
+      roomName,
+      ydoc.current,
+    );
+    provider.current.on("status", (event) => {
+      if (event.status === "connected") {
+        setIsConnected(true);
+
+        // Initialize or reinitialize the binding
+        if (editorRef.current) {
+          binding.current?.destroy(); // Destroy previous binding if exists
+          binding.current = new MonacoBinding(
+            type.current,
+            editorRef.current.getModel(),
+            new Set([editorRef.current]),
+            provider.current.awareness,
+          );
+        }
+      } else if (event.status === "disconnected") {
+        setIsConnected(false);
+      }
+    });
+
+    // Attempt to connect
+    provider.current.connect();
+  };
+
+  const handleDisconnect = () => {
+    provider.current?.disconnect();
+    setIsConnected(false);
   };
 
   const onAddCommentClick = (
@@ -121,6 +190,47 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
   return (
     <div className="editor-comments">
       <div className="editor-container">
+        <div
+          className="session-controls"
+          style={{ padding: "10px", textAlign: "center" }}
+        >
+          <input
+            type="text"
+            placeholder="Enter room name"
+            value={roomName}
+            onChange={(e) => setRoomName(e.target.value)}
+            disabled={isConnected}
+            style={{ marginRight: "10px", padding: "8px" }}
+          />
+          {isConnected ? (
+            <button
+              onClick={handleDisconnect}
+              style={{
+                padding: "8px 15px",
+                cursor: "pointer",
+                backgroundColor: "red",
+                color: "white",
+                border: "none",
+              }}
+            >
+              Disconnect
+            </button>
+          ) : (
+            <button
+              onClick={handleConnect}
+              style={{
+                padding: "8px 15px",
+                cursor: "pointer",
+                backgroundColor: "green",
+                color: "white",
+                border: "none",
+              }}
+            >
+              Connect
+            </button>
+          )}
+        </div>
+
         <div className="container6">
           <Editor
             height="90vh"

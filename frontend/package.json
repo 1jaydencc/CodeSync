@@ -36,7 +36,10 @@
     "react-fns": "^1.4.0",
     "react-select": "^5.8.0",
     "xterm": "^5.3.0",
+    "y-fire": "^1.0.2",
     "y-monaco": "^0.1.5",
+    "y-protocols": "^1.0.6",
+    "y-webrtc": "^10.3.0",
     "y-websocket": "^2.0.2",
     "yjs": "^13.6.14"
   },

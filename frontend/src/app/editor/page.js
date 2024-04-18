@@ -1,3 +1,4 @@
+// @/app/editor/editor.js
 "use client";
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -26,9 +27,6 @@ import {
 import { onAuthStateChanged } from "firebase/auth";
 import { auth, db } from "@/firebase-config";
 import Image from "next/image";
-import * as Y from 'yjs';
-import { WebsocketProvider } from 'y-websocket';
-import { MonacoBinding } from 'y-monaco';
 
 const Editor = dynamic(() => import("@/app/editor/editor.js"), {
   ssr: false,
@@ -100,7 +98,7 @@ const App = () => {
     electronAPI.receive("file-opened", handleFileOpen);
 
     // Cleanup
-    return () => { };
+    return () => {};
   });
 
   useEffect(() => {
@@ -315,6 +313,7 @@ const App = () => {
   useEffect(() => {
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log(user);
         // Now that we're sure we have a user, set the email in state
 
         setCurrentUserEmail(user.email);
@@ -358,7 +357,7 @@ const App = () => {
             ...doc.data(),
           }));
           setUser(userA);
-          setFriends(userA[0].friends);
+          //setFriends(userA[0].friends);
         });
 
         return unsubscribe;
@@ -458,7 +457,6 @@ const App = () => {
                   }
                   theme={theme}
                   onCodeChange={(newContent) => {
-                    console.log(newContent);
                     if (activeFileIndex >= 0) {
                       openFiles[activeFileIndex].content = newContent;
                       console.log(openFiles[activeFileIndex].content);
@@ -490,16 +488,6 @@ const App = () => {
               >
                 Friends
               </button>
-              {showFriends && (
-                <div className="notifications-area">
-                  Friends
-                  {friends.map((friend) => (
-                    <div className="notification-item">
-                      <span className="notification-description">{friend}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
 
               <button
                 className="btn btn-neutral btn-xs"
