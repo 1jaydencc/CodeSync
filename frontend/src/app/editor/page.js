@@ -1,3 +1,4 @@
+// @/app/editor/editor.js
 "use client";
 import React, { useState, useEffect } from "react";
 import dynamic from "next/dynamic";
@@ -51,7 +52,7 @@ const App = () => {
   const [openFiles, setOpenFiles] = useState([]); // Each item: { path, content, language, fileName }
   const [activeFileIndex, setActiveFileIndex] = useState(-1); // Index of the currently active file in openFiles
   const activeFile = openFiles[activeFileIndex];
-  
+
   const [activeFileIndexB, setActiveFileIndexB] = useState(-1); // Index of the currently active file in openFiles
   const activeFileB = openFiles[activeFileIndexB];
 
@@ -323,7 +324,7 @@ const App = () => {
     setShowNotifications(!showNotifications);
   };
 
-    /* CODE SNIPPETS */
+  /* CODE SNIPPETS */
 
   const [codeSnippetName, setCodeSnippetName] = useState("");
   const [codeSnippetText, setCodeSnippetText] = useState("");
@@ -361,7 +362,7 @@ const App = () => {
   const onDeleteCodeSnippetClick = async (
     name
   ) => {
-    const docRef = await doc(db, "codesnippets", name); 
+    const docRef = await doc(db, "codesnippets", name);
     await deleteDoc(docRef);
   };
 
@@ -408,6 +409,9 @@ const App = () => {
   useEffect(() => { // get notifications
     const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
       if (user) {
+        console.log(user);
+        // Now that we're sure we have a user, set the email in state
+
         setCurrentUserEmail(user.email);
 
         const q = query(
@@ -477,7 +481,7 @@ const App = () => {
             ...doc.data(),
           }));
           setUser(userA);
-          setFriends(userA[0].friends);
+          //setFriends(userA[0].friends);
         });
 
         return unsubscribe;
@@ -504,7 +508,7 @@ const App = () => {
                   key={file.path}
                   className="file-item"
                   onClick={() => handleFileSelect(index)}
-                > 
+                >
                   {file.fileName}
                 </div>
               ))}
@@ -584,7 +588,7 @@ const App = () => {
                       console.log(openFiles[activeFileIndex].content);
                     }
                   }}
-                  onClick={(e) => {console.log("clicked first")}}
+                  onClick={(e) => { console.log("clicked first") }}
                 />
               </div>
               {splitScreen && (
@@ -636,16 +640,6 @@ const App = () => {
               >
                 Friends
               </button>
-              {showFriends && (
-                <div className="notifications-area">
-                  Friends
-                  {friends.map((friend) => (
-                    <div className="notification-item">
-                      <span className="notification-description">{friend}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
 
               <button /* ----------------------- KANBAN ----------------------- */
                 className="btn btn-neutral btn-xs"
@@ -671,7 +665,7 @@ const App = () => {
               >
                 Code Snippets
               </button>
-              {showCodeSnippets && ( 
+              {showCodeSnippets && (
                 <div className="notifications-area">
                   Code Snippets
                   <span                                       /* TODO: ADD A CODE SNIPPET */
@@ -722,7 +716,7 @@ const App = () => {
                       onClick={() => {
                         onAddCodeSnippetClick(codeSnippetName, codeSnippetText);
                       }}
-                      >
+                    >
                       Add
                     </button>
                   </div>
@@ -759,8 +753,8 @@ const App = () => {
                         Update
                       </button>
                       <button
-                        onClick={() => {navigator.clipboard.writeText(selectedCodeSnippet.text)}}>
-                          Copy
+                        onClick={() => { navigator.clipboard.writeText(selectedCodeSnippet.text) }}>
+                        Copy
                       </button>
                     </div>
                   </div>
