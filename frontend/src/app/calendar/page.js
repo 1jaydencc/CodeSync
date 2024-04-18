@@ -46,12 +46,14 @@ const App = () => {
         }
     };
  
-    const Update_Event = (eventId, newName) => {
+    const Update_Event = (eventId, newName, newStartTime, newEndTime) => {
         const updated_Events = events.map((event) => {
             if (event.id === eventId) {
                 return {
                     ...event,
                     title: newName,
+                    startTime: newStartTime,
+                    endTime: newEndTime,
                 };
             }
             return event;
@@ -152,7 +154,9 @@ const App = () => {
                                                         onClick={() =>
                                                             {
                                                                 const newTitle = eventName || event.title;
-                                                                Update_Event(event.id, newTitle);
+                                                                const newStartTime = startTime || event.startTime;
+                                                                const newEndTime = endTime || event.endTime;
+                                                                Update_Event(event.id, newTitle, newStartTime, newEndTime);
                                                             }
                                                         }
                                                     >
