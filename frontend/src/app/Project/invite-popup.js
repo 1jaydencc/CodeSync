@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import '@/app/editor/editor.css';
 
-export const invitePopup = ({ isOpen, onClose, onSend }) => {
+export const InvitePopup = ({ isOpen, onClose, onSend }) => {
     const [email, setEmail] = useState('');
 
     useEffect(() => {

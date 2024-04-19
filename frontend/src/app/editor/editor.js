@@ -179,7 +179,7 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
       provider.current?.disconnect();
       ydoc.current.destroy();
     };
-  }, []);
+  }, [canonicalLanguage]);
 
   useEffect(() => {
     // Only update sharedLanguage if canonicalLanguage changes and it's not null

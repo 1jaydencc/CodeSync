@@ -68,15 +68,15 @@ const App = () => {
             return updatedTasks;
         };
 
-        const docRef = await doc(db, "tasks", taskId); 
+        const docRef = await doc(db, "tasks", taskId);
         await deleteDoc(docRef);
         // setUserTasks(prevTasks => updateTasks(prevTasks));
         // setProjectTasks(prevTasks => updateTasks(prevTasks));
     };
-    
+
     // firebase logic
     const [currentUserEmail, setCurrentUserEmail] = useState('adrien.qi304@gmail.com');
-    
+
     // const [tasks, setTasks] = useState([]);
     const [userToDo, setUserToDo] = useState();
     const [userInProgress, setUserInProgress] = useState();
@@ -91,7 +91,7 @@ const App = () => {
             // console.log("User:", user?.email, currentUserEmail)
         });
 
-        const q = query(collection(db, "tasks"), where ("assignedto", "array-contains", currentUserEmail), where("status", "==", "To-Do"));
+        const q = query(collection(db, "tasks"), where("assignedto", "array-contains", currentUserEmail), where("status", "==", "To-Do"));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const tasks = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
@@ -116,14 +116,14 @@ const App = () => {
             unsubscribe();
             unsubscribeAuth && unsubscribeAuth();
         };
-    }, []);
+    });
     useEffect(() => {   // USER INPROGRESS
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
             setCurrentUserEmail(user?.email);
             // console.log("User:", user?.email, currentUserEmail)
         });
 
-        const q = query(collection(db, "tasks"), where ("assignedto", "array-contains", currentUserEmail), where("status", "==", "In-Progress"));
+        const q = query(collection(db, "tasks"), where("assignedto", "array-contains", currentUserEmail), where("status", "==", "In-Progress"));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const tasks = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
@@ -148,7 +148,7 @@ const App = () => {
             unsubscribe();
             unsubscribeAuth && unsubscribeAuth();
         };
-    }, []);
+    });
 
     useEffect(() => {   // USER INPROGRESS
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -156,8 +156,8 @@ const App = () => {
             // console.log("User:", user?.email, currentUserEmail)
         });
 
-        const q = query(collection(db, "tasks"), where ("assignedto", "array-contains", currentUserEmail), 
-                                                    where("status", "==", "Done"));
+        const q = query(collection(db, "tasks"), where("assignedto", "array-contains", currentUserEmail),
+            where("status", "==", "Done"));
         const unsubscribe = onSnapshot(q, (querySnapshot) => {
             const tasks = querySnapshot.docs.map((doc) => ({
                 id: doc.id,
@@ -177,12 +177,12 @@ const App = () => {
             });
             // console.log('userTasks Done:', userTasks)
         });
-        
+
         return () => {
             unsubscribe();
             unsubscribeAuth && unsubscribeAuth();
         };
-    }, []);
+    });
     useEffect(() => {   // all notification listener
         // console.log("User:", auth.currentUser);
         const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
@@ -203,7 +203,7 @@ const App = () => {
             unsubscribe();
             unsubscribeAuth && unsubscribeAuth();
         };
-    }, []);
+    });
     var lastID = 10;
     const addTask = async (newTaskData) => {
         console.log('New Task Data:', newTaskData);
@@ -235,7 +235,7 @@ const App = () => {
             tags: newTask.tags,
             taskId: newTask.id,
             type: newTask.type,
-          });
+        });
     };
 
     const handleTaskChange = async (taskId, updates = {}) => {
@@ -286,7 +286,7 @@ const App = () => {
         setProjectTasks(updatedProjectTasks);
 
         // w/ firebase
-        await setDoc(doc(db, "tasks", taskId), {status: newStatus}, { merge: true });
+        await setDoc(doc(db, "tasks", taskId), { status: newStatus }, { merge: true });
     };
 
     useEffect(() => {
@@ -297,7 +297,7 @@ const App = () => {
         }, 1000);
 
         return () => clearInterval(interval);
-    }, []);
+    });
     const handleClearCurrentNotification = () => {
         setNotifications(notifications.filter(n => n.id !== selectedNotification.id));
         setSelectedNotification(null);
