@@ -620,23 +620,23 @@ body,
 }
 
 .yRemoteSelection {
-    background-color: rgba(250, 129, 0, 0.5) !important;
+    background-color: rgba(250, 129, 0, 0.5);
 }
 
 .yRemoteSelectionHead {
-    position: absolute !important;
-    border-left: 2px solid orange !important;
-    border-top: 2px solid orange !important;
-    border-bottom: 2px solid orange !important;
-    height: 100% !important;
-    box-sizing: border-box !important;
+    position: absolute;
+    border-left: 2px solid orange;
+    border-top: 2px solid orange;
+    border-bottom: 2px solid orange;
+    height: 100%;
+    box-sizing: border-box;
 }
 
 .yRemoteSelectionHead::after {
-    content: " " !important;
-    position: absolute !important;
-    border: 3px solid orange !important;
-    border-radius: 4px !important;
-    left: -4px !important;
-    top: -5px !important;
+    content: " ";
+    position: absolute;
+    border: 3px solid orange;
+    border-radius: 4px;
+    left: -4px;
+    top: -5px;
 }

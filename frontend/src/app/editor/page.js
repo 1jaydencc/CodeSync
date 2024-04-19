@@ -61,6 +61,7 @@ const App = () => {
   const [dropdownVisible, setDropdownVisible] = useState(true);
   const [theme, setTheme] = useState("vs-dark");
   const [electronAPI, setElectronAPI] = useState(null);
+  const [canonicalLanguage, setCanonicalLanguage] = useState(null);
 
   const [splitScreen, setSplitScreen] = useState(false);
   const [activeEditor, setActiveEditor] = useState(0);  // 0 for first, 1 for second
@@ -72,14 +73,20 @@ const App = () => {
     }
   }, []);
 
-  const handleDownloadAllFiles = () => {
-    const zip = new JSZip();
-    files.forEach((file) => {
-      zip.file(file.name, file.content);
-    });
-    zip.generateAsync({ type: "blob" }).then((content) => {
-      saveAs(content, "project.zip");
-    });
+  const handleDownloadCurrentFile = (index) => {
+    if (index >= 0 && index < openFiles.length) {
+      const file = openFiles[index];
+      const zip = new JSZip();
+      zip.file(file.fileName, file.content);
+      zip.generateAsync({ type: "blob" }).then((content) => {
+        saveAs(content, file.fileName);
+      });
+    }
+  };
+
+  const handleDownloadButtonClick = () => {
+    // Assuming you have a state variable to track the index of the active file
+    handleDownloadCurrentFile(activeFileIndex);
   };
 
   // In your useEffect within the React component
@@ -97,7 +104,10 @@ const App = () => {
       const languageObj = languages.find(
         (lang) => lang.extension === `.${extension}`,
       );
+
       const language = languageObj ? languageObj.language : "plaintext";
+      console.log("Setting canonical language to:", language);
+      setCanonicalLanguage(language);
 
       const newFile = { path, content, language, fileName };
 
@@ -589,6 +599,7 @@ const App = () => {
                     }
                   }}
                   onClick={(e) => { console.log("clicked first") }}
+                  canonicalLanguage={canonicalLanguage}
                 />
               </div>
               {splitScreen && (
@@ -613,6 +624,7 @@ const App = () => {
                         console.log(openFiles[activeFileIndexB].content);
                       }
                     }}
+                    canonicalLanguage={canonicalLanguage}
                   />
                 </div>
               )}
@@ -629,9 +641,18 @@ const App = () => {
 
               <button /* ----------------------- NEW PROJECT ----------------------- */
                 className="btn btn-neutral btn-xs"
-                onClick={handleNewProject}
+                onClick={() => {
+                  router.push("/calendar");
+                }}
               >
-                New Project
+                Calendar
+              </button>
+
+              <button /* ----------------------- FRIENDS ----------------------- */
+                className="btn btn-neutral btn-xs"
+                onClick={handleDownloadButtonClick}
+              >
+                Download
               </button>
 
               <button /* ----------------------- FRIENDS ----------------------- */
@@ -639,7 +660,7 @@ const App = () => {
                 onClick={toggleFriends}
               >
                 Friends
-              </button>
+              </button> 
 
               <button /* ----------------------- KANBAN ----------------------- */
                 className="btn btn-neutral btn-xs"

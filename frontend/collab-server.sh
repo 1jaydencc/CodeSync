@@ -1,0 +1,1 @@
+HOST=localhost PORT=4000 npx y-websocket

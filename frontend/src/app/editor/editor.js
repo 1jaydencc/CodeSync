@@ -28,12 +28,12 @@ const Comment = ({
         <h3>Collaborators</h3>
         <p>{collaborators}</p>
       </p>
-      <span onClick={() => handleCloseComment(commentID)}> ✖ </span> {}
+      <span onClick={() => handleCloseComment(commentID)}> ✖ </span> { }
     </div>
   );
 };
 
-const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
+const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) => {
   const [startLineNumber, setStartLineNumber] = useState(0);
   const [startColumn, setStartColumn] = useState(0);
   const [endLineNumber, setEndLineNumber] = useState(0);
@@ -48,71 +48,71 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
 
   const snippets = {
     javascript: [
-        "console.log(${1:variable});",
-        "function ${1:name}(${2:params}) {\n  ${0}\n}",
-        "if (${1:condition}) {\n  ${0}\n}",
-        "const ${1:name} = ${2:value};",
-        "let ${1:name} = ${2:value};",
-        "for (let ${1:i} = 0; ${1:i} < ${2:array}.length; ${1:i}++) {\n  ${0}\n}",
-        "array.forEach(element => {\n  ${0}\n});",
-        "setTimeout(() => {\n  ${0}\n}, ${1:1000});",
-        "if (${1:condition}) {\n  ${0}\n} else {\n  ${0}\n}",
-        "try {\n  ${0}\n} catch (${1:error}) {\n  ${0}\n}",
-        "class ${1:ClassName} {\n  constructor(${2:params}) {\n    ${0}\n  }\n}",
-        "const ${1:name} = new ${2:Class}(${3:params});",
-        "document.getElementById('${1:id}').addEventListener('${2:event}', event => {\n  ${0}\n});",
-        "fetch('${1:url}')\n  .then(response => response.json())\n  .then(data => {\n    ${0}\n  });",
-        "import ${1:module} from '${2:path}';",
-        "export const ${1:name} = ${2:value};",
-        "export default ${1:class};",
-        "module.exports = ${1:name};",
-        "require('${1:module}');",
-        "switch (${1:expr}) {\n  case ${2:value}:\n    ${0}\n    break;\n  default:\n    ${0}\n}"
+      "console.log(${1:variable});",
+      "function ${1:name}(${2:params}) {\n  ${0}\n}",
+      "if (${1:condition}) {\n  ${0}\n}",
+      "const ${1:name} = ${2:value};",
+      "let ${1:name} = ${2:value};",
+      "for (let ${1:i} = 0; ${1:i} < ${2:array}.length; ${1:i}++) {\n  ${0}\n}",
+      "array.forEach(element => {\n  ${0}\n});",
+      "setTimeout(() => {\n  ${0}\n}, ${1:1000});",
+      "if (${1:condition}) {\n  ${0}\n} else {\n  ${0}\n}",
+      "try {\n  ${0}\n} catch (${1:error}) {\n  ${0}\n}",
+      "class ${1:ClassName} {\n  constructor(${2:params}) {\n    ${0}\n  }\n}",
+      "const ${1:name} = new ${2:Class}(${3:params});",
+      "document.getElementById('${1:id}').addEventListener('${2:event}', event => {\n  ${0}\n});",
+      "fetch('${1:url}')\n  .then(response => response.json())\n  .then(data => {\n    ${0}\n  });",
+      "import ${1:module} from '${2:path}';",
+      "export const ${1:name} = ${2:value};",
+      "export default ${1:class};",
+      "module.exports = ${1:name};",
+      "require('${1:module}');",
+      "switch (${1:expr}) {\n  case ${2:value}:\n    ${0}\n    break;\n  default:\n    ${0}\n}"
     ],
     python: [
-        "print(${1:variable})",
-        "def ${1:function_name}(${2:params}):\n    ${0}",
-        "if ${1:condition}:\n    ${0}",
-        "class ${1:ClassName}:\n    def __init__(self, ${2:params}):\n        ${0}",
-        "import ${1:module}",
-        "from ${1:module} import ${2:class}",
-        "for ${1:var} in ${2:iterable}:\n    ${0}",
-        "with open('${1:file}', 'r') as f:\n    ${0}",
-        "try:\n    ${0}\nexcept ${1:Exception} as e:\n    ${0}",
-        "if ${1:condition}:\n    ${0}\nelse:\n    ${0}",
-        "@decorator\ndef ${1:function}(${2:params}):\n    ${0}",
-        "lambda ${1:args}: ${0}",
-        "list comprehension: [${1:expr} for ${2:var} in ${3:iterable}]",
-        "dictionary comprehension: {${1:key}: ${2:value} for ${3:var} in ${4:iterable}}",
-        "set comprehension: {${1:expr} for ${2:var} in ${3:iterable}}",
-        "generator expression: (${1:expr} for ${2:var} in ${3:iterable})",
-        "async def ${1:function}(${2:params}):\n    ${0}",
-        "await ${1:function}(${2:params})",
-        "yield ${1:expr}",
-        "yield from ${1:iterable}"
+      "print(${1:variable})",
+      "def ${1:function_name}(${2:params}):\n    ${0}",
+      "if ${1:condition}:\n    ${0}",
+      "class ${1:ClassName}:\n    def __init__(self, ${2:params}):\n        ${0}",
+      "import ${1:module}",
+      "from ${1:module} import ${2:class}",
+      "for ${1:var} in ${2:iterable}:\n    ${0}",
+      "with open('${1:file}', 'r') as f:\n    ${0}",
+      "try:\n    ${0}\nexcept ${1:Exception} as e:\n    ${0}",
+      "if ${1:condition}:\n    ${0}\nelse:\n    ${0}",
+      "@decorator\ndef ${1:function}(${2:params}):\n    ${0}",
+      "lambda ${1:args}: ${0}",
+      "list comprehension: [${1:expr} for ${2:var} in ${3:iterable}]",
+      "dictionary comprehension: {${1:key}: ${2:value} for ${3:var} in ${4:iterable}}",
+      "set comprehension: {${1:expr} for ${2:var} in ${3:iterable}}",
+      "generator expression: (${1:expr} for ${2:var} in ${3:iterable})",
+      "async def ${1:function}(${2:params}):\n    ${0}",
+      "await ${1:function}(${2:params})",
+      "yield ${1:expr}",
+      "yield from ${1:iterable}"
     ],
     java: [
-        "System.out.println(${1:variable});",
-        "public static void ${1:methodName}(${2:params}) {\n    ${0}\n}",
-        "if (${1:condition}) {\n    ${0}\n} else {\n    ${0}\n}",
-        "for (int ${1:i} = 0; ${1:i} < ${2:condition}; ${1:i}++) {\n    ${0}\n}",
-        "while (${1:condition}) {\n    ${0}\n}",
-        "do {\n    ${0}\n} while (${1:condition});",
-        "switch (${1:variable}) {\n    case ${2:case}:\n        ${0}\n        break;\n    default:\n        ${0}\n}",
-        "try {\n    ${0}\n} catch (${1:Exception} e) {\n    ${0}\n}",
-        "int[] ${1:array} = new int[]{${2:elements}};",
-        "ArrayList<${1:Type}> ${2:listName} = new ArrayList<>();",
-        "HashMap<${1:Key}, ${2:Value}> ${3:mapName} = new HashMap<>();",
-        "String ${1:name} = \"${2:value}\";",
-        "public class ${1:ClassName} {\n    ${0}\n}",
-        "public enum ${1:EnumName} {\n    ${2:constants}\n}",
-        "public interface ${1:InterfaceName} {\n    ${0}\n}",
-        "import ${1:package};",
-        "package ${1:name};",
-        "return ${1:value};",
-        "@Override\npublic ${1:methodType} ${2:methodName}(${3:params}) {\n    ${0}\n}",
-        "public ${1:type} get${2:PropertyName}() {\n    return ${3:field};\n}",
-        "public void set${1:PropertyName}(${2:type} ${3:param}) {\n    this.${4:field} = ${3:param};\n}"
+      "System.out.println(${1:variable});",
+      "public static void ${1:methodName}(${2:params}) {\n    ${0}\n}",
+      "if (${1:condition}) {\n    ${0}\n} else {\n    ${0}\n}",
+      "for (int ${1:i} = 0; ${1:i} < ${2:condition}; ${1:i}++) {\n    ${0}\n}",
+      "while (${1:condition}) {\n    ${0}\n}",
+      "do {\n    ${0}\n} while (${1:condition});",
+      "switch (${1:variable}) {\n    case ${2:case}:\n        ${0}\n        break;\n    default:\n        ${0}\n}",
+      "try {\n    ${0}\n} catch (${1:Exception} e) {\n    ${0}\n}",
+      "int[] ${1:array} = new int[]{${2:elements}};",
+      "ArrayList<${1:Type}> ${2:listName} = new ArrayList<>();",
+      "HashMap<${1:Key}, ${2:Value}> ${3:mapName} = new HashMap<>();",
+      "String ${1:name} = \"${2:value}\";",
+      "public class ${1:ClassName} {\n    ${0}\n}",
+      "public enum ${1:EnumName} {\n    ${2:constants}\n}",
+      "public interface ${1:InterfaceName} {\n    ${0}\n}",
+      "import ${1:package};",
+      "package ${1:name};",
+      "return ${1:value};",
+      "@Override\npublic ${1:methodType} ${2:methodName}(${3:params}) {\n    ${0}\n}",
+      "public ${1:type} get${2:PropertyName}() {\n    return ${3:field};\n}",
+      "public void set${1:PropertyName}(${2:type} ${3:param}) {\n    this.${4:field} = ${3:param};\n}"
     ]
   };
 
@@ -127,7 +127,7 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
         if (editorRef.current && window.monaco) {
           const editor = editorRef.current;
           const monaco = window.monaco;
-  
+
           if (editor.hasTextFocus()) {  // Ensure the editor is focused and can get selection
             const selection = editor.getSelection();
             if (selection) {
@@ -144,7 +144,7 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
         }
       }
     };
-  
+
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [currentSnippet, isSuggestionsEnabled]);
@@ -152,14 +152,26 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
 
-  const ydoc = useRef(new Y.Doc());
+  const ydoc = useRef(null);
   const provider = useRef(null);
   const type = useRef(null);
   const binding = useRef(null);
+  const sharedLanguage = useRef(new Y.Text("plaintext"));
 
   useEffect(() => {
+    console.log(canonicalLanguage);
+    if (!ydoc.current) {
+      ydoc.current = new Y.Doc();
+    }
     // Initialize Yjs type
-    type.current = ydoc.current.getText("monaco");
+    sharedLanguage.current = ydoc.current.getText("language");
+
+    sharedLanguage.current.observe(() => {
+      const newLanguage = sharedLanguage.current.toString();
+      if (window.monaco && editorRef.current) {
+        window.monaco.editor.setModelLanguage(editorRef.current.getModel(), newLanguage);
+      }
+    });
 
     return () => {
       // Cleanup Yjs document and provider on component unmount
@@ -168,6 +180,14 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
       ydoc.current.destroy();
     };
   }, []);
+
+  useEffect(() => {
+    // Only update sharedLanguage if canonicalLanguage changes and it's not null
+    if (canonicalLanguage) {
+      sharedLanguage.current.delete(0, sharedLanguage.current.length);
+      sharedLanguage.current.insert(0, canonicalLanguage);
+    }
+  }, [canonicalLanguage]);
 
   setTimeout(function () {
     if (editorRef.current) {
@@ -183,7 +203,7 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
   }, 2000);
 
   const handleEditorChange = (value, event) => {
-    /* whenever text in the editor is updated */
+
     onCodeChange(value);
     if (isSuggestionsEnabled) {
       const editor = editorRef.current;
@@ -203,6 +223,7 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
       return;
     }
     if (!binding.current) {
+      type.current = ydoc.current.getText("monaco");
       binding.current = new MonacoBinding(
         type.current,
         editor.getModel(),
@@ -212,42 +233,57 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
     }
     monaco.languages.registerCompletionItemProvider(language, {
       provideCompletionItems: () => {
-          const suggestions = [
-              {
-                  label: 'AI Suggestion',
-                  kind: monaco.languages.CompletionItemKind.Snippet,
-                  insertText: currentSnippet,
-                  detail: 'Insert AI-generated code snippet',
-                  insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
-              }
-          ];
-          return { suggestions: suggestions };
+        const suggestions = [
+          {
+            label: 'AI Suggestion',
+            kind: monaco.languages.CompletionItemKind.Snippet,
+            insertText: currentSnippet,
+            detail: 'Insert AI-generated code snippet',
+            insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet
+          }
+        ];
+        return { suggestions: suggestions };
       }
     });
   };
 
   const handleConnect = () => {
     if (provider.current) {
-      provider.current.disconnect(); // Disconnect if connected
+      provider.current.disconnect(); // Properly disconnect if already connected
     }
+
     // Reinitialize the provider to the specified room
     provider.current = new WebsocketProvider(
-      "ws://localhost:4000",
+      "ws://146.235.209.208:4000",
       roomName,
       ydoc.current,
     );
+
     provider.current.on("status", (event) => {
       if (event.status === "connected") {
         setIsConnected(true);
 
-        // Initialize or reinitialize the binding
+        // Check if the shared language needs to be updated
+        if (canonicalLanguage && sharedLanguage.current.toString() !== canonicalLanguage) {
+          sharedLanguage.current.delete(0, sharedLanguage.current.length);
+          sharedLanguage.current.insert(0, canonicalLanguage);
+        }
+
+        // Ensure the 'monaco' type is attached to the current provider
+        if (!type.current) {
+          type.current = ydoc.current.getText("monaco");
+        }
+
+        // Initialize or reinitialize the Monaco binding
         if (editorRef.current) {
-          binding.current?.destroy(); // Destroy previous binding if exists
+          if (binding.current) {
+            binding.current.destroy(); // Clean up existing binding if any
+          }
           binding.current = new MonacoBinding(
             type.current,
             editorRef.current.getModel(),
             new Set([editorRef.current]),
-            provider.current.awareness,
+            provider.current.awareness
           );
         }
       } else if (event.status === "disconnected") {
@@ -255,14 +291,25 @@ const EditorPage = ({ language, code, theme, currentFile, onCodeChange }) => {
       }
     });
 
-    // Attempt to connect
     provider.current.connect();
   };
 
   const handleDisconnect = () => {
-    provider.current?.disconnect();
-    setIsConnected(false);
+    if (provider.current) {
+      // Clear local awareness state
+      provider.current.awareness.setLocalState(null);
+
+      // Disconnect the provider
+      provider.current.disconnect();
+      setIsConnected(false);
+
+      // Clear the provider to force reinitialization next connect
+      provider.current = null;
+
+    }
+
   };
+
 
   const onAddCommentClick = (
     file,
