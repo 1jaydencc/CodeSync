@@ -1,3 +1,4 @@
+/*
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from "next/navigation";
@@ -170,3 +171,5 @@ const WhiteboardPage = () => {
 };
 
 export default WhiteboardPage;
+*/
+'use client';
