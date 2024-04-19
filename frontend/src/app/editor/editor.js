@@ -213,6 +213,15 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
     }
   };
 
+  const handleDownload = () => {
+    const editor = editorRef.current;
+    if (editor) {
+      const editorContent = editor.getValue(); // Get the current content of the editor
+      const blob = new Blob([editorContent], { type: "text/plain;charset=utf-8" });
+      saveAs(blob, ""); // Trigger the download
+    }
+  };
+
   const handleEditorDidMount = (editor, monaco) => {
     editorRef.current = editor;
     window.monaco = monaco;
@@ -343,13 +352,16 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
           className="session-controls"
           style={{ padding: "10px", textAlign: "center" }}
         >
-          <label>
-            <input
-              type="checkbox"
-              checked={isSuggestionsEnabled}
-              onChange={() => setIsSuggestionsEnabled(!isSuggestionsEnabled)}
-            /> Enable Suggestions
-          </label>
+        <button onClick={handleDownload}
+        style={{
+          padding: "8px 15px",
+          marginRight: "70px",
+          cursor: "pointer",
+          backgroundColor: "grey",
+          color: "white",
+          border: "none",
+        }}
+        >Download</button>
           <input
             type="text"
             placeholder="Enter room name"
@@ -363,6 +375,7 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
               onClick={handleDisconnect}
               style={{
                 padding: "8px 15px",
+                marginRight: "70px",
                 cursor: "pointer",
                 backgroundColor: "red",
                 color: "white",
@@ -376,6 +389,7 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
               onClick={handleConnect}
               style={{
                 padding: "8px 15px",
+                marginRight: "70px",
                 cursor: "pointer",
                 backgroundColor: "green",
                 color: "white",
@@ -385,6 +399,13 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
               Connect
             </button>
           )}
+          <label>
+            <input
+              type="checkbox"
+              checked={isSuggestionsEnabled}
+              onChange={() => setIsSuggestionsEnabled(!isSuggestionsEnabled)}
+            /> Enable Suggestions
+          </label>
         </div>
 
         <div className="container6">
