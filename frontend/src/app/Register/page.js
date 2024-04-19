@@ -1,6 +1,6 @@
 'use client';
 import '@/app/globals.css'
-import '@/app/register/register.css'
+import '../register.css'
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
