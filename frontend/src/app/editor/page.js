@@ -152,7 +152,7 @@ const App = () => {
     const cleanup = electronAPI.receive("invoke-save", saveCurrentFile);
 
     return () => cleanup(); // Explicitly remove the listener on component unmount
-  }, [activeFileIndex, activeFileIndexB, openFiles]);
+  }, [activeFileIndex, activeFileIndexB, openFiles, electronAPI]);
 
   useEffect(() => {
     const closeDropdown = (e) => {
@@ -660,7 +660,7 @@ const App = () => {
                 onClick={toggleFriends}
               >
                 Friends
-              </button> 
+              </button>
 
               <button /* ----------------------- KANBAN ----------------------- */
                 className="btn btn-neutral btn-xs"

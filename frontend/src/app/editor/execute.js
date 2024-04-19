@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import './editor.css';
 
-export const output = ({ onClose }) => {
+export const Output = ({ onClose }) => {
     const [fileName, setFileName] = useState('');
 
     return (
