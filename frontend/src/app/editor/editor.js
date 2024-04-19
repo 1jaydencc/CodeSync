@@ -152,7 +152,7 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
   const editorRef = useRef(null);
   const monacoRef = useRef(null);
 
-  const ydoc = useRef(new Y.Doc());
+  const ydoc = useRef(null);
   const provider = useRef(null);
   const type = useRef(null);
   const binding = useRef(null);
@@ -160,8 +160,10 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
 
   useEffect(() => {
     console.log(canonicalLanguage);
+    if (!ydoc.current) {
+      ydoc.current = new Y.Doc();
+    }
     // Initialize Yjs type
-    type.current = ydoc.current.getText("monaco");
     sharedLanguage.current = ydoc.current.getText("language");
 
     sharedLanguage.current.observe(() => {
@@ -201,7 +203,7 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
   }, 2000);
 
   const handleEditorChange = (value, event) => {
-    /* whenever text in the editor is updated */
+
     onCodeChange(value);
     if (isSuggestionsEnabled) {
       const editor = editorRef.current;
@@ -221,6 +223,7 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
       return;
     }
     if (!binding.current) {
+      type.current = ydoc.current.getText("monaco");
       binding.current = new MonacoBinding(
         type.current,
         editor.getModel(),
@@ -246,31 +249,41 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
 
   const handleConnect = () => {
     if (provider.current) {
-      provider.current.disconnect(); // Disconnect if connected
+      provider.current.disconnect(); // Properly disconnect if already connected
     }
+
     // Reinitialize the provider to the specified room
     provider.current = new WebsocketProvider(
-      "ws://localhost:4000",
+      "ws://146.235.209.208:4000",
       roomName,
       ydoc.current,
     );
+
     provider.current.on("status", (event) => {
       if (event.status === "connected") {
         setIsConnected(true);
-        if (canonicalLanguage) {
-          // Ensure the language is updated on each connect
+
+        // Check if the shared language needs to be updated
+        if (canonicalLanguage && sharedLanguage.current.toString() !== canonicalLanguage) {
           sharedLanguage.current.delete(0, sharedLanguage.current.length);
           sharedLanguage.current.insert(0, canonicalLanguage);
         }
 
-        // Initialize or reinitialize the binding
+        // Ensure the 'monaco' type is attached to the current provider
+        if (!type.current) {
+          type.current = ydoc.current.getText("monaco");
+        }
+
+        // Initialize or reinitialize the Monaco binding
         if (editorRef.current) {
-          binding.current?.destroy(); // Destroy previous binding if exists
+          if (binding.current) {
+            binding.current.destroy(); // Clean up existing binding if any
+          }
           binding.current = new MonacoBinding(
             type.current,
             editorRef.current.getModel(),
             new Set([editorRef.current]),
-            provider.current.awareness,
+            provider.current.awareness
           );
         }
       } else if (event.status === "disconnected") {
@@ -278,14 +291,25 @@ const EditorPage = ({ language, code, theme, onCodeChange, canonicalLanguage }) 
       }
     });
 
-    // Attempt to connect
     provider.current.connect();
   };
 
   const handleDisconnect = () => {
-    provider.current?.disconnect();
-    setIsConnected(false);
+    if (provider.current) {
+      // Clear local awareness state
+      provider.current.awareness.setLocalState(null);
+
+      // Disconnect the provider
+      provider.current.disconnect();
+      setIsConnected(false);
+
+      // Clear the provider to force reinitialization next connect
+      provider.current = null;
+
+    }
+
   };
+
 
   const onAddCommentClick = (
     file,
