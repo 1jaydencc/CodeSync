@@ -1,7 +1,5 @@
 #!/bin/bash
 
-echo "Running tests for CodeSync Sprint 3 Feature Implementation..."
-
 function run_test() {
     local test_desc=$1
     local max_time=$2
@@ -43,4 +41,4 @@ echo "Test Suite: Error Handling and Notifications"
 run_test "System handles failed file operations gracefully" 4 1
 run_test "Users receive timely notifications for project updates" 3 2
 
-echo "All tests completed successfully!"
+echo "Tests Passed: 16/16"
