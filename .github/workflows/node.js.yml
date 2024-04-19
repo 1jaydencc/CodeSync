@@ -31,5 +31,13 @@ jobs:
       working-directory: ./frontend
     - run: npm run build --if-present
       working-directory: ./frontend
+      env:
+          NEXT_PUBLIC_FIREBASE_APIKEY: ${{ secrets.NEXT_PUBLIC_FIREBASE_APIKEY }}
+          NEXT_PUBLIC_FIREBASE_AUTHDOMAIN: ${{ secrets.NEXT_PUBLIC_FIREBASE_AUTHDOMAIN }}
+          NEXT_PUBLIC_FIREBASE_PROJECTID: ${{ secrets.NEXT_PUBLIC_FIREBASE_PROJECTID }}
+          NEXT_PUBLIC_FIREBASE_STORAGEBUCKET: ${{ secrets.NEXT_PUBLIC_FIREBASE_STORAGEBUCKET }}
+          NEXT_PUBLIC_FIREBASE_MESSAGINGSENDERID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MESSAGINGSENDERID }}
+          NEXT_PUBLIC_FIREBASE_APPID: ${{ secrets.NEXT_PUBLIC_FIREBASE_APPID }}
+          NEXT_PUBLIC_FIREBASE_MEASUREMENTID: ${{ secrets.NEXT_PUBLIC_FIREBASE_MEASUREMENTID }}
     - run: npm test
       working-directory: ./frontend
