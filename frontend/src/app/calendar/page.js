@@ -5,6 +5,10 @@ import "react-calendar/dist/Calendar.css";
 import "./App.css";
 import Taskbar from './taskbar.js';
 import { db, auth } from "@/firebase-config"; // make sure these imports are correct
+import { useEffect } from "react";
+import { onAuthStateChanged } from "firebase/auth";
+
+
 import {
     collection,
     query,
@@ -22,23 +26,37 @@ const App = () => {
     const [eventName, setEventName] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
-    const [events, setEvents] = useState([
-        {
-        id: 1713500132313, // Unique ID generated using new Date().getTime()
-        date: new Date(2024, 3, 20), // Date object representing the event date
-        title: "a", // Event title
-        startTime: "a", // Event start time
-        endTime: "a" // Event end time
-        },
-        {
-            id: new Date(2024, 3, 20).getTime(), // Unique ID based on timestamp
-            date: new Date(2024, 3, 10),
-            title: "Meeting",
-            startTime: "10:00 AM",
-            endTime: "11:00 AM"
-        },
-        // Add more events as needed
-    ]);
+    const [events, setEvents] = useState([]);
+
+    useEffect(() => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Now that we're sure we have a user, fetch events from Firestore
+                const q = query(collection(db, "events"));
+                const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                    const eventsData = querySnapshot.docs.map((doc) => {
+                        const eventData = doc.data();
+                        // Ensure date field is parsed as a Date object
+                        const date = eventData.date.toDate();
+                        return {
+                            id: doc.id,
+                            ...eventData,
+                            date: date,
+                        };
+                    });
+                    setEvents(eventsData);
+                });
+
+                return unsubscribe;
+            } else {
+                // Handle case when user is logged out if necessary
+                console.log("No user logged in");
+            }
+        });
+
+        return unsubscribeAuth; // Unsubscribe from auth state changes when component unmounts
+    }, []);
+
  
     const Date_Click = (date) => {
         setSelectedDate(date);
@@ -57,6 +75,13 @@ const App = () => {
     };
  
     const Create_Event = async () => {
+        const user = auth.currentUser; // Get the current user
+        console.log(user);
+    
+    if (!user) {
+        console.error("User not authenticated.");
+        return; // Exit function if user is not authenticated
+    }
         if (selectedDate && eventName) {
             const newEvent = {
                 id: new Date().getTime(),
@@ -67,7 +92,7 @@ const App = () => {
              // Assuming you have authentication set up
             };
             try {
-               // await setDoc(doc(db, "Events", eventName));
+                await setDoc(doc(db, "events", (newEvent.id).toString()), newEvent);
                 console.log(newEvent);
                 setEvents([...events, newEvent]); // Update local state
                 setSelectedDate(null);
@@ -83,12 +108,12 @@ const App = () => {
  
     const Update_Event = async (eventId, newName, newStartTime, newEndTime) => {
         try {
-           /* await setDoc(doc(db, "Events", newName), 
+           await setDoc(doc(db, "events", eventID.toString()), 
             {
                 title: newName,
                 startTime: newStartTime,
                 endTime: newEndTime
-            }, { merge: true }); */
+            }, { merge: true }); 
             const updatedEvents = events.map(event => {
                 if (event.id === eventId) {
                     return { ...event, title: newName, startTime: newStartTime, endTime: newEndTime };
@@ -103,7 +128,7 @@ const App = () => {
  
     const Delete_Event = async (eventId) => {
         try {
-           // await deleteDoc(doc(db, "Events", eventId));
+            await deleteDoc(doc(db, "events", eventId.toString()));
             const updatedEvents = events.filter(event => event.id !== eventId);
             setEvents(updatedEvents); // Update local state
         } catch (error) {
