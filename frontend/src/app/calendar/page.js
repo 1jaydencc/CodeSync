@@ -108,7 +108,7 @@ const App = () => {
  
     const Update_Event = async (eventId, newName, newStartTime, newEndTime) => {
         try {
-           await setDoc(doc(db, "events", eventID.toString()), 
+           await setDoc(doc(db, "events", eventId.toString()), 
             {
                 title: newName,
                 startTime: newStartTime,
