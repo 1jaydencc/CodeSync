@@ -1,7 +1,7 @@
 'use client';
 import { useState } from 'react';
 import '@/app/globals.css'
-import '../password-reset.css'
+import './password-reset.css'
 import { useRouter } from 'next/navigation';
 import { auth } from '@/firebase-config'
 import { sendPasswordResetEmail } from 'firebase/auth'
@@ -12,7 +12,7 @@ export default function Home() {
   const [error, setError] = useState('');
   const [showNotification, setShowNotification] = useState(false);
   const [showError, setShowError] = useState(false);
-  
+
   const [formData, setFormData] = useState({
     email: '',
   });
@@ -22,7 +22,7 @@ export default function Home() {
     const { email } = formData;
     try {
       await sendPasswordResetEmail(auth, email);
-      setFormData({email: ''});
+      setFormData({ email: '' });
       setShowNotification(true);
     } catch (error) {
       setFormData({ email: '' });
@@ -57,8 +57,8 @@ export default function Home() {
     <div>
       <div className='wrapper'>
         <form onSubmit={handleSubmit}>
-            <h1>Forgot Your Password?</h1>
-            <div className='input-box'>
+          <h1>Forgot Your Password?</h1>
+          <div className='input-box'>
             <input
               type='email'
               name='email'
@@ -67,17 +67,17 @@ export default function Home() {
               onChange={handleChange}
               required
             />
-            </div>
-            <button type='submit'>Send Reset Link</button>
+          </div>
+          <button type='submit'>Send Reset Link</button>
         </form>
         <div>
           {showNotification && (
             <div className='notification-overlay'>
               <div className='notification'>
-              <p>Reset link sent successfully!</p>
-              <button onClick={() => setShowNotification(false)}>Close</button>
-              <button onClick={handleSubmit}>Resend</button>
-              <button onClick={handleGoToHomePage}>Reset</button>
+                <p>Reset link sent successfully!</p>
+                <button onClick={() => setShowNotification(false)}>Close</button>
+                <button onClick={handleSubmit}>Resend</button>
+                <button onClick={handleGoToHomePage}>Reset</button>
               </div>
             </div>
           )}
@@ -86,14 +86,14 @@ export default function Home() {
           {showError && (
             <div className='notification-overlay'>
               <div className='notification'>
-              <p>{error}</p>
-              <button onClick={() => setShowError(false)}>Try Again.</button>
+                <p>{error}</p>
+                <button onClick={() => setShowError(false)}>Try Again.</button>
               </div>
             </div>
           )}
         </div>
       </div>
-      
+
     </div>
   );
 }

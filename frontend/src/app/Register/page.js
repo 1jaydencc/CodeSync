@@ -1,6 +1,6 @@
 'use client';
 import '@/app/globals.css'
-import '../register.css'
+import './register.css'
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createUserWithEmailAndPassword, sendEmailVerification } from 'firebase/auth'
@@ -28,19 +28,19 @@ export default function Home() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     const { email, password } = formData;
-        try {
-            const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-            const user = userCredential.user;
-            setShowNotification(true);
-            sendEmailVerification(user);
-            // Redirect or perform other actions after successful sign-up
-        } catch (error) {
-            console.error("Error signing up:", error.message);
-            // Set error state and clear form fields
-            setFormData({ email: error.message, password: '' });
-            setError(getErrorMessage(error.code));
-            setshowError(true);
-        }
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      setShowNotification(true);
+      sendEmailVerification(user);
+      // Redirect or perform other actions after successful sign-up
+    } catch (error) {
+      console.error("Error signing up:", error.message);
+      // Set error state and clear form fields
+      setFormData({ email: error.message, password: '' });
+      setError(getErrorMessage(error.code));
+      setshowError(true);
+    }
   };
 
   const getErrorMessage = (errorCode) => {
@@ -58,8 +58,8 @@ export default function Home() {
     <div>
       <div className='wrapper'>
         <form onSubmit={handleSubmit}>
-            <h1>Create a Codesync Account</h1>
-            <div className='input-box'>
+          <h1>Create a Codesync Account</h1>
+          <div className='input-box'>
             <input
               type='email'
               name='email'
@@ -68,8 +68,8 @@ export default function Home() {
               onChange={handleChange}
               required
             />
-            </div>
-            <div className='input-box'>
+          </div>
+          <div className='input-box'>
             <input
               type='password'
               name='password'
@@ -78,23 +78,23 @@ export default function Home() {
               onChange={handleChange}
               required
             />
-            </div>
+          </div>
 
-            <button type='submit'>CREATE</button>
+          <button type='submit'>CREATE</button>
 
-            <div className='terms'>
-                <p>By continuing, you agree to CodeSync&apos;s Terms of Service and Privacy Policy</p>
-            </div>
+          <div className='terms'>
+            <p>By continuing, you agree to CodeSync&apos;s Terms of Service and Privacy Policy</p>
+          </div>
         </form>
         <div>
           {showNotification && (
             <div className='notification-overlay'>
               <div className='notification'>
-              <p>Verification email sent!</p>
-              <button onClick={() => {
-                setShowNotification(false);
-                router.push('/');
-            }}>Go to Login.</button>
+                <p>Verification email sent!</p>
+                <button onClick={() => {
+                  setShowNotification(false);
+                  router.push('/');
+                }}>Go to Login.</button>
               </div>
             </div>
           )}
@@ -103,8 +103,8 @@ export default function Home() {
           {showError && (
             <div className='notification-overlay'>
               <div className='notification'>
-              <p>{error}</p>
-              <button onClick={() => setshowError(false)}>Try Again.</button>
+                <p>{error}</p>
+                <button onClick={() => setshowError(false)}>Try Again.</button>
               </div>
             </div>
           )}
