@@ -4,13 +4,41 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "./App.css";
 import Taskbar from './taskbar.js';
+import { db, auth } from "@/firebase-config"; // make sure these imports are correct
+import {
+    collection,
+    query,
+    orderBy,
+    where,
+    onSnapshot,
+    addDoc,
+    deleteDoc,
+    setDoc,
+    doc
+} from "firebase/firestore";
  
 const App = () => {
     const [selectedDate, setSelectedDate] = useState(null);
     const [eventName, setEventName] = useState("");
     const [startTime, setStartTime] = useState("");
     const [endTime, setEndTime] = useState("");
-    const [events, setEvents] = useState([]);
+    const [events, setEvents] = useState([
+        {
+        id: 1713500132313, // Unique ID generated using new Date().getTime()
+        date: new Date(2024, 3, 20), // Date object representing the event date
+        title: "a", // Event title
+        startTime: "a", // Event start time
+        endTime: "a" // Event end time
+        },
+        {
+            id: new Date(2024, 3, 20).getTime(), // Unique ID based on timestamp
+            date: new Date(2024, 3, 10),
+            title: "Meeting",
+            startTime: "10:00 AM",
+            endTime: "11:00 AM"
+        },
+        // Add more events as needed
+    ]);
  
     const Date_Click = (date) => {
         setSelectedDate(date);
@@ -28,42 +56,59 @@ const App = () => {
         setEndTime(event.target.value);
     };
  
-    const Create_Event = () => {
+    const Create_Event = async () => {
         if (selectedDate && eventName) {
             const newEvent = {
                 id: new Date().getTime(),
                 date: selectedDate,
                 title: eventName,
                 startTime: startTime,
-                endTime: endTime
+                endTime: endTime,
+             // Assuming you have authentication set up
             };
-            setEvents([...events, newEvent]);
-            setSelectedDate(null);
-            setEventName("");
-            setStartTime("");
-            setEndTime("");
-            setSelectedDate(newEvent.date);
+            try {
+               // await setDoc(doc(db, "Events", eventName));
+                console.log(newEvent);
+                setEvents([...events, newEvent]); // Update local state
+                setSelectedDate(null);
+                setEventName("");
+                setStartTime("");
+                setEndTime("");
+                setSelectedDate(newEvent.date);
+            } catch (error) {
+                console.error("Error adding document: ", error);
+            }
         }
     };
  
-    const Update_Event = (eventId, newName, newStartTime, newEndTime) => {
-        const updated_Events = events.map((event) => {
-            if (event.id === eventId) {
-                return {
-                    ...event,
-                    title: newName,
-                    startTime: newStartTime,
-                    endTime: newEndTime,
-                };
-            }
-            return event;
-        });
-        setEvents(updated_Events);
+    const Update_Event = async (eventId, newName, newStartTime, newEndTime) => {
+        try {
+           /* await setDoc(doc(db, "Events", newName), 
+            {
+                title: newName,
+                startTime: newStartTime,
+                endTime: newEndTime
+            }, { merge: true }); */
+            const updatedEvents = events.map(event => {
+                if (event.id === eventId) {
+                    return { ...event, title: newName, startTime: newStartTime, endTime: newEndTime };
+                }
+                return event;
+            });
+            setEvents(updatedEvents); // Update local state
+        } catch (error) {
+            console.error("Error updating document: ", error);
+        }
     };
  
-    const Delete_Event = (eventId) => {
-        const updated_Events = events.filter((event) => event.id !== eventId);
-        setEvents(updated_Events);
+    const Delete_Event = async (eventId) => {
+        try {
+           // await deleteDoc(doc(db, "Events", eventId));
+            const updatedEvents = events.filter(event => event.id !== eventId);
+            setEvents(updatedEvents); // Update local state
+        } catch (error) {
+            console.error("Error deleting document: ", error);
+        }
     };
  
     return (
