@@ -1,20 +1,20 @@
-/*
+
 'use client';
 import React, { useState, useRef, useEffect } from 'react';
 import { useRouter } from "next/navigation";
 import './App.css';
 import { db, auth } from "@/firebase-config";
 import {
-  query,
-  orderBy,
-  where,
-  onSnapshot,
-  deleteDoc,
-  setDoc,
-  doc,  
-  collection,
-  addDoc,
-  serverTimestamp
+    query,
+    orderBy,
+    where,
+    onSnapshot,
+    deleteDoc,
+    setDoc,
+    doc,
+    collection,
+    addDoc,
+    serverTimestamp
 } from "firebase/firestore";
 import { onAuthStateChanged } from "firebase/auth";
 
@@ -33,7 +33,7 @@ const WhiteboardPage = () => {
 
         const newRenderedLines = new Set(renderedLines);
         const newLines = [];
-    
+
         const linesRef = collection(db, "whiteboards", "defaultWhiteboard", "lines");
         const q = query(linesRef, orderBy("createdAt"));
         const unsubscribe = onSnapshot(q, (snapshot) => {
@@ -171,5 +171,3 @@ const WhiteboardPage = () => {
 };
 
 export default WhiteboardPage;
-*/
-'use client';
