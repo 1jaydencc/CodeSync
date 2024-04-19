@@ -73,14 +73,20 @@ const App = () => {
     }
   }, []);
 
-  const handleDownloadAllFiles = () => {
-    const zip = new JSZip();
-    files.forEach((file) => {
-      zip.file(file.name, file.content);
-    });
-    zip.generateAsync({ type: "blob" }).then((content) => {
-      saveAs(content, "project.zip");
-    });
+  const handleDownloadCurrentFile = (index) => {
+    if (index >= 0 && index < openFiles.length) {
+      const file = openFiles[index];
+      const zip = new JSZip();
+      zip.file(file.fileName, file.content);
+      zip.generateAsync({ type: "blob" }).then((content) => {
+        saveAs(content, file.fileName);
+      });
+    }
+  };
+
+  const handleDownloadButtonClick = () => {
+    // Assuming you have a state variable to track the index of the active file
+    handleDownloadCurrentFile(activeFileIndex);
   };
 
   // In your useEffect within the React component
@@ -635,9 +641,18 @@ const App = () => {
 
               <button /* ----------------------- NEW PROJECT ----------------------- */
                 className="btn btn-neutral btn-xs"
-                onClick={handleNewProject}
+                onClick={() => {
+                  router.push("/calendar");
+                }}
               >
-                New Project
+                Calendar
+              </button>
+
+              <button /* ----------------------- FRIENDS ----------------------- */
+                className="btn btn-neutral btn-xs"
+                onClick={handleDownloadButtonClick}
+              >
+                Download
               </button>
 
               <button /* ----------------------- FRIENDS ----------------------- */
@@ -645,7 +660,7 @@ const App = () => {
                 onClick={toggleFriends}
               >
                 Friends
-              </button>
+              </button> 
 
               <button /* ----------------------- KANBAN ----------------------- */
                 className="btn btn-neutral btn-xs"
